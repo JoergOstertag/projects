@@ -23,23 +23,31 @@ if ( testDoveTail){
 // ==================================================================================================
 
 module wallBracket(){
-    bracketWidth=30;
+    count=4;
+    tailWidth=60;
+    screwDistFromBorder=5;
+    dScrew=5;
+    posFirst=screwDistFromBorder+4;
+    bracketWidth=count*tailWidth+ (2*(posFirst));
     bracketHeight=30;
-    // translate([-bracketWidth/2,0,0])
     {
         difference(){
             union(){
                 cube([bracketWidth,5,bracketHeight]);
-                translate([bracketWidth/2,-5,0])
-                    doveTailWallPart(tailWidth=bracketWidth);
+                for( i=[0:count-1] ) {
+                    translate([posFirst + tailWidth*i + tailWidth/2,-5,0])
+                        doveTailWallPart(tailWidth=bracketWidth);
+                    }
             }
 
-            dist=5;
-            for (x=[dist,bracketWidth-dist])
-                for (z=[dist,bracketWidth-dist])
-                    translate([x,-.2,z]){
+            for (x=[screwDistFromBorder,bracketWidth-screwDistFromBorder])
+                for (z=[screwDistFromBorder,bracketHeight-screwDistFromBorder])
+                    translate([x,z>screwDistFromBorder?-.1:-5,z]){
                         rotate([270,0,0])
-                            cylinder(d=3,h=10);
+                            union(){
+                                cylinder(d=dScrew,h=20);
+                                translate([0,0,0]) cylinder(d1=dScrew+3,d2=dScrew,h=2);
+                            }
                     }
                 }
             }
