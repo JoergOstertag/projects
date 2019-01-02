@@ -21,11 +21,11 @@ sensorSwitch=[12.6,6.1,5.8];
 
 // translate([30,40,0])        Sensor(additionForCutout=1);
     
-translate([90,40,10])    rotate([180,0,180])        SensorCutout();
+// translate([90,40,10])    rotate([180,0,180])        SensorCutout();
     
 // ============================================================================== 
 
-// FilemantGuideNew();
+FilemantGuideNew();
 
 // ============================================================================== 
 module  SensorCutout(additionForCutout=0){
@@ -35,7 +35,7 @@ module  SensorCutout(additionForCutout=0){
             Sensor(additionForCutout=1);
     }
 }
-
+ 
 module  Sensor(){
     
     // Sensor PCB with mounding holes
@@ -160,10 +160,9 @@ module FilemantGuideNew(){
                     translate([-22,-10,hoehe-hoeheOberePlatte])
                         cube([101,25,hoeheOberePlatte]);
                     // Hintere Stabilierung    
-                    translate([-18,-10,0])
-                        cube([37,11,hoehe]);
-                    translate([-31,-10,0])
-                        cube([25,40,hoehe]);
+                    translate([-18,-10,0]) cube([37,11,hoehe]);
+                    translate([-31,-10,hoehe-12]) cube([25,40,12]);
+//                    translate([-31,-10,0]) cube([25,40,hoehe]);
 
                     // Basis platte für Bohrlöcher
                     translate([5,0,0])
@@ -182,8 +181,8 @@ module FilemantGuideNew(){
                     }
                 
                 // Inner cutout space
-                translate([20,-7,-0.1])
-                        cube([55,46,22]);
+                translate([18,-8.5,-0.1])
+                        cube([59,49,23]);
 
                 myCurvedPipe(filled=1);
            }
@@ -193,9 +192,13 @@ module FilemantGuideNew(){
         }
 
         // Sensor Cutout
-        translate([-31,10,16])
-            rotate([0,0,-90])
-                Sensor(additionForCutout=1);
+        translate([-30,9,15.5])
+            union(){
+                rotate([0,0,-90])
+                    Sensor(additionForCutout=1);
+                translate([-0,-20,1.9])
+                    cube([20,20,10]);
+            }
 
 
         }   
