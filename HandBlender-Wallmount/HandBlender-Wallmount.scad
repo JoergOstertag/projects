@@ -10,7 +10,7 @@ if (1){
         rotate([-90,0,0])
             backPlane();
 
-//    rotate([0,180,0])
+//    rotate([0,180,0]) 
     {
         translate([0,0,-5])     holderClamp(type="mixer");
         translate([70,0,-5])    holderClampMotor(type="motor");
@@ -18,14 +18,15 @@ if (1){
 }
 
 
-testDoveTail=0;
+testDoveTail=1;
 if ( testDoveTail){
-    translate([70,-0,0]){
+    translate([190,-0,0]){
         translate([0,0,10])
-        rotate([0,180,0]) // For printing
+//        rotate([0,180,0]) // For printing
+          rotate([0,0,180]) // For printing
+        translate([-28,5,-10])
             doveTail(count=2);
 
-        translate([-30,10,0])
             doveTailWallPart(count=2);
 }
 }
@@ -109,28 +110,28 @@ module holderClamp(type="mixer"){
     
     rotate([0,0,180]){
 
-        translate([0,2,-5])
+        translate([0,2,0])
             doveTail();
             
         if(type=="mixer"){
             outerDiameter=35;
-            translate(outerDiameter*[-.5,0,0]+[0,-22,0])
-                    cube([outerDiameter,22+2,5]);
+            translate(outerDiameter*[-.5,0,0]+[0,-24,0])
+                    cube([outerDiameter,22+2,15]);
 
             translate([0,-22-outerDiameter/2,0])
                 difference(){
                     translate(outerDiameter*[-.5,-.5,0])
-                        cube([outerDiameter,outerDiameter,5]);
+                        cube([outerDiameter,outerDiameter,15]);
 
                         innerDiameter=18;
                         translate([0,0,-.01])
-                            cylinder(d=innerDiameter,h=5+.2);
+                            cylinder(d=innerDiameter,h=15+.2);
 
-                        translate([0,0,0])
-                            cylinder(d1=innerDiameter,d2=innerDiameter+10,h=5+.2);
+                        translate([0,0,5])
+                            cylinder(d1=innerDiameter,d2=innerDiameter+10,h=10+.2);
 
                         translate(innerDiameter*[-.5,-1.0,-.01])
-                            cube([innerDiameter,innerDiameter,5+.2]);
+                            cube([innerDiameter,innerDiameter,15+.2]);
                 }
         }
     }
