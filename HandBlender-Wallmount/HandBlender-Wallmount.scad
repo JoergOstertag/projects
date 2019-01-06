@@ -3,12 +3,14 @@
 
 $fn=30;
 
+tailOuterWidth=20+2*4;
+
 if (1){
     translate([-110,-70,5]) 
         rotate([-90,0,0])
-            wallBracket();
+            backPlane();
 
-    rotate([0,180,0])
+//    rotate([0,180,0])
     {
         translate([0,0,-5])     holderClamp(type="mixer");
         translate([70,0,-5])    holderClampMotor(type="motor");
@@ -18,34 +20,37 @@ if (1){
 
 testDoveTail=0;
 if ( testDoveTail){
-    translate([60,0,10])
-//        rotate([0,180,0])
-            doveTail();
+    translate([70,-0,0]){
+        translate([0,0,10])
+        rotate([0,180,0]) // For printing
+            doveTail(count=2);
 
-        doveTailWallPart();
+        translate([-30,10,0])
+            doveTailWallPart(count=2);
+}
 }
 
 // ==================================================================================================
 
-module wallBracket(){
-    count=4;
-    tailWidth=60;
+module backPlane(){
+    count=8;
+    tailWidth=tailOuterWidth;
     screwDistFromBorder=5;
     dScrew=5;
     posFirst=screwDistFromBorder+4;
     bracketWidth=count*tailWidth+ (2*(posFirst));
     bracketHeight=30;
     bracketThickness=5;
+    
     translate([0,0,bracketThickness]){
         difference(){
             union(){
                 cube([bracketWidth,bracketThickness,bracketHeight]);
-                for( i=[0:count-1] ) {
-                    translate([posFirst + tailWidth*i + tailWidth/2,-5,0])
-                        doveTailWallPart(tailWidth=bracketWidth);
-                    }
+                    translate([posFirst + tailWidth/2,-5,0])
+                        doveTailWallPart(tailWidth=bracketWidth,count=count);
             }
 
+            // Screw Holes
             for (x=[screwDistFromBorder,bracketWidth-screwDistFromBorder])
                 for (z=[screwDistFromBorder,bracketHeight-screwDistFromBorder])
                     translate([x,z>screwDistFromBorder?-.1:-5,z]){
@@ -63,9 +68,9 @@ module wallBracket(){
 
 module holderClampMotor(){
     
-    translate([0,-2,-5])
+    translate([tailOuterWidth/2,-2,0])
         rotate([0,0,180])
-            doveTail();
+            doveTail(count=2);
 
         motorDiameter=54;
         innerDiameter=41;
@@ -73,12 +78,12 @@ module holderClampMotor(){
         
         stegLength=22;
         translate(outerDiameter*[-.5,0,0]+[0,0,0])
-                cube([outerDiameter,stegLength,5]);
+                cube([outerDiameter,stegLength,15]);
 
         translate([0,stegLength,0])
             difference(){
                 translate(outerDiameter*[-.5,0,0])
-                    cube([outerDiameter,outerDiameter,5]);
+                    cube([outerDiameter,outerDiameter,15]);
 
                 translate([0,+motorDiameter/2,-.01])
                     difference(){
@@ -134,17 +139,19 @@ module holderClamp(type="mixer"){
 
 
 // ==================================================================================================
-module doveTailWallPart(){
+
+module doveTailWallPart(count=1){
     difference(){
-        translate([-30,.01,0]) cube([60,6,10+3]);
-        translate([0,0,3])         doveTail();
+        translate([-tailOuterWidth/2,.01,0]) cube([tailOuterWidth*count,6,15+3]);
+        translate([0,0,3])         doveTail(count=count);
     }
 }
     
 module doveTail(
     tailLength=4,
-    tailWidth=40,
-    tailHeight=10
+    tailWidth=12,
+    tailHeight=15,
+    count=1
     ) {
     
     x0=tailWidth/2;
@@ -152,18 +159,24 @@ module doveTail(
     xd=4;
 
     attachmentThickness=2;
-    translate([-x0+.1,-attachmentThickness,0])  cube([2*x0-.2,attachmentThickness,tailHeight]);
         
-    hull()
-        for(z=[0,1])
-            translate([0,0,z*tailHeight])
-               linear_extrude(.001){
-                    polygon([
-                        [-x0, 0], 
-                        [-x1-z*xd, tailLength],
-                        [x1+z*xd, tailLength],
-                        [x0, 0]
-                    ]);
-               }
+    for( i=[0:count-1] ) {
+        translate([ tailOuterWidth*i ,0,0])
+        union(){
+            translate([-x0+.1,-attachmentThickness,0])  cube([2*x0-.2,attachmentThickness,tailHeight]);
+
+            hull()
+                for(z=[0,1])
+                    translate([0,0,z*tailHeight])
+                       linear_extrude(.001){
+                            polygon([
+                                [-x0, 0], 
+                                [-x1-z*xd, tailLength],
+                                [x1+z*xd, tailLength],
+                                [x0, 0]
+                            ]);
+                       }
+                   }
+           }
 }
     
