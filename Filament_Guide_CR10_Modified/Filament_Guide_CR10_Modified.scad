@@ -3,7 +3,7 @@
 
 hoehe=23;
 ueberstandMotor=12;
-hoeheOberePlatte=6;
+hoeheOberePlatte=2;
 
 sensorPlatine=[20,20,2];
 sensorPlug=[10,7,6];
@@ -40,9 +40,6 @@ module FilemantGuideNew(){
                     translate([11+5,-10,0])
                     // Z-Motor Cover
                        cube([63,25,hoehe]);
-                    // Oberer Platte  durch den die Röhre geht
-
-//#                    translate([-2,-10,hoehe-hoeheOberePlatte])                        cube([80,25,hoeheOberePlatte]);
 
                     // Hintere Stabilierung    
                     translate([-18,-10,0]) cube([37,11,hoehe]);
@@ -69,7 +66,7 @@ module FilemantGuideNew(){
                 
                 // Inner cutout space
                 translate([18,-8.5,-0.1])
-                        cube([59,49,23]);
+                        cube([59,49,hoehe-hoeheOberePlatte]);
 
                 // Cutout for Filament Motor Blech
                 translate([-4,.5,0])
@@ -87,7 +84,7 @@ module FilemantGuideNew(){
         translate([-35,12,13.5])
             union(){
                 rotate([0,0,-90])
-#                    Sensor(additionForCutout=1);
+                    Sensor(additionForCutout=1);
                 translate([-2,-24,1.85])
                     cube([22,24,10]);
             }
