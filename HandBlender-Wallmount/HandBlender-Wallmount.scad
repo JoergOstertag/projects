@@ -73,12 +73,13 @@ module holderClampMotor(){
         rotate([0,0,180])
             doveTail(count=2);
 
-        motorDiameter=54;
-        innerDiameter=41;
+        motorDiameter=53;
+        innerDiameter=42;
         outerDiameter=54;
         
-        stegLength=22;
+        stegLength=12;
         translate(outerDiameter*[-.5,0,0]+[0,0,0])
+            color("blue")
                 cube([outerDiameter,stegLength,15]);
 
         translate([0,stegLength,0])
@@ -88,18 +89,18 @@ module holderClampMotor(){
 
                 translate([0,+motorDiameter/2,-.01])
                     difference(){
-                        cylinder(d=motorDiameter,h=5+.2);
+#                        cylinder(d1=innerDiameter,d2=motorDiameter,h=15+.2);
                         translate([-30,-20,-.1]) cube([60,70,6]);
                     }
                             
 //#                    translate([0,innerDiameter/2+5,-.01]) cylinder(d=innerDiameter,h=5+.2);
 
-                translate([0,innerDiameter/2+7,4-.01])
-                    rotate([30,0,0])
+  if(0)              translate([0,innerDiameter/2+7,4-.01])
+//                    rotate([30,0,0])
                         cylinder(d1=innerDiameter,d2=innerDiameter+15,h=20);
 
                     translate(innerDiameter*[-.5,.5,0]+[0,-3,-.1])
-                       cube([innerDiameter,innerDiameter,5+.2]);
+                       cube([innerDiameter,innerDiameter,15+.2]);
                 }
             
             
@@ -108,17 +109,21 @@ module holderClampMotor(){
 
 module holderClamp(type="mixer"){
     
-    rotate([0,0,180]){
-
-        translate([0,2,0])
-            doveTail();
+    translate([0,-2,0])
+        rotate([0,0,180])
+            doveTail(count=1);
             
         if(type=="mixer"){
             outerDiameter=35;
-            translate(outerDiameter*[-.5,0,0]+[0,-24,0])
-                    cube([outerDiameter,22+2,15]);
 
-            translate([0,-22-outerDiameter/2,0])
+    
+            stegLength=12;
+            translate(outerDiameter*[-.5,0,0]+[0,0,0])
+                color("blue")
+                    cube([outerDiameter,stegLength,15]);
+
+
+            translate([0,stegLength+outerDiameter/2,0]){
                 difference(){
                     translate(outerDiameter*[-.5,-.5,0])
                         cube([outerDiameter,outerDiameter,15]);
@@ -130,7 +135,7 @@ module holderClamp(type="mixer"){
                         translate([0,0,5])
                             cylinder(d1=innerDiameter,d2=innerDiameter+10,h=10+.2);
 
-                        translate(innerDiameter*[-.5,-1.0,-.01])
+                        translate(innerDiameter*[-.5,0,-.01])
                             cube([innerDiameter,innerDiameter,15+.2]);
                 }
         }
