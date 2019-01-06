@@ -89,21 +89,28 @@ module holderClampMotor(){
 
                 translate([0,+motorDiameter/2,-.01])
                     difference(){
-#                        cylinder(d1=innerDiameter,d2=motorDiameter,h=15+.2);
-                        translate([-30,-20,-.1]) cube([60,70,6]);
+                        cylinder(d=motorDiameter,h=15+.2);
+                        translate([-30,-motorDiameter/2+8,-.1]) cube([60,motorDiameter,20]);
+                    }
+
+                translate([0,+motorDiameter/2,-.01])
+                    difference(){
+                        cylinder(d1=innerDiameter,d2=motorDiameter,h=15+.2);
+                        translate([-30,-motorDiameter*1.5+8,-.1]) cube([60,motorDiameter,20]);
                     }
                             
 //#                    translate([0,innerDiameter/2+5,-.01]) cylinder(d=innerDiameter,h=5+.2);
 
-  if(0)              translate([0,innerDiameter/2+7,4-.01])
-//                    rotate([30,0,0])
-                        cylinder(d1=innerDiameter,d2=innerDiameter+15,h=20);
 
-                    translate(innerDiameter*[-.5,.5,0]+[0,-3,-.1])
-                       cube([innerDiameter,innerDiameter,15+.2]);
-                }
+                    translate(innerDiameter*[-.5,0,0]+[0,8,-.1])
+                         cube([innerDiameter,motorDiameter,15+.2]);
+            }
             
-            
+            for (x=[-motorDiameter/2+4,motorDiameter/2]){
+                translate([x+1,motorDiameter+8,15])
+                    rotate([0,-90,0])
+                        cylinder(d=10,h=6);
+            }    
         }
 
 
