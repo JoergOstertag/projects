@@ -1,6 +1,10 @@
-innerMountCube=[8,5.7,1.4];
-lowerMountPlate=[12.6,13,2.3];
-basePlateSize=[40,40,0];
+innerMountCube=[8,5.7,1.2];
+//innerMountCube=[8,5.7,1.4];
+lowerMountPlate=[12.6,13,0.6];
+//lowerMountPlate=[12.6,13,2.3];
+basePlateSize=[30,22,0];
+mountHeightHolder=[8,2.4,1.85];
+//mountHeightHolder=[8,2.4,1.6];
 
 DashCamMount();
 
@@ -17,7 +21,6 @@ module DashCamMount(){
         cubeCenterXY(lowerMountPlate);
         translate([0,0,lowerMountPlate[2]]){
             
-            mountHeightHolder=[8,2.4,1.6];
             cubeCenterXY(mountHeightHolder);
             translate([0,0,mountHeightHolder[2]*1]){
 
