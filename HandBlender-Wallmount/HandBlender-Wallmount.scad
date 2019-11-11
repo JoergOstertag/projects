@@ -3,7 +3,12 @@
 
 $fn=30;
 
-tailOuterWidth=20+2*4;
+//tailOuterWidth=20+2*4;
+tailOuterWidth=38;
+tailHeight=35;
+tailThickness=9;
+tailWidth=12;
+
 
 if (1){
     translate([-110,-70,5]) 
@@ -68,7 +73,8 @@ module backPlane(){
 
 
 module holderClampMotor(){
-    
+    clampHeight=35;
+
     translate([tailOuterWidth/2,-2,0])
         rotate([0,0,180])
             doveTail(count=2);
@@ -80,22 +86,22 @@ module holderClampMotor(){
         stegLength=12;
         translate(outerDiameter*[-.5,0,0]+[0,0,0])
             color("blue")
-                cube([outerDiameter,stegLength,15]);
+                cube([outerDiameter,stegLength,clampHeight]);
 
         translate([0,stegLength,0])
             difference(){
                 translate(outerDiameter*[-.5,0,0])
-                    cube([outerDiameter,outerDiameter,15]);
+                    cube([outerDiameter,outerDiameter,clampHeight]);
 
                 translate([0,+motorDiameter/2,-.01])
                     difference(){
-                        cylinder(d=motorDiameter,h=15+.2);
+                        cylinder(d=motorDiameter,h=clampHeight+.2);
                         translate([-30,-motorDiameter/2+8,-.1]) cube([60,motorDiameter,20]);
                     }
 
                 translate([0,+motorDiameter/2,-.01])
                     difference(){
-                        cylinder(d1=innerDiameter,d2=motorDiameter,h=15+.2);
+                        cylinder(d1=innerDiameter,d2=motorDiameter,h=clampHeight+.2);
                         translate([-30,-motorDiameter*1.5+8,-.1]) cube([60,motorDiameter,20]);
                     }
                             
@@ -103,11 +109,11 @@ module holderClampMotor(){
 
 
                     translate(innerDiameter*[-.5,0,0]+[0,8,-.1])
-                         cube([innerDiameter,motorDiameter,15+.2]);
+                         cube([innerDiameter,motorDiameter,clampHeight+.2]);
             }
             
             for (x=[-motorDiameter/2+4,motorDiameter/2]){
-                translate([x+1,motorDiameter+8,15])
+                translate([x+1,motorDiameter+8,clampHeight])
                     rotate([0,-90,0])
                         cylinder(d=10,h=6);
             }    
@@ -115,7 +121,7 @@ module holderClampMotor(){
 
 
 module holderClamp(type="mixer"){
-    
+    clampHeight=35;
     translate([0,-2,0])
         rotate([0,0,180])
             doveTail(count=1);
@@ -127,23 +133,23 @@ module holderClamp(type="mixer"){
             stegLength=12;
             translate(outerDiameter*[-.5,0,0]+[0,0,0])
                 color("blue")
-                    cube([outerDiameter,stegLength,15]);
+                    cube([outerDiameter,stegLength,clampHeight]);
 
 
             translate([0,stegLength+outerDiameter/2,0]){
                 difference(){
                     translate(outerDiameter*[-.5,-.5,0])
-                        cube([outerDiameter,outerDiameter,15]);
+                        cube([outerDiameter,outerDiameter,clampHeight]);
 
                         innerDiameter=18;
                         translate([0,0,-.01])
-                            cylinder(d=innerDiameter,h=15+.2);
+                            cylinder(d=innerDiameter,h=clampHeight+.2);
 
                         translate([0,0,5])
                             cylinder(d1=innerDiameter,d2=innerDiameter+10,h=10+.2);
 
                         translate(innerDiameter*[-.5,0,-.01])
-                            cube([innerDiameter,innerDiameter,15+.2]);
+                            cube([innerDiameter,innerDiameter,clampHeight+.2]);
                 }
         }
     }
@@ -154,16 +160,17 @@ module holderClamp(type="mixer"){
 // ==================================================================================================
 
 module doveTailWallPart(count=1){
+    tailOffset=3;
+    backThickness=4;
     difference(){
-        translate([-tailOuterWidth/2,.01,0]) cube([tailOuterWidth*count,6,15+3]);
-        translate([0,0,3])         doveTail(count=count);
+        translate([-tailOuterWidth/2,.01,0]) 
+            cube([tailOuterWidth*count,tailThickness+backThickness,35+tailOffset]);
+        translate([0,0*backThickness,tailOffset+.1])
+            doveTail(count=count);
     }
 }
     
 module doveTail(
-    tailLength=4,
-    tailWidth=12,
-    tailHeight=15,
     count=1
     ) {
     
@@ -176,7 +183,8 @@ module doveTail(
     for( i=[0:count-1] ) {
         translate([ tailOuterWidth*i ,0,0])
         union(){
-            translate([-x0+.1,-attachmentThickness,0])  cube([2*x0-.2,attachmentThickness,tailHeight]);
+            translate([-x0+.1,-attachmentThickness,0])  
+                cube([2*x0-.2,attachmentThickness,tailHeight]);
 
             hull()
                 for(z=[0,1])
@@ -184,8 +192,8 @@ module doveTail(
                        linear_extrude(.001){
                             polygon([
                                 [-x0, 0], 
-                                [-x1-z*xd, tailLength],
-                                [x1+z*xd, tailLength],
+                                [-x1-z*xd, tailThickness],
+                                [x1+z*xd, tailThickness],
                                 [x0, 0]
                             ]);
                        }
