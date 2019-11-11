@@ -19,6 +19,7 @@ if (1){
     {
         translate([0,0,-5])     holderClamp(type="mixer");
         translate([70,0,-5])    holderClampMotor(type="motor");
+//        translate([120,0,-5])     holderClamp(type="unknown");
     }
 }
 
@@ -129,7 +130,6 @@ module holderClamp(type="mixer"){
         if(type=="mixer"){
             outerDiameter=35;
 
-    
             stegLength=12;
             translate(outerDiameter*[-.5,0,0]+[0,0,0])
                 color("blue")
@@ -145,7 +145,7 @@ module holderClamp(type="mixer"){
                         translate([0,0,-.01])
                             cylinder(d=innerDiameter,h=clampHeight+.2);
 
-                        translate([0,0,5])
+                        translate([0,0,clampHeight-10])
                             cylinder(d1=innerDiameter,d2=innerDiameter+10,h=10+.2);
 
                         translate(innerDiameter*[-.5,0,-.01])
