@@ -26,12 +26,12 @@ zapfenOffset=[0,-2.1,0];
 arretierLasche=[6,backOuterSize[1]/2,2.5];
 
 $fn=18;
-debugShow=0;
+debugShow=1;
 
 // ---------------------- Examples ----------------------
 
 if (debugShow){
-    translate([0,0,0]) Stecker();
+color("brown")    translate([0,0,0]) Stecker();
     translate([50,0,0]) SteckerHaelfte(side=0);
     translate([100,0,0]) SteckerHaelfte(side=1);
     translate([0,50,0]) Buchse(side=1);
