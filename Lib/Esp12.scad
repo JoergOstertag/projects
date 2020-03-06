@@ -5,6 +5,43 @@ grundPlatineZ=0.7;
 
 ESP12();
 
+
+translate([50,0,0]) WemosD1Mini();
+
+module WemosD1Mini(){
+    // PCB
+    pcb=[26.2,34.5,1.9];
+    difference(){
+        cube(pcb);
+        
+        // cut out Reset Switch
+        resetSW=[2.3,7.0,3+.1];
+        translate(-0.01*[1,1,1])
+            cube(resetSW);
+
+        for (x=[1.4,pcb[0]-1.4])
+            for (y=[8.3:2.45:28.0])
+                translate([x,y,-.1])
+                    color("silver")
+                        cylinder(r=1,h=4);
+    }
+    
+    // ICs
+    translate([4.5,10,-1.3])
+        color("silver")
+            cube([17.6,14.7,1.3]);
+
+    // USB Plug
+    translate([8.8,0,-2.7])
+        color("silver")
+            cube([7.6,5.5,2.7]);
+    
+    translate([grundPlatineY+4.7,10,1.6])
+        rotate([0,0,90])
+            ESP12();
+
+}
+
 module ESP12(){
     ESP12GrundPlatte();
     translate([1.4,(grundPlatineY-12)/2,grundPlatineZ])

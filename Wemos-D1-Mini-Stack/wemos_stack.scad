@@ -83,7 +83,7 @@ numberOfBaseMountingClips=4;
 showExamples=false;
 
 // show each Tape once
-showAllOnce=false;
+showAllOnce=true;
 
 // ---------------------------------------------------------------------------------------------------------
 // do not need to modify anything below here
@@ -492,8 +492,10 @@ module  base(
 
 
             difference () {
-                    // Set Outer Base level to -wallThickness. So coordinate zero is at front lower inner corner.
-                    // So we can measure all other Heights and positions from the front corner of the Wemos PCB (-2mm)
+                    // Set Outer Base level to -wallThickness. 
+                    // So coordinate zero is at front lower inner corner.
+                    // So we can measure all other Heights and positions 
+                    // from the front corner of the Wemos PCB (-2mm)
                     translate(-wallThickness*[1,1,1]) 
                         cube([outerSizeX, outerSizeY, outerSizeZ]); 
                     translate([-1,-1,0]*printerWobble)
