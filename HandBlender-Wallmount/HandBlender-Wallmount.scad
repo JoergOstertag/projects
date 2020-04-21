@@ -18,12 +18,13 @@ placeForPrint=0;
 placeForPrint0=(1-placeForPrint);
 
 if (showAllMain){
+        translate([0,-60,-5])
         rotate([placeForPrint*-90,0,0])
             backPlane();
 
     {
-        translate([0,60,-5])     holderClamp(type="mixer");
-        translate([70,60,-5])    holderClampMotor(type="motor");
+        translate([0,0,-5])     holderClamp(type="mixer");
+        translate([70,0,-5])    holderClampMotor(type="motor");
 //        translate([120,0,-5])     holderClamp(type="unknown");
     }
 }
@@ -90,7 +91,7 @@ module backPlane(){
 module holderClampMotor(){
     clampHeight=35;
 
-    translate([tailOuterWidth/2,-2,0])
+    translate([tailOuterWidth/2,0,0])
         rotate([0,0,180])
             doveTail(count=2);
 
@@ -137,7 +138,6 @@ module holderClampMotor(){
 
 module holderClamp(type="mixer"){
     clampHeight=35;
-    translate([0,-2,0])
         rotate([0,0,180])
             doveTail(count=1);
             
