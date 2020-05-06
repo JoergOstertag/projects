@@ -11,23 +11,40 @@ tailWidth=12;
 tailAttachmentThickness=3;
 tailThicknessTotal=tailAttachmentThickness+tailThickness;
 
+placeForPrint=1;
+
 testDoveTail=0;
-showAllMain=1;
-placeForPrint=0;
+showAllMain=0;
+showBackplane=0;
+showMotor=0;
+showMixer=0;
+showQuirl=1;
 
 placeForPrint0=(1-placeForPrint);
 
 if (showAllMain){
-        translate([0,-60,-5])
+    showBackplane=1;;
+    showMotor=1;
+    showMixer=1;
+    showQuirl=1;
+}
+
+if (showBackplane)
+        translate([0,-60,16])
         rotate([placeForPrint*-90,0,0])
             backPlane();
 
-    {
+if (showMixer)
         translate([0,0,-5])     holderClamp(type="mixer");
-        translate([70,0,-5])    holderClampMotor(type="motor");
+
+if (showQuirl)
+        translate([0,0,-5])     holderClamp(type="quirl");
+
+if (showMotor)
+    translate([70,0,-5])    holderClampMotor(type="motor");
 //        translate([120,0,-5])     holderClamp(type="unknown");
-    }
-}
+    
+
 
 
 if ( testDoveTail ){
@@ -76,7 +93,7 @@ module backPlane(){
                     //cube([12,bracketThickness,bracketHeight]);
                     for (z=[screwDistFromBorder,bracketHeight-screwDistFromBorder])
 //                        translate([x,z>screwDistFromBorder?-.1:-5,z]){
-#                         translate([x,-.1,z]){
+                         translate([x,-.1,z]){
                             rotate([270,0,0])
                                 union(){
                                     cylinder(d=dScrew,h=20);
@@ -137,34 +154,64 @@ module holderClampMotor(){
 
 
 module holderClamp(type="mixer"){
-    clampHeight=35;
-        rotate([0,0,180])
-            doveTail(count=1);
-            
-        if(type=="mixer"){
-            outerDiameter=35;
+/*
+    outerDiameter= ( type == "quirl" ) ? 50:35;
+    innerDiameter= ( type == "quirl" ) ? 20:35;
+*/
+    innerCone1D1= ( type == "quirl" ) ? 42:35;
+    innerCone1D2= ( type == "quirl" ) ? 50:35;
+    innerCone1H= ( type == "quirl" ) ? 18:18;
 
-            stegLength=12;
-            translate(outerDiameter*[-.5,0,0]+[0,0,0])
-                color("blue")
-                    cube([outerDiameter,stegLength,clampHeight]);
+    innerCone2D1= ( type == "quirl" ) ? 20:35;
+    innerCone2D2= innerCone1D1;
+    innerCone2H= ( type == "quirl" ) ? 10:18;
+
+    outerDiameter= innerCone1D2+2*5;
+    innerDiameter= ( type == "quirl" ) ? 20:35;
+    
+    clampHeight=innerCone1H+innerCone2H+8;
+    
+    rotate([0,0,180])
+        doveTail(count=1);
+        
+    if( ( type=="mixer" ) || ( type=="quirl" ) ){
+
+        stegLength=12;
+        translate(outerDiameter*[-.5,0,0]+[0,0,0])
+            color("blue")
+                cube([outerDiameter,stegLength,clampHeight]);
 
 
-            translate([0,stegLength+outerDiameter/2,0]){
-                difference(){
-                    translate(outerDiameter*[-.5,-.5,0])
-                        cube([outerDiameter,outerDiameter,clampHeight]);
+        translate([0,stegLength+outerDiameter/2,0]){
+            difference(){
+                translate(outerDiameter*[-.5,-.5,0])
+                    cube([outerDiameter,outerDiameter,clampHeight]);
 
-                        innerDiameter=18;
-                        translate([0,0,-.01])
-                            cylinder(d=innerDiameter,h=clampHeight+.2);
+                // Central cylinder cutout
+                translate([0,0,-.01])
+                    cylinder(d=innerDiameter,h=clampHeight+.2);
+                // Central cutout to front
+                translate(innerDiameter*[-.5,0,-.01])
+                    cube([innerDiameter,2*innerDiameter,clampHeight+2]);
 
-                        translate([0,0,clampHeight-10])
-                            cylinder(d1=innerDiameter,d2=innerDiameter+10,h=10+.2);
+                translate([0,0,clampHeight-innerCone1H])
+                    cylinder(d1=innerCone1D1,d2=innerCone1D2,h=innerCone1H+.2);
 
-                        translate(innerDiameter*[-.5,0,-.01])
-                            cube([innerDiameter,innerDiameter,clampHeight+.2]);
+                translate([0,0,clampHeight-innerCone1H-innerCone2H])
+                    cylinder(d1=innerCone2D1,d2=innerCone2D2,h=innerCone2H+.2);
+                    
+/*
+                translate([0,0,clampHeight-10])
+                    cylinder(d1=innerCone2D1,d2=innerCOne2D2,h=10+.2);
+*/
+                
+                
+                
+                if( (type=="no-quirl") ){
+                        translate([outerDiameter*-.5-.1,0,-5])
+                            cube([outerDiameter+.2,innerDiameter*2,clampHeight]);
                 }
+            }
         }
     }
 }
