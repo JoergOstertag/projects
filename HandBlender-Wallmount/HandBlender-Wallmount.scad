@@ -18,7 +18,8 @@ showAllMain=0;
 showBackplane=0;
 showMotor=0;
 showMixer=0;
-showQuirl=1;
+showMixerBlade=1;
+showQuirl=0;
 
 placeForPrint0=(1-placeForPrint);
 
@@ -30,12 +31,12 @@ if (showAllMain){
 }
 
 if (showBackplane)
-        translate([0,-60,16])
+        translate([0,-80,16])
         rotate([placeForPrint*-90,0,0])
             backPlane();
 
 if (showMixer)
-        translate([0,0,-5])     holderClamp(type="mixer");
+        translate([-70,0,-5])     holderClamp(type="mixer");
 
 if (showQuirl)
         translate([0,0,-5])     holderClamp(type="quirl");
@@ -44,6 +45,8 @@ if (showMotor)
     translate([70,0,-5])    holderClampMotor(type="motor");
 //        translate([120,0,-5])     holderClamp(type="unknown");
     
+if (showMixerBlade)
+        translate([140,0,-5])     holderClamp(type="mixerBlade");
 
 
 
@@ -153,6 +156,41 @@ module holderClampMotor(){
         }
 
 
+module holderClampMixerBlade(){
+    scheibeT = 5   + 3 ; // Thickness Cutting Blade
+    scheibeD = 160 + 4 ; // DIameter Cutting Blade
+
+    maxZ = 40;
+    
+    scheibeNobbeH = 18;
+    scheibeNobbeD = 28 + 3;
+    scheibeCenterY = scheibeD/2+20;
+    scheibeCenterZ = maxZ -10; 
+    
+    maxX = 2*scheibeNobbeH+4;
+    maxY = scheibeCenterY+scheibeNobbeD+10;
+    
+    difference(){
+        translate([maxX*-.5,0,0])
+            cube([maxX,maxY,maxZ]);
+
+        // cutout for nobbe of cutting Blade
+        translate([0,scheibeCenterY,scheibeCenterZ])
+            rotate([0,-90,0])
+                cylinder(d=scheibeNobbeD, h=scheibeNobbeH*2 + scheibeT, center=true);
+
+        // cutout for Cutting Blade
+        translate([0,scheibeCenterY,scheibeCenterZ])
+            rotate([0,-90,0])
+                cylinder(d=scheibeD, h=scheibeT, center=true);
+
+        // cutout above Nobbe
+        translate([-maxX/2,scheibeCenterY-scheibeNobbeD/2,scheibeCenterZ])
+                cube([maxX, scheibeNobbeD, maxZ]);
+
+    }
+}
+
 module holderClamp(type="mixer"){
 /*
     outerDiameter= ( type == "quirl" ) ? 50:35;
@@ -166,7 +204,12 @@ module holderClamp(type="mixer"){
     innerCone2D2= innerCone1D1;
     innerCone2H= ( type == "quirl" ) ? 10:18;
 
-    outerDiameter= innerCone1D2+2*5;
+
+    if( type == "mixerBlade" ){
+         outerDiameter=22;
+    } else {
+        outerDiameter= innerCone1D2+2*5;
+    }
     innerDiameter= ( type == "quirl" ) ? 20:35;
     
     clampHeight=innerCone1H+innerCone2H+8;
@@ -174,15 +217,20 @@ module holderClamp(type="mixer"){
     rotate([0,0,180])
         doveTail(count=1);
         
-    if( ( type=="mixer" ) || ( type=="quirl" ) ){
 
-        stegLength=12;
-        translate(outerDiameter*[-.5,0,0]+[0,0,0])
-            color("blue")
-                cube([outerDiameter,stegLength,clampHeight]);
+    stegLength=12;
+    translate(outerDiameter*[-.5,0,0]+[0,0,0])
+        color("blue")
+            cube([outerDiameter,stegLength,clampHeight]);
+    
+    translate([0,stegLength+outerDiameter/2,0]){
 
-
-        translate([0,stegLength+outerDiameter/2,0]){
+        if( ( type == "mixerBlade" ) ){
+            translate(outerDiameter*[0,-.5,0])
+                holderClampMixerBlade(clampHeight=clampHeight);
+        }
+        
+        if( ( type == "mixer" ) || ( type=="quirl" ) ){
             difference(){
                 translate(outerDiameter*[-.5,-.5,0])
                     cube([outerDiameter,outerDiameter,clampHeight]);
@@ -207,7 +255,7 @@ module holderClamp(type="mixer"){
                 
                 
                 
-                if( (type=="no-quirl") ){
+                if( (type == "no-quirl") ){
                         translate([outerDiameter*-.5-.1,0,-5])
                             cube([outerDiameter+.2,innerDiameter*2,clampHeight]);
                 }
