@@ -17,11 +17,11 @@ wallThicknessXYZ2=wallThicknessXYZ*2;
 // ---------------------------------------------------------------------------------------------------------
 /* [Hidden] */
 
-printerWobble=0.501;
+printerWobble=0.01;
 printerWobbleXY=printerWobble*[1,1,0];
 printerWobbleXYZ=printerWobble*[1,1,1];
 printerWobbleXYZ2=printerWobbleXYZ*2;
-$fn=20;
+$fn=45;
 numberOfBaseMountingClips=4;
 
 // Main
@@ -63,7 +63,11 @@ module UltrasonicHousing(){
                      text("T", ,size=6,halign="left");
 	         translate([41.3,0,0]) linear_extrude(height = 1.5) 
                      text("R", ,size=6,halign="left");
-         } 
+         }
+         
+         // cutout for Pins
+        translate([17.5,-10,-2.1])
+            cube([11,11,3.5]); 
 	}	
 }
 
