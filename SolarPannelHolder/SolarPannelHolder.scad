@@ -18,7 +18,8 @@ wireBoxOffsetZ=10-.5;
 borderBase=2; // Border in every direction
 borderX=4+borderBase+cutOutDifference;
 borderY=0+borderBase+cutOutDifference;
-borderZ=21+borderBase+cutOutDifference;
+borderZ=2+borderBase+cutOutDifference;
+baseZ=pannelZ;
 
 if(showPannelInHolder){
 
@@ -60,8 +61,9 @@ module SolarPannel(cutOut=0){
                 +cutReduceBorder*[1,0,1]
 //                + cutOutAdd*[1,1,1]
                 )
-                 cube( [pannelX,cutFreeY,.5*pannelZ]
-                    - 2*cutReduceBorder*[1,0,0]);
+                 cube( [pannelX,cutFreeY,pannelZ]
+                    - 2*cutReduceBorder*[1,0,0]
+                      +[0,22,0]);
             
 /*
             translate([0,-cutFreeY-pannelY-.2,-cutOutAdd]
@@ -73,6 +75,14 @@ module SolarPannel(cutOut=0){
                     - 2*cutReduceBorder*[1,0,1]);
 */
             }
+            
+        // Pannel wire attachments
+        if ( cutOut ){
+            for(x=[22,75])
+             translate([x,2,0] )
+                     cube( [10,3,15]);
+            
+        }
         
         translate([0,0,wireBoxOffsetZ]){
             // Wire Box
@@ -104,7 +114,7 @@ module SolarPannelHolder(){
         holderZ=wireBoxZ+borderZ+wireBoxOffsetZ-5;
 
         translate(-[borderX,borderY,borderZ])
-            cube([pannelX,pannelY+wireBoxY,holderZ-borderZ]
+            cube([pannelX,pannelY+wireBoxY,holderZ+baseZ]
                 +2*[borderX,borderY,borderZ]);
 
         SolarPannel(cutOut=1);
@@ -112,7 +122,7 @@ module SolarPannelHolder(){
         // For saving Material cut out a lot in the back
         translate([-.1,0,0]
             +[-borderX*0,pannelY+borderY,borderZ])
-            cube([pannelX,pannelY+wireBoxY,holderZ-borderZ]
+            cube([pannelX,pannelY+wireBoxY,holderZ-borderZ+pannelZ]
                 +2*[borderX*0,borderY,borderZ]
                 +[.2,0,0]);
      
