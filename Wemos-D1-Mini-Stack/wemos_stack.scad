@@ -29,6 +29,7 @@
 // Final height of the stack measured when placing the sole stack on a flat surface.
 //innerHeightZ = 58.7;
 innerHeightZ = 18.4;
+//innerHeightZ = 6.4;
 
 
 /* [Shield Ports] */
@@ -62,28 +63,30 @@ showBase=true;
 lidHasVisiblePinoutSlits=false;
 
 // The lid should contain a cutout connecting the PINs
-lidCutOutType="LED"; // [ LCD:LCD Shield , DHT:Dht Shield,DHThorizontal:Dht Shield, BUTTON:Button Shield , NONE:No cutout]
+lidCutOutType="LCD"; // [ :LCD Shield , DHT:Dht Shield,DHThorizontal:Dht Shield, BUTTON:Button Shield , NONE:No cutout]
 
 // Do you want the Lid to show up
-showLid=true;
+showLid=false;
 
 //Side and Front slits for letting warm air out
 airSlits=true;
 
 /* [Others] */
 wallThickness = 1.8;
+wallThickness = 1.1;
 
 // cut through at Bottom for Pins
 bottomHasPinoutSlits=true;
 
 // Add mounting clips with screw holes a bottom
 numberOfBaseMountingClips=4;
+numberOfBaseMountingClips=0;
 
 // show some Examples
 showExamples=false;
 
 // show each Tape once
-showAllOnce=true;
+showAllOnce=false;
 
 // ---------------------------------------------------------------------------------------------------------
 // do not need to modify anything below here
