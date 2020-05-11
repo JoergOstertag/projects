@@ -11,7 +11,7 @@ and counts down from 20seconds to zero.
 
 Displaing the timer is done with a standard Servo
 
-![Example Image](images/in-housing.jpg =300x200)
+![Example Image](images/in-housing.jpg =100x)
 
 ![Video](images/HandWashTimerServo.mp4)
 
