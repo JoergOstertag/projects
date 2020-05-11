@@ -1,9 +1,13 @@
-use <../LibExternal/Triangles.scad>;
+// use <../LibExternal/Triangles.scad>;
+// use <MCAD/shapes/triangles.scad>;
+use <MCAD/triangles.scad>;
+
+debug=0;
 
 wemosD1Mini=[26+2,36+2,12];
 wemosD1ExperimentBoard=[0,0,13];
 
-servoSize=[30,20,14+1];
+servoSize=[32,20,14+1];
 
 border=2;
 
@@ -25,16 +29,22 @@ numberOfBaseMountingClips=4;
 
 // Main
 HandWashTimerHousing();
-// translate([-90,0,0]) wemosCutout();
+translate([0,90,0]) bottomLid(cutout=0);
+
+
+if ( debug ) {
+    translate([-60,0,0]) wemosCutout();
+    translate([-120,0,0])  servoCutout();
+}
 
 module HandWashTimerHousing(){
 
     connectionHeight=10;
     offsetX=9.5;
 
-    outerSize=[ 0*wemosD1Mini[0] + 1*servoSize[0] + 2*border,
+    outerSize=[                    1*servoSize[0] + 2*border,
                 1*wemosD1Mini[1] + 1*servoSize[1] + 2*border,
-                1*wemosD1Mini[2] + 0*servoSize[2] + 2*border
+                1*wemosD1Mini[2] +                + 2*border
                     +wemosD1ExperimentBoard[2]
                 ]
                +[offsetX+5.5,3,0];
@@ -43,12 +53,16 @@ module HandWashTimerHousing(){
         cube(outerSize);
         
         translate( border * [1,1,-.01] 
-                  + [offsetX,servoSize[1],0])
+                  + [offsetX,servoSize[1],0]) {
             wemosCutout();
-            
+            // Lid at bottom cutout
+            translate(border*[-1,-1,.5])
+                bottomLid(cutout=1);
+    }
         // Servo cutout
-        translate([-.1,-.1,border])
+        translate([14-.1,-.1,border])
             servoCutout();
+        
         
     }
 
@@ -63,7 +77,13 @@ module HandWashTimerHousing(){
             outerSize= outerSize);
 	
     }
-    
+        
+module bottomLid(cutout=0){
+    cube([wemosD1Mini[0],wemosD1Mini[1],1]
+        +cutout*[1,11,1]
+    );
+}
+
 module wemosCutout(){
         height=wemosD1Mini[2]
             +wemosD1ExperimentBoard[2];
@@ -74,26 +94,34 @@ module wemosCutout(){
         
         // Usb Cutout
         translate([6,31,-3])
-            cube([14,15,9+4]);
+            cube([14,15,9+4]); 
 
         // SC04 4-Pin Plug cutout
+        // y direction is larger so we can slide in the SR04
         translate([6,3,height])
-            cube([14,6,15]);
+            cube([14,16,15]);
 
         // Servo cable cutout
         translate([-4+.01,1,-1])
             cube([4,5,height]);
-        translate([-14+.01,1,-1])
-            cube([14,5,5]);
+        translate([-1+.01,-11,4])
+            cube([6,15,12]);
 
 }
     
 module servoCutout(){
     cube(servoSize);
         
-    // cable cutout
-     translate([-2,servoSize[1]-4.5-5,1])
-        cube([5,5,15]);
+    // cable cutout side part
+    translate([-12-.1 , 2*border , 2])
+        cube([12,20,11]);
+    
+    
+    // cable cutout back part
+    translate([-2-.1,servoSize[1]-4.5-5,7])
+        cube([12,14,4]);
+
+
 }
 
 // Modules
@@ -133,14 +161,7 @@ module UltrasonicHousing(){
                 translate([x,0,wallThickness+innerCutout[2]/2])
                     rotate([-90,0,0])
                         cylinder(d=diameter,h=12.3);
-
-
-}
-
-
-	
-
-    
+    }
 }
 
 
@@ -160,7 +181,7 @@ module BaseMountingClips(numberOfBaseMountingClips=4,outerSize){
     for( x=[0,outerSizeX]){
         for( y=yRange){
             translate([x,y,0])
-    	    rotate([0,0,(x>0.01?-90:90)])
+    	    rotate([0,0,(x > 0.01?-90:90)])
     	        BaseMountingClip(
                     diameterBaseClipHoles=diameterBaseClipHoles,
                     x=x,y=y);
@@ -196,7 +217,8 @@ module BaseMountingClip(diameterBaseClipHoles=3){
         for(x=[0,sizeBaseMountX-reinforcementX])
        		translate([x,0,sizeBaseMountZ])
        			rotate([90,0,90]) 
-       				Right_Angled_Triangle(a=2, b=sizeBaseMountY,height=reinforcementX);
+       				Right_Angled_Triangle(a=2, 
+                            b=sizeBaseMountY,height=reinforcementX);
        
 
         
