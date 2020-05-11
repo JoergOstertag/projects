@@ -11,7 +11,7 @@ and counts down from 20seconds to zero.
 
 Displaing the timer is done with a standard Servo
 
-![Image of timer in housing]("images/in-housing.jpg")
+![Example Image](images/in-housing.jpg)
 
 There a different source Codes available.
 The minimal Version is stripped of to almost the minimum. This way you can see that not really much is needed to get it working.
