@@ -32,6 +32,9 @@ difference(){
 //translate([0,90,0]) bottomLid(cutout=0);
 //wemosCutout();
 // neoPixelCutout();
+translate([70,debug*20,31.7])
+    bottomLid()
+
 
 if ( debug ) {
     translate([-60,0,0]) wemosCutout();
@@ -79,21 +82,23 @@ module HandWashTimerHousing(){
                   + borderX*[1,0,0]) 
             wemosCutout();
 
-    /*
-        translate( border*[0,-1,0]
-                    + [offsetX,wemosD1Mini[1] -2 ,-.01 ]
+        // Cutout for Neopixel Cable
+        translate( border*[1,0,0]
+                    + [offsetX + wemosD1Mini[0]/2-4,
+                    wemosD1Mini[1] +2-.1 ,18-.01 ]
                 ) 
-            backLid(cutout=1);
-    */
+            cube([16,border+2,10]);
+
         // remove border bottom
-        translate([borderX+border,border,-.1])
-            cube([wemosD1Mini[0],wemosD1Mini[1],border]
-                +.2*[1,1,1]);
-       
+        translate([borderX,0,-.1]
+                    +border*[0,1,0]
+                    +addSpace*[-1,-1,0])
+            bottomLid(cutOut=1);
+
         // remove border back
-        translate([borderX+border,wemosD1Mini[1]+border,-.1])
-            cube([wemosD1Mini[0],2,border-5
-                    + wemosD1Mini[2]+wemosD1ExperimentBoard[2]]
+        translate([borderX+border,wemosD1Mini[1]+border,-.1])   
+            cube([wemosD1Mini[0],2,border
+                    + wemosD1Mini[2]+0.5*wemosD1ExperimentBoard[2]]
                 +.2*[0,1,1]);
         }
 
@@ -113,6 +118,14 @@ module HandWashTimerHousing(){
             outerSize= outerSize);
 	
     }
+
+
+module bottomLid(cutOut=0){
+    cube(
+        [wemosD1Mini[0],wemosD1Mini[1],border]
+        +border*[2,2,1]
+        +cutOut*addSpace*[2,2,2]);
+}
 
 module backLid(cutout=0){
     cube([  wemosD1Mini[0] + 2*border,
