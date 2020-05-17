@@ -39,10 +39,6 @@ Adafruit_NeoPixel pixels(NUM_PIXELS, D4, NEO_GRB | NEO_KHZ800);
 UltraSonicDistanceSensor distanceSensor(SR04_TRIGGER, SR04_ECHO);
 
 
-
-// Global variable for time left in seconds
-double timeLeft     = 0.0;
-
 // Time for complete countdown in seconds
 #define WASH_TIME_SEC 20.0
 
@@ -54,6 +50,9 @@ double timeLeft     = 0.0;
 
 // Delay for each loop
 #define DELAY 1000.0*(TIMER_STEPS-TIME_MEASURING)
+
+// Global variable for time left in seconds
+double timeLeft     = 0.0;
 
 
 void setup () {
@@ -79,18 +78,23 @@ void initColors(uint32_t color) {
 
 void showDistance(double distance) {
 
+  // Only show Distance if not in Timer mode
   if ( timeLeft > 0.0){
     return;
   }
   uint32_t color1 = pixels.Color(0, 1, 0);
   uint32_t color2 = pixels.Color(0, 0, 20);
   
+  int pixelNumMin = (int)(DISTANCE_TIMER_START-DISTANCE_TIMER_RESET)/3;
+  int pixelNumMax = (int)(distance-DISTANCE_TIMER_RESET)/3;
   for (int i = 0; i < NUM_PIXELS; i++) {
-    pixels.setPixelColor(i, color1);
+    if ( i >= pixelNumMin && i <= pixelNumMax ){
+      pixels.setPixelColor(i, color2);
+    } else {
+      pixels.setPixelColor(i, color1);
+    }
   }
 
-  int pixelNum = (int)(distance-DISTANCE_TIMER_RESET)/3;
-  pixels.setPixelColor(pixelNum, color2);
   pixels.show();
 }
 
@@ -112,12 +116,22 @@ boolean isTimerActive(){
 void decrementTimeLeft(){
   
     if ( timeLeft > 0.0 ){
-       setColors( (int)timeLeft-1 , pixels.Color(10, 0, 0) , pixels.Color(0, 10, 0));
+       int numLeds = (int)( timeLeft/WASH_TIME_SEC*       NUM_PIXELS);
+       setColors( numLeds , pixels.Color(10, 0, 0) , pixels.Color(0, 10, 0));
 
        delay(1000*TIMER_STEPS);
        
        timeLeft -= TIMER_STEPS;
 
+      if ( timeLeft <=0){
+        // Flash LEDs when ready
+        for ( int i=0; i<3; i++) {
+          setColors(NUM_PIXELS, pixels.Color(0, 100, 0) , pixels.Color(0, 0, 0));
+          delay(80);
+          setColors(NUM_PIXELS, pixels.Color(0, 0, 0) , pixels.Color(0, 0, 0));
+          delay(80);
+        }
+      }
     }
 }
 
