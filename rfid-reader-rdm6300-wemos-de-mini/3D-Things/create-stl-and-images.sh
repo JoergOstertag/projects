@@ -29,18 +29,22 @@ cp "$scadFile" "Archiv/wemos_stack-${date}.scad"
 function generateStl {
 	echo "--------------------------------------------------------------------------------"
 	echo
-	echo "$@"
+	# echo "$@"
 	partNumber="$1"
 	shift 1
-	$scadBin "$scadFile" -o "$fileName-part-$partNumber.stl" -D "part=$partNumber" -D 'debug=0' "$@"
-	$scadBin "$scadFile" -o "$fileName-part-$partNumber.png" -D "part=$partNumber" -D 'debug=0' "$@"
+	name="$1"
+	shift 1
+	echo "Generate '$fileName-part-$partNumber-$name.stl'"
+	$scadBin "$scadFile" -o "$fileName-part-$partNumber-$name.stl" -D "part=$partNumber" -D 'debug=0' "$@"
+	$scadBin "$scadFile" -o "$fileName-part-$partNumber-$name.png" -D "part=$partNumber" -D 'debug=0' "$@"
 }  
 
 function generateAllFiles {
-    generateStl 1 "$@"
-    generateStl 2 "$@"
-    generateStl 3 "$@"
-#    generateStl 4 "$@"
+    grep -e 'part=.*\[' < "$scadFile" | \
+    	 perl -pe 's/.*\[//;s/\].*//; s/:/ /gs; s/,/\n/gs' | \
+	 while read number name; do
+	 generateStl $number "$name" "$@"
+    done
 }
 
 # ==================================================================
