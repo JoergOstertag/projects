@@ -22,9 +22,6 @@ if ! [ -s "$scadFile" ]; then
 	echo "!!!!!!!! ERROR: missing FIle $scadFile"
 	exit;
 fi
-mkdir -p Archiv
-cp "$scadFile" "Archiv/wemos_stack-${date}.scad"
-
 
 function generateStl {
 	echo "--------------------------------------------------------------------------------"
@@ -35,8 +32,9 @@ function generateStl {
 	name="$1"
 	shift 1
 	echo "Generate '$fileName-part-$partNumber-$name.stl'"
-	$scadBin "$scadFile" -o "$fileName-part-$partNumber-$name.stl" -D "part=$partNumber" -D 'debug=0' "$@"
-	$scadBin "$scadFile" -o "$fileName-part-$partNumber-$name.png" -D "part=$partNumber" -D 'debug=0' "$@"
+	$scadBin "$scadFile" -o "stl/$fileName-part-$partNumber-$name.stl" -D "part=$partNumber" -D 'debug=0' "$@"
+	echo "Generate '$fileName-part-$partNumber-$name.png'"
+	$scadBin "$scadFile" -o "stl/$fileName-part-$partNumber-$name.png" -D "part=$partNumber" -D 'debug=0' "$@"
 }  
 
 function generateAllFiles {
@@ -48,17 +46,13 @@ function generateAllFiles {
 }
 
 # ==================================================================
-mkdir -p Upload
-perl -p \
-	-e 's/debug=.+?;/debug=0;/;' \
-	< "$scadFile" \
-	> "Upload/$scadFile"
+mkdir -p Archiv
+cp "$scadFile" "Archiv/wemos_stack-${date}.scad"
 
-(
-	cd Upload 
-	mkdir Old
-	mv *.stl Old
-	mv *.png Old
-	generateAllFiles
-)
+mkdir -p stl
+rm -f stl/*.stl
+rm -f stl/*.png
+
+generateAllFiles
+
 
