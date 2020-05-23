@@ -18,7 +18,9 @@ Entwicklungs Umgebung
 ---------------------
 Links to descriptions of how to install the Development Environment,
 
- - [Anleitung zur Installation der Entwicklungsumgebung](https://makesmart.net/esp8266-d1-mini-programmieren/) In der Kurzfassung:
+ - [Anleitung zur Installation der Entwicklungsumgebung](https://makesmart.net/esp8266-d1-mini-programmieren/)
+
+In der Kurzfassung:
    + Download der [Arduino Entwicklungsumgebung](https://www.arduino.cc/en/Main/Software)
    + Unter Voreinstellungen setzen der zusätzliche Boardverwalter URLs:
      https://arduino.esp8266.com/stable/package_esp8266com_index.json
@@ -43,26 +45,46 @@ Pinout:
  - [Suche nach Wemos D1 Pinout](https://duckduckgo.com/?q=wemos+d1+pinout&t=canonical&iar=images&iax=images&ia=images)
    Die Pinbelegungen zu den Wemos Chips sind durch eine einfache Suche zu finden:
 
-{|
-|+
-! Pin
-! Function
-! ESP-8266 Pin
-|-
-| A0 	| Analog input, max 3.2V 	A0
-D0 	IO 	GPIO16
-D1 	IO, SCL 	GPIO5
-D2 	IO, SDA 	GPIO4
-D3 	IO, 10k Pull-up 	GPIO0
-D4 	IO, 10k Pull-up, BUILTIN_LED 	GPIO2
-D5 	IO, SCK 	GPIO14
-D6 	IO, MISO 	GPIO12
-D7 	IO, MOSI 	GPIO13
-D8 	IO, 10k Pull-down, SS 	GPIO15
-G 	Ground 	GND
-5V 	5V 	-
-3V3 	3.3V 	3.3V
-}
+ | Pin |ESP Pin | Additional Function    | Wemos Shields         |
+ |-----|--------|------------------------|-----------------------|
+ | A0  | A0	| Analog input, max 3.2V |			|
+ | D0  | GPIO16	|		    	 | Wake 	        |
+ | D1  | GPIO5	| SCL(I²C) 		 | Wemos Relay Shield    |
+ | D2  | GPIO4	| SDA(I²C)		 | 
+ | D3  | GPIO0	| 10k Pull-up 		 | Wemos Button Shield   |
+ | D4  | GPIO2	| 10k Pull-up, BUILTIN_LED  | 	       		|
+ | D5  | GPIO14	| SCK 	       		 | Default SCL of Wire.h; Default SCLK of SPI
+ | D6  | GPIO12	| MISO(SPI) 		 | 
+ | D7  | GPIO13	| MOSI(SPI) 		 | 
+ | D8  | GPIO15	| 10k Pull-down, SS(SPI) |
+ | G   | GND	| Masse 		 |
+ | 5V  | 5V 	| 5V 			 |
+ | 3V3 | 3.3V 	| 3.3V		 	 |
+
+Die Pins D0-D8 können standard mäßig als DIgital In/DIgital Out pins verwendet werden.
+
+Anschlussmöglichkeiten:
+-----------------------
+
+Es gibt verschiedene Möglichkeiten andere Devices an zu schliessen.
+
+ - [I²C Interface](https://de.wikipedia.org/wiki/I%C2%B2C)
+  uses 2 pins, data and clock.
+  https://en.wikipedia.org/wiki/I²C
+
+    SDA: Serial Data Line (D2/GPIO4 on the Wemos D1 Mini)
+    SCL: Serial Clock Line (D1/GPIO5 on the Wemos D1 Mini)
+
+ - SPI
+  https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus
+  SPI uses 4 pins, MISO, MOSI, SCLK and SS.
+
+    SCLK: Serial Clock (D5/GPIO14 on the Wemos D1 Mini).
+    MOSI: Master Output Slave Input (D7/GPIO13 on the Wemos D1 Mini)
+    MISO: Master Input Slave Output (D6/GPIO12 on the Wemos D1 Mini)
+    SS: Slave Select (D8/GPIO15 on the Wemos D1 Mini)
+
+
 
 Examples:
 https://github.com/wemos/D1_mini_Examples/tree/master/examples
