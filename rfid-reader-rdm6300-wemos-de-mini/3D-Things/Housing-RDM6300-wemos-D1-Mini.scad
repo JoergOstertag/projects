@@ -9,7 +9,8 @@ part=0; // [ 0:All, 1:RFID-Reader Housing, 2:Antenna Holder, 3:Bottom Lid ]
 border=2;
 border1=1;
 addSpace=.25;
-wemosD1Mini=[26,36,5]+addSpace*[2,2,2];
+wemosD1Mini=[26,36,5]+addSpace*[2,2,2]
+            +[0,0,3]; // Safety for Pins
 wemosD1ExperimentBoard=[26,29,12.5]+addSpace*[2,2,2];
 
 
@@ -24,19 +25,19 @@ numberOfBaseMountingClips=0;
 difference(){
     showPart(part=part);
  
-    // cube to cut fee for Debugging
-    if ( 0*debug ) 
+    // cube to cut fee for Debugging and seeing inside Objects
+    if ( 0 * debug ) 
         translate([25,0,-.1]) 
-            cube([60,60,45]);
+            cube([90,90,45]);
     
 } 
 
 module showPart(part=0){
-    distX=70;
-    distY=100;
+    distX=70;  maxX=5;
+    distY=100; maxY=5;
     if ( part == 0) {
-        for ( i = [1:10] )
-            for ( j = [0:10] )
+        for ( i = [1:maxX] )
+            for ( j = [0:maxY] )
                 translate([ (i-1)*distX, j*distY, 0]){
                     showPart(part= i + j*10);
                 if ( debug) 
@@ -63,9 +64,14 @@ module showPart(part=0){
 
             if ( part == 21 ) {
                 translate([ 0,10,0]) wemosCutout();
-                translate([35,10,0]) RDM6300(cutOut=1);
-                translate([60,10,0]) RDM6300(cutOut=0);
+                translate([38,10,0]) RDM6300(cutOut=1);
             }
+
+            if ( part == 22 ) 
+                translate([10,10,0]) RDM6300(cutOut=0);
+            
+            if ( part == 23 )
+                verbinder(cutOut=1,placeForPrint=1);
         }
     }
 }
@@ -92,12 +98,12 @@ module RFIDReaderHousing(placeForPrint=0){
         cube(outerSize);
        
         // Wemos cutout
-        translate( border * [1,1,1] 
+        translate( border * [1,1,2] 
                   + borderX*[1,0,0]) 
             wemosCutout();
 
 
-        translate([20,25, wemosD1Mini[2] + 2*border
+        translate([20,25, wemosD1Mini[2] + 3*border
                     +wemosD1ExperimentBoard[2]
                ])
                 verbinder(cutOut=1);
@@ -112,14 +118,11 @@ module RFIDReaderHousing(placeForPrint=0){
         // remove border back
         translate([borderX+border,wemosD1Mini[1]+border,-.1])   
             cube([wemosD1Mini[0],2,border
-                    + wemosD1Mini[2]+0.5*wemosD1ExperimentBoard[2]]
+                    + wemosD1Mini[2]
+                    +0.5*wemosD1ExperimentBoard[2]]
                 +.2*[0,1,1]);
         }
 
-    // Antenna Holder
-//    translate([borderX+15,7.5,outerSize[2]-1.2*border+2])
-  //      rotate([0,0,180]) antennaHolder();
-    
     // Base Mount Clips
     translate([0,0,0]) 
         BaseMountingClips(
@@ -130,27 +133,52 @@ module RFIDReaderHousing(placeForPrint=0){
 }
 
 module bottomLid(cutOut=0,placeForPrint=0){
-    bottomHeight=4;
-    addY=14;
+    bottomHeight=3;
+    addY=15;
+    addYCutOut=10*cutOut;
     
+    
+    X= wemosD1Mini[0] + 2*border + cutOut*addSpace*2;
+    Y= wemosD1Mini[1] + 2*border + cutOut*addSpace*2 
+        + addY +addYCutOut;
+                
     translate(placeForPrint*[14,19,bottomHeight]){
-        // large bottom plate
-        translate([-15,-20,-bottomHeight+cutOut*addSpace])
-            cube([60,80,bottomHeight]);
-        
-        X= wemosD1Mini[0] + 2*border + cutOut*addSpace*2;
-        Y= wemosD1Mini[1] + 2*border + cutOut*addSpace*2 + 14 + addY;
-        
-        // fit size of wemos
-        cube(
-            [X,Y, 2*border  +cutOut*addSpace*2]);
+        difference(){
+            union(){
+                // large bottom plate
+                bottomBorderX=10;
+                bottomBorderY=6;
+                
+                translate([-bottomBorderX,-bottomBorderY,
+                            -bottomHeight+cutOut*addSpace])
+                    cube([X+2*bottomBorderX,Y+2*bottomBorderY,bottomHeight]);
+                
+                // fit size of wemos
+                    cube(
+                        [X,Y, 2*border  +cutOut*addSpace*2]);
 
-        // small fitting brim to hold things togeter
-        sizeFitting=.5;
-        translate(sizeFitting*[-1,-1,0]+[0,0,2])
-            cube(
-                [X,Y, cutOut*addSpace*2]
-                +sizeFitting*[2,2,1]);
+                // small fitting brim to allow sliding Housing into Bottom plate
+                sizeFitting=.5;
+                translate(sizeFitting*[-1,-1,0]+[0,0,2])
+                    cube(
+                        [X,Y, cutOut*addSpace*2]
+                        +sizeFitting*[2,2,1]);
+                
+                
+                // small fitting brim snap Housing into fixed position against Bottom plate
+                sizeSnap=.5;
+                translate(sizeSnap*[0,-1,0]
+                        +[0,Y-2,2*border  +cutOut*addSpace*2-.1])
+                    cube(
+                        [X,0, 0]
+                        +sizeSnap*[0,2,1]);
+            }
+                 
+            // Cut out for USB Plug
+            if(! cutOut)
+                translate([8,-1,0])
+                    cube([15,Y+2,15]);
+        }
     }
 }
 
@@ -160,6 +188,7 @@ module wemosCutout(){
             +wemosD1ExperimentBoard[2];
  
         addY=17;
+        translate([0,0,0])
         cube(wemosD1Mini + [.1,.1,.1]
             +[0,addY,0]
             );
@@ -182,20 +211,20 @@ module wemosCutout(){
 module RDM6300(cutOut=1){
     translate(-[5,0,0])
         color("green")
-        cube(   [16,38.5,6]
+        cube(   [18.5,38.5,6]
             +[6,0,0] // buffer-x
             +cutOut*2*[1,1,1]
             +cutOut*addSpace*2*[1,1,1]
         );
 
     color("white")
-        translate([10,30,0])
+        translate([13,30,0])
             cube(   [6,8,15]
                     +cutOut*addSpace*[2,2,2]
                 );
 
     color("black")
-        translate([10,30,0])
+        translate([13,30,0])
             cube(   [5.6,7.3,25]
                     +cutOut*addSpace*[1,1,0]
                 );
@@ -205,13 +234,14 @@ module RDM6300(cutOut=1){
 
 antennaOuterBase=[34.5,46.5,2.2];
 antennaSpace=2;
-module antennaHolder(){
+module antennaHolder(placeForPrint=0){
     outerCube=  antennaOuterBase
             + border*[2,2,1]
             + addSpace*[2,2,2]
             + antennaSpace*[2,2,2];
 
     translate([outerCube[0]/2,outerCube[1]/2,0]) {
+        // Base with antenna cutout
         difference(){
             translate(border*[0,0,1])
                 cube(outerCube,center=true);
@@ -220,18 +250,23 @@ module antennaHolder(){
             
         }
         
+        translate([-0,0,5.5])
+            cube([34,10,1.7],center=true);
+
+        // Verbinder
         translate([0,0,border-.01])
             verbinder();
     }
 }
 
-module verbinder(cutOut=0){
+module verbinder(cutOut=0,placeForPrint=0){
     Z1=12;
     Z2=3;
     Z=Z1+Z2;
     D=10;
     noseSize=.2;
     
+    translate(placeForPrint*[8+5,11+5,0])
     rotate([0,cutOut*180,0])
     for (x=[-1,1])
         for (y=[-1,1])
@@ -331,10 +366,12 @@ module BaseMountingClip(diameterBaseClipHoles=3){
     }        
 }
 
-module debugFrame(size=[distX,distY,2],border=.1){
+module debugFrame(size=[60,60,2],border=.1){
+    translate([0,0,-2])
     difference(){
         cube(size);
-        translate([0,0,-1])cube(size - border*[1,1,0]+[0,0,2]);
+        translate([0,0,-1])
+            cube(size - border*[1,1,0]+[0,0,2]);
     }
 }
                 
