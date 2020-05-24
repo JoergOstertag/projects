@@ -49,8 +49,10 @@ Vorteil:
  - Stromversorgung über 3.3 oder 5V
  - Viele schon fertige Libraries auf ESP8266 portiert
 
-[Programmierung](programming/README.md)
+[Programmierung](programmierung/README.md)
 ---------------------------------------
+
+In der Sektion [Programmierung](programmierung/README.md) sind verschiedenste Beispiele referenziert.
 
    
 Anschlüsse Wemos D1 Mini (Lolin D1 Mini)
