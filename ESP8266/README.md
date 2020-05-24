@@ -2,8 +2,8 @@ ESP8266
 =======
 
 
-ESP8266
--------
+[ESP8266](https://en.wikipedia.org/wiki/ESP8266)
+------------------------------------------------
 
 Die Chipserie ESP8266 ist inzwischen sehr weit verbreitet und findet sich auch in sehr vielen fertig zu kaufenden embeded Geräten.
 Die Vorteile des Chips sind:
@@ -11,6 +11,7 @@ Die Vorteile des Chips sind:
  - Integrierte WLAN Unterstützung
  - Kann mit der Standard Arduino Entwicklungsumgebung programmiert werden
  - viele schon fertige Libraries auf ESP8266 portiert
+ - In vielen Geräten verwendet. [Sonoff](https://sonoff.tech/), 
 
 
 
@@ -29,7 +30,7 @@ In der Kurzfassung für diejenigen, die es schon mal gemacht haben und sich nur 
      Menü: Werkzeuge - Board - Boardverwalter: Suche nach "Wemos" und installieren der "ESP8266"-Boards
    + Nachdem das Device angeschlossen ist muss der Port eingestellt werden.</br>
      Menü: Werkzeuge - Port</br>
-     Sollte kein Port auftauchen, so ist ein passender USB-Seriell Treiber zu installieren.
+     Sollte kein Port passend zu dem angeschlossenen Gerät auftauchen, so ist ein passender USB-Seriell Treiber zu installieren.
    + Für den Compiler muss das richtige Board ausgewählt werden.</br>
      Menü: Werkzeuge - Board: "Lolin(Wemos)D1 R1" oder entsprechend
    + Um Libraries zu verwenden müssen sie zuerst in der IDE eingebunden werden.</br>
@@ -48,8 +49,13 @@ Vorteil:
  - Stromversorgung über 3.3 oder 5V
  - Viele schon fertige Libraries auf ESP8266 portiert
 
+[Programmierung](programming/README.md)
+---------------------------------------
+
    
-Pinout:
+Anschlüsse Wemos D1 Mini (Lolin D1 Mini)
+----------------------------------------
+
  - [Suche nach Wemos D1 Pinout](https://duckduckgo.com/?q=wemos+d1+pinout&t=canonical&iar=images&iax=images&ia=images)
    Die Pinbelegungen zu den Wemos Chips sind durch eine einfache Suche zu finden:
 
@@ -77,25 +83,25 @@ Anschlussmöglichkeiten:
 
 Es gibt verschiedene Möglichkeiten andere Devices an zu schliessen.
 
- - Digital IO:
+ - Digital IO:</br>
    Man kann die einzelnen Pins als digitalen Eingang oder Ausgang verwenden.
    Hierbei entspricht
     + 3.2V einem Wert von 1 (An)
     + 0V einem Wert von 0 (Aus)
 
- - PWM:
+ - PWM:</br>
    "Puls Weiten Modulation" wird z.B. verwendet um:
    	 + um verschiedenen Intensität von LEDs zu steuern.
 	 + Modellbau-Servos an zu steuern.
 
- - [I²C Interface](https://de.wikipedia.org/wiki/I%C2%B2C)
+ - [I²C Interface](https://de.wikipedia.org/wiki/I%C2%B2C)</br>
   uses 2 pins, data and clock.
   https://en.wikipedia.org/wiki/I²C
 
     + SDA: Serial Data Line (D2/GPIO4 on the Wemos D1 Mini)
     + SCL: Serial Clock Line (D1/GPIO5 on the Wemos D1 Mini)
 
- - SPI
+ - SPI:</br>
   https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus
   SPI uses 4 pins, MISO, MOSI, SCLK and SS.
 
@@ -104,8 +110,12 @@ Es gibt verschiedene Möglichkeiten andere Devices an zu schliessen.
     + MISO: Master Input Slave Output (D6/GPIO12 on the Wemos D1 Mini)
     + SS: Slave Select (D8/GPIO15 on the Wemos D1 Mini)
 
- - Interrupt:
+ - Interrupt:</br>
    Die Pins können verwendet werden um bei einem 1=>0 oder 0=>1 Übergang eine Funktion zu triggern.
+
+ - Soft Serial:</br>
+   Man kann die Digitalpins so programmieren, daß sie als serielle Schnittstelle agieren.
+   Ein Bsp ist das lesen des RFID Readers RDM6300.
 
 Examples:
 https://github.com/wemos/D1_mini_Examples/tree/master/examples
@@ -115,9 +125,6 @@ Hardware
 Verschiedenste Hardware für die Embedded Spielereien:
 [Hardware](Embedded-Hardware.md)
 
-
-Programmierung
---------------
 
 
 Sonoff Geräte
