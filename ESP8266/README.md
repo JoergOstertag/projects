@@ -16,16 +16,24 @@ Die Vorteile des Chips sind:
 
 Entwicklungs Umgebung
 ---------------------
-Links to descriptions of how to install the Development Environment,
+Da es schon einige gute Anleitungen gibt wie man für einen Wemos-D1-Mini die passende Entwicklungsumgebung installiert, verweise ich nur darauf.
 
  - [Anleitung zur Installation der Entwicklungsumgebung](https://makesmart.net/esp8266-d1-mini-programmieren/)
+   Wenn man sowas noch nie gemacht hat, wird man vermutlich zum Arduino installieren ca. 30 min und zum Einrichten ohne test ca 20 min brauchen.
 
-In der Kurzfassung:
-   + Download der [Arduino Entwicklungsumgebung](https://www.arduino.cc/en/Main/Software)
-   + Unter Voreinstellungen setzen der zusätzliche Boardverwalter URLs:
+In der Kurzfassung für diejenigen, die es schon mal gemacht haben und sich nur noch an die Schritte erinnern wollen:
+   + Download der [Arduino Entwicklungsumgebung](https://www.arduino.cc/en/Main/Software).
+   + Unter Voreinstellungen setzen der zusätzliche Boardverwalter URLs:</br>
      https://arduino.esp8266.com/stable/package_esp8266com_index.json
-   + In der Arduino-IDE: Werkzeuge - Board - Boardverwalter: Suche nach "Wemos" und installieren der "ESP8266"-Boards
-
+   + Den Compiler und die Tools für die Wemos Devices hinzufügen.</br>
+     Menü: Werkzeuge - Board - Boardverwalter: Suche nach "Wemos" und installieren der "ESP8266"-Boards
+   + Nachdem das Device angeschlossen ist muss der Port eingestellt werden.</br>
+     Menü: Werkzeuge - Port</br>
+     Sollte kein Port auftauchen, so ist ein passender USB-Seriell Treiber zu installieren.
+   + Für den Compiler muss das richtige Board ausgewählt werden.</br>
+     Menü: Werkzeuge - Board: "Lolin(Wemos)D1 R1" oder entsprechend
+   + Um Libraries zu verwenden müssen sie zuerst in der IDE eingebunden werden.</br>
+     Menü: Sketch - Bibliothek einbinden
 
 
 Wemos D1 Mini (Lolin D1 Mini)
@@ -46,13 +54,13 @@ Pinout:
    Die Pinbelegungen zu den Wemos Chips sind durch eine einfache Suche zu finden:
 
  | Pin |ESP Pin | Additional Function    | Wemos Shields         |
- |-----|--------|------------------------|-----------------------|
- | A0  | A0	| Analog input, max 3.2V |			|
- | D0  | GPIO16	|		    	 | Wake 	        |
- | D1  | GPIO5	| SCL(I²C) 		 | Wemos Relay Shield    |
+ |:----|:-------|:-----------------------|:----------------------|
+ | A0  | A0	| Analog input, max 3.2V |			
+ | D0  | GPIO16	|		    	 | Wake 	        
+ | D1  | GPIO5	| SCL(I²C) 		 | Wemos Relay Shield    
  | D2  | GPIO4	| SDA(I²C)		 | 
- | D3  | GPIO0	| 10k Pull-up 		 | Wemos Button Shield   |
- | D4  | GPIO2	| 10k Pull-up, BUILTIN_LED  | 	       		|
+ | D3  | GPIO0	| 10k Pull-up 		 | Wemos Button Shield   
+ | D4  | GPIO2	| 10k Pull-up, BUILTIN_LED  | 	       		
  | D5  | GPIO14	| SCK 	       		 | Default SCL of Wire.h; Default SCLK of SPI
  | D6  | GPIO12	| MISO(SPI) 		 | 
  | D7  | GPIO13	| MOSI(SPI) 		 | 
@@ -62,32 +70,54 @@ Pinout:
  | 3V3 | 3.3V 	| 3.3V		 	 |
 
 Die Pins D0-D8 können standard mäßig als DIgital In/DIgital Out pins verwendet werden.
+Die Pins können jeweils als digital IO, interrupt, pwm, I2C oder one-wire verwendet werden.
 
 Anschlussmöglichkeiten:
 -----------------------
 
 Es gibt verschiedene Möglichkeiten andere Devices an zu schliessen.
 
+ - Digital IO:
+   Man kann die einzelnen Pins als digitalen Eingang oder Ausgang verwenden.
+   Hierbei entspricht
+    + 3.2V einem Wert von 1 (An)
+    + 0V einem Wert von 0 (Aus)
+
+ - PWM:
+   "Puls Weiten Modulation" wird z.B. verwendet um:
+   	 + um verschiedenen Intensität von LEDs zu steuern.
+	 + Modellbau-Servos an zu steuern.
+
  - [I²C Interface](https://de.wikipedia.org/wiki/I%C2%B2C)
   uses 2 pins, data and clock.
   https://en.wikipedia.org/wiki/I²C
 
-    SDA: Serial Data Line (D2/GPIO4 on the Wemos D1 Mini)
-    SCL: Serial Clock Line (D1/GPIO5 on the Wemos D1 Mini)
+    + SDA: Serial Data Line (D2/GPIO4 on the Wemos D1 Mini)
+    + SCL: Serial Clock Line (D1/GPIO5 on the Wemos D1 Mini)
 
  - SPI
   https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus
   SPI uses 4 pins, MISO, MOSI, SCLK and SS.
 
-    SCLK: Serial Clock (D5/GPIO14 on the Wemos D1 Mini).
-    MOSI: Master Output Slave Input (D7/GPIO13 on the Wemos D1 Mini)
-    MISO: Master Input Slave Output (D6/GPIO12 on the Wemos D1 Mini)
-    SS: Slave Select (D8/GPIO15 on the Wemos D1 Mini)
+    + SCLK: Serial Clock (D5/GPIO14 on the Wemos D1 Mini).
+    + MOSI: Master Output Slave Input (D7/GPIO13 on the Wemos D1 Mini)
+    + MISO: Master Input Slave Output (D6/GPIO12 on the Wemos D1 Mini)
+    + SS: Slave Select (D8/GPIO15 on the Wemos D1 Mini)
 
-
+ - Interrupt:
+   Die Pins können verwendet werden um bei einem 1=>0 oder 0=>1 Übergang eine Funktion zu triggern.
 
 Examples:
 https://github.com/wemos/D1_mini_Examples/tree/master/examples
+
+Hardware
+--------
+Verschiedenste Hardware für die Embedded Spielereien:
+[Hardware](Embedded-Hardware.md)
+
+
+Programmierung
+--------------
 
 
 Sonoff Geräte
@@ -96,9 +126,17 @@ Für Fertige Geräte eignen sich recht gut die Geräte von [Sonoff](https://duck
 
 
 
-Firmware Packages
------------------
+
+Home-Automation
+---------------
+
+Für die eine oder andere Aufgabe gibt es schon fertige Packages. Diese kann man als binary runter laden und direkt flashen. Vorteil ist, daß hier auch schon die WLAN Anbindung, eine MQTT Anbindung fertig integriert ist und man sich über das Handling keine Gedanken machen muss.
 Bei der fertigen Firmware kann aber auch eines der bekannten fertigen binaries verwendet werden.
  - [Tasmota](https://github.com/arendst/Tasmota)
  - [ESP-Easy](https://www.letscontrolit.com/wiki/index.php/ESPEasy)
 
+Diese fertigen Binaries arbeiten üblicherweise mit einem Home-Automation System zusammen.
+
+Hier wird zur Kommunikation MQTT verwendet. Als MQTT Server kann z.B. [mosquito](https://mosquitto.org/) verwendet werden.
+
+Als Home-Automation System wird unter anderem gerne [OpenHab](https://www.openhab.org/) verwendet.
