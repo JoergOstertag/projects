@@ -77,7 +77,7 @@ Anschlüsse Wemos D1 Mini (Lolin D1 Mini)
  | 5V  | 5V 	| 5V 			 |
  | 3V3 | 3.3V 	| 3.3V		 	 |
 
-Die Pins D0-D8 können standard mäßig als DIgital In/DIgital Out pins verwendet werden.
+Die Pins D0-D8 können standard mäßig als Digital In/Digital Out pins verwendet werden.
 Die Pins können jeweils als digital IO, interrupt, pwm, I2C oder one-wire verwendet werden.
 
 Anschlussmöglichkeiten:
@@ -125,7 +125,7 @@ https://github.com/wemos/D1_mini_Examples/tree/master/examples
 Hardware
 --------
 Verschiedenste Hardware für die Embedded Spielereien:
-[Hardware](Embedded-Hardware.md)
+[Hardware](Hardware/README.md)
 
 
 

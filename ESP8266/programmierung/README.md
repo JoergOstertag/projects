@@ -1,7 +1,7 @@
 Programmierung
 ==============
 
-Bevor ihr weiter in die Programmierung einsteigt, kann ich noch empfehlen, sich mit einem Versionsverwaltungssystem zu beschäftigen. Es macht Sinn, nach jedem Schritt, den man ans laufen bekommen hat diesen im Versionsverwaltungssystem zu sichern.
+Bevor ihr weiter in die Programmierung einsteigt, kann ich noch empfehlen, sich mit einem Versionsverwaltungssystem zu beschäftigen. Es macht Sinn, nach jedem Schritt, den man ans laufen bekommen hat diesen im Versionsverwaltungssystem zu sichern. Prominente Versionsverwaltungssysteme sind SVN oder GIT.
 
 Zur eigentlichen Programmierung mit der Arduino IDE und über die Sprache finden sich viele Links. Die Original Referenz bei arduino.cc ist für das meisste ein guter Einstieg. 
  - [Sprachreferenz](https://www.arduino.cc/reference/en/)
