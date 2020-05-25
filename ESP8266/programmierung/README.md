@@ -66,7 +66,7 @@ In dem Bsp wird mittels PWM(Pulse weiten Modulation) die Helligkeit der LED gest
 Wifi Verbindung und Zeit aus dem Internet(NTP)
 ----------------------------------------------
 
-[]()
+Im Beispiel [ESP_WiFiManager show Time](ESP_WifiManager-show-NTP-time) wird eine Wifi Verbindung aufgebaut. Über diese Verbindung wird dann die Zeit mittel dem NTP Protokoll aktualisiert. Danach wird dann die Zeit alle Sekunde auf der Konsole angezeigt.
 
 
 Wemos DOT Matrix Display
