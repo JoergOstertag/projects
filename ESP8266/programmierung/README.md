@@ -63,6 +63,12 @@ In dem Bsp wird mittels PWM(Pulse weiten Modulation) die Helligkeit der LED gest
    Dadurch entsteht der eindruck, daß die LED heller oder dukler leuchtet. 
   
 
+Wifi Verbindung und Zeit aus dem Internet(NTP)
+----------------------------------------------
+
+[]()
+
+
 Wemos DOT Matrix Display
 ------------------------
 
