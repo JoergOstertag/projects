@@ -32,8 +32,7 @@ difference(){
 //translate([0,90,0]) bottomLid(cutout=0);
 //wemosCutout();
 // neoPixelCutout();
-translate([70,debug*20,31.7])
-    bottomLid()
+// translate([70,debug*20,31.7])    bottomLid()
 
 
 if ( debug ) {
