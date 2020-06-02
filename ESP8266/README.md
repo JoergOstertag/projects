@@ -131,7 +131,9 @@ Verschiedenste Hardware für die Embedded Spielereien:
 
 Sonoff Geräte
 -------------
-Für Fertige Geräte eignen sich recht gut die Geräte von [Sonoff](https://duckduckgo.com/?q=sonoff&t=canonical&iax=images&ia=images). DIe Bandbreite rangiert von Relays über Taster zu weiteren. DIe Sonoff Geräte können sehr leicht mit neuer Firmware geflasht werden.
+Für Fertige Geräte eignen sich recht gut die Geräte von [Sonoff](https://duckduckgo.com/?q=sonoff&t=canonical&iax=images&ia=images).
+Die Bandbreite rangiert von Relays über Taster zu weiteren.
+Die Sonoff Geräte können sehr leicht mit neuer Firmware geflasht werden, deswegen sind sie im DIY-Home-Automation Bereich recht beliebt.
 
 
 
@@ -139,7 +141,9 @@ Für Fertige Geräte eignen sich recht gut die Geräte von [Sonoff](https://duck
 Home-Automation
 ---------------
 
-Für die eine oder andere Aufgabe gibt es schon fertige Packages. Diese kann man als binary runter laden und direkt flashen. Vorteil ist, daß hier auch schon die WLAN Anbindung, eine MQTT Anbindung fertig integriert ist und man sich über das Handling keine Gedanken machen muss.
+Für die eine oder andere Aufgabe gibt es schon fertige Packages.
+Diese kann man als binary runter laden und direkt flashen.
+Vorteil ist, daß hier auch schon die WLAN Anbindung, eine MQTT Anbindung fertig integriert ist und man sich über das Handling keine Gedanken machen muss.
 Bei der fertigen Firmware kann aber auch eines der bekannten fertigen binaries verwendet werden.
  - [Tasmota](https://github.com/arendst/Tasmota)
  - [ESP-Easy](https://www.letscontrolit.com/wiki/index.php/ESPEasy)
