@@ -13,12 +13,12 @@ Hierzu verwenden wir das einfache Blink Baispil, das beim Compiler für den ESP8
 Planung und Strukturierung eines Projektes
 ------------------------------------------
 
- - Ermitteln der Zeilstellung.
+ - *Ermitteln der Zeilstellung:* \\
  In unserem Fall gilt es eine kleines Embedded Gerät zu designen, zu bauen und zu programmieren.
  Da unser aller Leben gerade durch Covid sehr geprägt ist wollen wir einen Bezug dazu herstellen.
  Inspiriert durch andere Programmiereer und deren Projekte wollen wir daher einen "Hand Wasch Timer" bauen.
 
- - Brainstorming:
+ - *Brainstorming:*\\
 Am Anfang eines Projektes liegt üblicherweise die Brainstorming Phase.
 Dieser Phase überlegen wir uns wie wir unser Ziel erreichen können.
 Welche Funktionen soll das Gerät am Ende haben?
@@ -27,13 +27,13 @@ Jetzt fehlt uns noch irgendwas das den ganzen Vorgang einleitet; sozusagen ein S
 Da wir als Menschen gerne ungeduldig sind wollen wir auch gerne wissen, wie lange es noch dauert. Also wäre ein nettes plus für uns während des Timers zu sehen wie lange wir noch waschen müssen.
 
 
- - Welche Komponenten werden benötigt
+ - *Welche Komponenten werden benötigt*:
 
-Im nächsten Schritt ermitteln wir welche Komponenten wir brauchen um dieses Ziel zu erreichen. In unserem Fall brauchen wir also
- - Etwas zu triggern des startes (Wir haben hier einen Distanzsensor gewählt)
- - Eine komponente, die uns die 20 Sekunden ermittelt (als Timer wählen wir entweder die Funktion sleep() oder miliseconds() )
- - Eine komponente, die uns sagt wie weit wir sind und diese als Fortschrittsanzeige visualisiert (Als Fortschrittsanzeige wählen wir entweder einen Modelbau Servo mit Zeiger oder einen Neopixel Ring) 
- - Eine Komponente die uns das Ende signalisiert (Hier kann die Fortschrittsanzeige verwendet werden)
+   Im nächsten Schritt ermitteln wir welche Komponenten wir brauchen um dieses Ziel zu erreichen. In unserem Fall brauchen wir also
+    - Etwas zu triggern des Anfangs (Wir haben hier einen Distanzsensor gewählt)
+    - Eine komponente, die uns die 20 Sekunden ermittelt (als Timer wählen wir entweder die Funktion sleep() oder miliseconds() )
+    - Eine komponente, die uns sagt wie weit wir sind und diese als Fortschrittsanzeige visualisiert (Als Fortschrittsanzeige wählen wir entweder einen Modelbau Servo mit Zeiger oder einen Neopixel Ring) 
+    - Eine Komponente die uns das Ende signalisiert (Hier kann die Fortschrittsanzeige verwendet werden)
 
 Dadurch ergeben sich dann auch die Komponenten die für das Projekt gebraucht werden.
 
