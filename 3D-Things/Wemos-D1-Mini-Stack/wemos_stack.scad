@@ -73,7 +73,7 @@ airSlits=true;
 
 /* [Others] */
 // wallThickness = 1.8;
-wallThickness = 1.1;
+wallThickness = 1.8;
 
 // cut through at Bottom for Pins
 bottomHasPinoutSlits=true;
