@@ -63,16 +63,16 @@ showBase=true;
 lidHasVisiblePinoutSlits=false;
 
 // The lid should contain a cutout connecting the PINs
-lidCutOutType="LCD"; // [ :LCD Shield , DHT:Dht Shield,DHThorizontal:Dht Shield, BUTTON:Button Shield , NONE:No cutout]
+lidCutOutType="MATRIX"; // [ LCD:LCD Shield , DHT:Dht Shield, DHThorizontal:Dht Shield, BUTTON:Button Shield , LED: Single LED, MATRIX: LedMatrix, HOLE: Bog hole, NONE:No cutout]
 
 // Do you want the Lid to show up
-showLid=false;
+showLid=true;
 
 //Side and Front slits for letting warm air out
 airSlits=true;
 
 /* [Others] */
-wallThickness = 1.8;
+// wallThickness = 1.8;
 wallThickness = 1.1;
 
 // cut through at Bottom for Pins
@@ -80,7 +80,7 @@ bottomHasPinoutSlits=true;
 
 // Add mounting clips with screw holes a bottom
 numberOfBaseMountingClips=4;
-numberOfBaseMountingClips=0;
+// numberOfBaseMountingClips=0;
 
 // show some Examples
 showExamples=false;
@@ -113,6 +113,8 @@ holeDiameter = 20.0;
 // Offset of all stacked Boards because of the WIFI Antenna
 antennaOffsetY=6.2;
 lcdDimensions=[18.5,18.1,4.5]
+              +2*printerWobble*[1,1,0];
+ledMatrixDimensions=[20.0,20.1,5.9]
               +2*printerWobble*[1,1,0];
 
 // Size of the slits for pins of PCB board
@@ -195,9 +197,11 @@ module BaseExamples(){
 module LidExamples(){
         translate([000,0,0])   lid(lidCutOutType="BUTTON");
         translate([040,0,0])   lid(lidCutOutType="LCD");
-        translate([080,0,0])   lid(lidCutOutType="DHT");
-        translate([120,0,0])   lid(lidCutOutType="HOLE");
-        translate([160,0,0])   lid(lidCutOutType="NONE");
+        translate([080,0,0])   lid(lidCutOutType="LED");
+        translate([120,0,0])   lid(lidCutOutType="DHT");
+        translate([160,0,0])   lid(lidCutOutType="HOLE");
+        translate([200,0,0])   lid(lidCutOutType="MATRIX");
+        translate([240,0,0])   lid(lidCutOutType="NONE");
 
 }
 
@@ -211,6 +215,13 @@ module lcdCutOut(){
     cableZ=4;
     translate([lcdDimensions[0]/2-cableX/2,-cableY+.001,.5])
         cube([cableX,cableY,cableZ]);
+}
+
+module ledMatrixCutOut(){
+    translate([2.8,7.1,0])
+        cube(ledMatrixDimensions+extraGap*[1,1,0]);
+
+
 }
 
 
@@ -246,7 +257,8 @@ module lid(lidCutOutType="BUTTON"){
             translate([0, 0, 0.0]) cube([outerSizeX, outerSizeY, 2.0]);
 
             // Lid inner part
-            translate([ wallThickness+printerWobble, wallThickness+printerWobble,wallThickness]) {
+            translate(  wallThickness*[1,1,1]
+                        +printerWobble*[1,1,0]) {
                 color("green")
                     cube([innerSizeX-2*printerWobble, innerSizeY-2*printerWobble, 2.3]);
                 LidNotch(wobble=-1);
@@ -255,110 +267,120 @@ module lid(lidCutOutType="BUTTON"){
         
         // Space for PCB Board
         innerFrameOffset=2;
-        translate([ wallThickness+innerFrameOffset, wallThickness+innerFrameOffset,wallThickness]) 
+        translate( wallThickness*[1,1,1]+innerFrameOffset*[1,1,0]) 
                 cube([innerSizeX-innerFrameOffset*2, innerSizeY-innerFrameOffset*2, 4]);
         
-        translate([wallThickness,0,0])
+        translate(wallThickness*[1,0,0])
             pinHoleSlits(visibleFromOutside=lidHasVisiblePinoutSlits);
         
         // Lid Cutout
-        if(lidCutOutType=="LCD"){
-                translate(wallThickness*[1,1,-0.001]
-                        +[innerSizeX/2,innerSizeY,0])
-                        translate([-lcdDimensions[0]/2,-lcdDimensions[1],0]
-                                  +[0,-antennaOffsetY,0]
-                                ) 
-                            lcdCutOut();
+        translate(  wallThickness*[1,1,0]
+                    +[0,0,-0.001]
+                    ){
+            if(lidCutOutType=="LCD"){
+                translate([innerSizeX/2,innerSizeY,0]
+                            +[-lcdDimensions[0]/2,-lcdDimensions[1],0]
+                            +[0,-antennaOffsetY,0]
+                            ) 
+                        lcdCutOut();
 
-                // Text LCD
-                translate([wallThickness+innerSizeX/2,9,-0.01])
+                // Text: LCD
+                translate([innerSizeX/2,9,-0.01])
                     linear_extrude(height = 0.5) 
                         rotate([180,0,0])
                             text("LCD", ,size=7,halign="center");
-        } else if (lidCutOutType=="DHT") {
+            } else if(lidCutOutType=="MATRIX"){
+                ledMatrixCutOut();
+
+                // Text: LED
+                translate([innerSizeX/2,7,-0.01])
+                    linear_extrude(height = 0.5) 
+                        rotate([180,0,0])
+                            text("LED", size=6,halign="center");
+                // Text: Matrix
+#                translate([innerSizeX/2,36,-0.01])
+                    linear_extrude(height = 0.5) 
+                        rotate([180,0,0])
+                            text("Matrix", size=6,halign="center");
+            } else if (lidCutOutType=="DHT") {
                 dhtSensorDimensions=[12.1+extraGap2,5.6+extraGap2,6];
-                translate(wallThickness*[1,1,-0.001]
-                         +[innerSizeX/2,0,0])
-                    translate([-dhtSensorDimensions[0]/2,16.8,0] -printerWobbleXYZ   ) 
+                translate([innerSizeX/2,0,0]
+                        +[-dhtSensorDimensions[0]/2,16.8,0] -printerWobbleXYZ   ) 
                         cube(dhtSensorDimensions+printerWobbleXYZ2);
 
                 // Text DHT
-                translate([wallThickness+innerSizeX/2,32,-0.01])
+                translate([innerSizeX/2,32,0])
                     linear_extrude(height = 0.5) 
                         rotate([180,0,0])
                             text("DHT", ,size=7,halign="center");   
-        } else if (lidCutOutType=="LED") {
+            } else if (lidCutOutType=="LED") {
                 dLED=4.2;
-                translate(wallThickness*[1,1,1.001]
-                         +[innerSizeX/2,0,0])
+                translate([innerSizeX/2,0,0])
                     translate([-0,15.2,0] -printerWobbleXYZ   ) 
-                        cylinder(d1=dLED,d1=dLED+1,h=4,center=true);
+                        cylinder(d1=dLED,d2=dLED+1,h=4,center=true);
 
                 // Text DHT
-                translate([wallThickness+innerSizeX/2,32,-0.01])
+                translate([innerSizeX/2,32,-0.01])
                     linear_extrude(height = 0.5) 
                         rotate([180,0,0])
                             text("LED", ,size=7,halign="center");   
-        } else if (lidCutOutType=="DHThorizontal") {
+            } else if (lidCutOutType=="DHThorizontal") {
                 dhtSensorDimensions=[12.1+extraGap,15.6+extraGap,6];
-                translate(wallThickness*[1,1,-0.001]
-                         +[innerSizeX/2,0,0])
+                translate([innerSizeX/2,0,0])
                     translate([-dhtSensorDimensions[0]/2,0.6,0] -printerWobbleXYZ   ) 
                         cube(dhtSensorDimensions+printerWobbleXYZ2);
 
                 // Text DHT
-                translate([wallThickness+innerSizeX/2,32,-0.01])
+                translate([innerSizeX/2,32,-0.01])
                     linear_extrude(height = 0.5) 
                         rotate([180,0,0])
                             text("DHT", ,size=7,halign="center");   
-        } else if (lidCutOutType=="BUTTON" ){
-                translate(wallThickness*[1,1,-0.001]
-                         +[innerSizeX/2,innerSizeY,0])
+            } else if (lidCutOutType=="BUTTON" ){
+                translate([innerSizeX/2,innerSizeY,0])
                     translate([0,-innerSizeY/2, 2.5-0.01]) 
                         cylinder(h = 5 , d = diameterButton+2*printerWobble, center = true);
 
                 // Text Button
-                translate([wallThickness+innerSizeX/2,35,-0.01])
+                translate([innerSizeX/2,35,-0.01])
                     linear_extrude(height = 0.5) 
                         rotate([180,0,0])
                             text("Button", ,size=7,halign="center");   
-        } else if (lidCutOutType=="HOLE" ){
-                translate(wallThickness*[1,1,-0.001]
-                         +[innerSizeX/2,innerSizeY,0])
+                {
+                    buttonGap=.3;
+                    color("blue")
+                   translate([-20,innerSizeY/2, 0]) 
+                        difference(){
+                            union(){
+                                cylinder(h = 2 , d = diameterButton+4 );
+                                translate([0,0,2])
+                                cylinder(h = wallThickness+1  , d = diameterButton);
+                            }
+                            
+                            // inner Hole
+                            innerHoleZ=3;
+                            translate([-3.8/2,-3.8/2, -.001]-printerWobbleXYZ) 
+                               cube([3.8,3.8,innerHoleZ-.2]+printerWobbleXYZ2);
+                        }
+                }
+            } else if (lidCutOutType=="HOLE" ){
+                translate([innerSizeX/2,innerSizeY,0])
                     translate([0,-innerSizeY/2, 2.5-0.01]) 
                         cylinder(h = 5 , d = holeDiameter, center = true);
 
                 // Text Button
-                translate([wallThickness+innerSizeX/2,35,-0.01])
+                translate([innerSizeX/2,37,-0.01])
                     linear_extrude(height = 0.5) 
                         rotate([180,0,0])
-                            text("Button", ,size=7,halign="center");   
+                            text("Hole", ,size=7,halign="center");   
 
-        } else if (lidCutOutType=="NONE"){
-        } else {
-            echo("!!!!!!!!!!!!!!! Error Wrong Type for lidCutOutType");
+            } else if (lidCutOutType=="NONE"){
+            } else {
+                echo("!!!!!!!!!!!!!!! Error Wrong Type for lidCutOutType");
+            }
         }
-        
         
     }
 
-    if (lidCutOutType=="BUTTON" ){
-        buttonGap=.3;
-        color("blue")
-       translate([-20,innerSizeY/2, 0]) 
-            difference(){
-                union(){
-                    cylinder(h = 2 , d = diameterButton+4 );
-                    translate([0,0,2])
-                    cylinder(h = wallThickness+1  , d = diameterButton);
-                }
-                
-                // inner Hole
-                innerHoleZ=3;
-                translate([-3.8/2,-3.8/2, -.001]-printerWobbleXYZ) 
-                   cube([3.8,3.8,innerHoleZ-.2]+printerWobbleXYZ2);
-        }
-    }
 
 }
 
@@ -557,7 +579,7 @@ module  base(
                             // Front Text
                             translate([textX,0.5,2+usbHeight])
                                 rotate([90,0,0]) 
-                                    linear_extrude(height = 0.7,width=12) 
+                                    linear_extrude(height=0.7) 
                                         text("USB", ,size=2.3,halign="left"); 
                         }
                         
@@ -566,7 +588,8 @@ module  base(
                             translate([ -6, 0,microsdHeight]) 
                                     cube([ 15,4 ,3]);
                             // Front Text
-                            translate([textX,0.5,1+microsdHeight]) rotate([90,0,0]) text("SD", ,size=2,halign="left"); 
+                            translate([textX,0.5,1+microsdHeight]) 
+                                rotate([90,0,0]) text("SD", ,size=2,halign="left"); 
                         }
                         
                         // Battery Shield
