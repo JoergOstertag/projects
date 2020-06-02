@@ -2,7 +2,7 @@
 // use <MCAD/shapes/triangles.scad>;
 use <MCAD/triangles.scad>;
 
-debug=0;
+debug=1;
 
 
 border=2;
@@ -37,15 +37,9 @@ difference(){
 
 if ( debug ) {
     translate([-60,0,0]) wemosCutout();
-
     translate([-90,50,0]) UltrasonicHousing();
-
     translate([0,-60,0]) neoPixelHolder();
-
     translate([90,-60,0]) neoPixelCutout();
-
-
-
 }
 
 neoPixelRingH=3.2;
@@ -167,7 +161,7 @@ module neoPixelHolder(){
         translate([0,0,-.01])
             cylinder(h=hTotal+.02,d=dInner);
         
-        translate([0,0,.01+border])
+        translate([0,0,.01+border-3])
             rotate([0,0,180])
                 neoPixelCutout();
         
@@ -191,7 +185,7 @@ module neoPixelCutout(){
 
     translate([-3,dOuter/2-.2,0])    cube([6,6,hTotal]);
 
-    // FOr cables
+    // for cables
     translate([-10,dInner/2,-3])        cube([20,7,3.1]);
 
     // for cable tie to fix cables
@@ -202,7 +196,7 @@ module neoPixelCutout(){
     numLeds=24;
     for ( i=[0:360/numLeds:360] ){
         rotate([0,0,i])
-            translate([-3,dInner/2+1,hTotal])
+            translate( [-3 , dInner/2+1, hTotal-0.01 ] )
                 cube([6,6,2]);
     }
 }
