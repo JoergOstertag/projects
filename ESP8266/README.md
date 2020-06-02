@@ -20,7 +20,7 @@ Entwicklungs Umgebung
 Da es schon einige gute Anleitungen gibt wie man für einen Wemos-D1-Mini die passende Entwicklungsumgebung installiert, verweise ich nur darauf.
 
  - [Anleitung zur Installation der Entwicklungsumgebung](https://makesmart.net/esp8266-d1-mini-programmieren/)
-   Wenn man sowas noch nie gemacht hat, wird man vermutlich zum Arduino installieren ca. 30 min und zum Einrichten ohne test ca 20 min brauchen.
+   Wenn man sowas noch nie gemacht hat, wird man vermutlich zum installieren der Arduino-IDE ca. 30 min und zum Einrichten ohne test ca 20 min brauchen.
 
 In der Kurzfassung für diejenigen, die es schon mal gemacht haben und sich nur noch an die Schritte erinnern wollen:
    + Download der [Arduino Entwicklungsumgebung](https://www.arduino.cc/en/Main/Software).
