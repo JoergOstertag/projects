@@ -1,5 +1,5 @@
-Hand Wash Timer Build with a Servo
-==================================
+Hand Wash Timer
+===============
 
 Inspiriert durch [das Video auf youtube](https://www.youtube.com/watch?v=CEpfipV1_3w) habe ich mir überlegt dass es recht
 einfach ist auch Anfängern mit so einem Beispiel das Programmieren von embedded Geräten näher zu bringen.
