@@ -71,7 +71,9 @@ Used Hardware:
 Gehäuse
 -------
 First Try for a housing
-   https://github.com/JoergOstertag/openScad/tree/master/HandwashTimer
+   - [With Servo](with-servo/3D-Thing/)
+   - [With Neopixel](with-servo/3D-Thing/)
+
    printing takes about 3h
    Material Cost about 1.46€
 
