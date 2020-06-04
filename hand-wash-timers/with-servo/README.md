@@ -2,10 +2,6 @@ Hand Wash Timer Build with a Servo
 ==================================
 
 
-This is an example Project with the intention to inspire beginners to start playing arround with embedded devices.
-
-In times of Covid-19 this device will give you a hint how long you should wash your hands.
-
 If you get closer to the sonar distance sensor a timer starts 
 and counts down from 20seconds to zero.
 
@@ -17,11 +13,12 @@ Displaing the timer is done with a standard Servo
 
 ![Schaltplan](img/wemos-servo-hc-sr04_Steckplatine.png)
 
-There a different source Codes available.
-The minimal Version is stripped of to almost the minimum. This way you can see that not really much is needed to get it working.
+There are different source Codes available.
 
+ - The [minimal Version](src/Wemos-D1-HandwashTimerServo-Minimal) is stripped of to almost the minimum. This way you can see that not really much is needed to get it working.
+ - The [Version with Delay](src/Wemos-D1-HandwashTimerServo). This Variant is using a delay() command to timer the 20 seconds.
 
-First Try for a housing 3D-Thing/HandwashTimer-Housing.scad
+First Try for a [housing](3D-Thing/)
    printing takes about 3h
    Material Cost about 1.46€
 
