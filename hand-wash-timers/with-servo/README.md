@@ -11,9 +11,11 @@ and counts down from 20seconds to zero.
 
 Displaing the timer is done with a standard Servo
 
-![Example Image](images/in-housing.png)
+![Example Image](img/in-housing.png)
 
-![Video](images/HandWashTimerServo.mp4)
+![Video](img/HandWashTimerServo.mp4)
+
+![Schaltplan](img/wemos-servo-hc-sr04_Steckplatine.png)
 
 There a different source Codes available.
 The minimal Version is stripped of to almost the minimum. This way you can see that not really much is needed to get it working.
