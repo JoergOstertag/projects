@@ -22,18 +22,33 @@ function generateStl {
 	shift 1
 	name="$1"
 	shift 1
-	echo "Generate '$fileName-part-$partNumber-$name.stl'"
-	$scadBin "$scadFile" -o "stl/$fileName-part-$partNumber-$name.stl" -D "part=$partNumber" -D 'debug=0' "$@"
-	echo "Generate '$fileName-part-$partNumber-$name.png'"
-	$scadBin "$scadFile" -o "stl/$fileName-part-$partNumber-$name.png" -D "part=$partNumber" -D 'debug=0' "$@"
+
+	partDefinition=""
+	baseName="stl/$fileName"
+	if [ -n "$patNumber" ]; then
+	    partDefinition=" -D 'part=$partNumber' "
+	    baseName="stl/$fileName-part-$partNumber-$name"
+	fi
+	stlName="$baseName.stl"
+	echo "Generate '$stlName'"
+	$scadBin "$scadFile" -o "$stlName" $partDefinition -D 'debug=0' "$@"
+
+	pngName="$baseName.png"
+	echo "Generate '$pngName'"
+	$scadBin "$scadFile" -o "$pngName" $partDefinition -D 'debug=0' "$@"
 }  
 
 function generateAllFiles {
-    grep -e 'part=.*\[' < "$scadFile" | \
-    	 perl -pe 's/.*\[//;s/\].*//; s/:/ /gs; s/,/\n/gs' | \
-	 while read number name; do
-	 generateStl $number "$name" "$@"
-    done
+    if grep -q  -e 'part=.*\[' "$scadFile" ; then
+	grep -e 'part=.*\[' "$scadFile" | \
+    	    perl -pe 's/.*\[//;s/\].*//; s/:/ /gs; s/,/\n/gs' | \
+	    while read number name; do
+		generateStl $number "$name" "$@"
+	    done
+    else
+	generateStl "" "" "$@"
+    fi
+    
 }
 
 
