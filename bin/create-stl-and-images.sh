@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# This script takes all *.scad Files and creates png and stl files for them
+# if a parts=.. line is found it iterates over these and generates one set of files for each
+
+
 scadBin="/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD"
 if ! [ -s "$scadBin" ]; then
 	scadBin="/Applications/MacPorts/OpenSCAD.app/Contents/MacOS/OpenSCAD"
