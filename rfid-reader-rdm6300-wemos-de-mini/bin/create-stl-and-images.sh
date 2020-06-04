@@ -1,11 +1,5 @@
 #!/bin/bash
 
-#date=`date -I`
-#date=`date +%d.%m.%Y-%H-%M-%S`
-date=`date +%Y-%m-%d_%H-%M`
-
-fileName="Housing-RDM6300-wemos-D1-Mini"
-scadFile="$fileName.scad"
 scadBin="/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD"
 if ! [ -s "$scadBin" ]; then
 	scadBin="/Applications/MacPorts/OpenSCAD.app/Contents/MacOS/OpenSCAD"
@@ -18,10 +12,7 @@ if ! [ -s "$scadBin" ]; then
 	exit;
 fi
 
-if ! [ -s "$scadFile" ]; then
-	echo "!!!!!!!! ERROR: missing FIle $scadFile"
-	exit;
-fi
+###################################################################
 
 function generateStl {
 	echo "--------------------------------------------------------------------------------"
@@ -45,14 +36,25 @@ function generateAllFiles {
     done
 }
 
-# ==================================================================
-mkdir -p Archiv
-cp "$scadFile" "Archiv/wemos_stack-${date}.scad"
 
+# ==================================================================
 mkdir -p stl
 rm -f stl/*.stl
 rm -f stl/*.png
 
-generateAllFiles
 
+# ==================================================================
+for scadFile in *.scad; do
 
+    fileName="${scadFile%.scad}"
+
+    if ! [ -s "$scadFile" ]; then
+	echo "!!!!!!!! ERROR: missing FIle $scadFile"
+	exit;
+    fi
+
+    generateAllFiles
+
+done
+
+exit
