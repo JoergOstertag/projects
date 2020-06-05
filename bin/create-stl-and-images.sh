@@ -12,8 +12,11 @@ if ! [ -s "$scadBin" ]; then
     scadBin="/usr/bin/openscad"
 fi
 if ! [ -s "$scadBin" ]; then
+    scadBin="/cygdrive/c/Program Files/OpenSCAD/openscad.exe"
+fi
+if ! [ -s "$scadBin" ]; then
 	echo "!!!!!!!! ERROR: missing Scad Binary"
-	exit;
+	exit -1;
 fi
 
 ###################################################################
@@ -35,11 +38,11 @@ function generateStl {
 	fi
 	stlName="$baseName.stl"
 	echo "Generate '$stlName'"
-	$scadBin "$scadFile" -o "$stlName" $partDefinition -D 'debug=0' "$@"
+	"$scadBin" "$scadFile" -o "$stlName" $partDefinition -D 'debug=0' "$@"
 
 	pngName="$baseName.png"
 	echo "Generate '$pngName'"
-	$scadBin "$scadFile" -o "$pngName" $partDefinition -D 'debug=0' "$@"
+	"$scadBin" "$scadFile" -o "$pngName" $partDefinition -D 'debug=0' "$@"
 }  
 
 function generateAllFiles {
