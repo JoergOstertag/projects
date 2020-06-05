@@ -1,0 +1,1 @@
+![Lantern](stl/Lantern.png)

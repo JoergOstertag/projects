@@ -3,6 +3,9 @@
 # This script takes all *.scad Files and creates png and stl files for them
 # if a parts=.. line is found it iterates over these and generates one set of files for each
 
+DO_GENERATE_STL=true
+DO_GENERATE_PNG=true
+
 
 scadBin="/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD"
 if ! [ -s "$scadBin" ]; then
@@ -36,13 +39,19 @@ function generateStl {
 	    partDefinition=" -D 'part=$partNumber' "
 	    baseName="stl/$fileName-part-$partNumber-$name"
 	fi
-	stlName="$baseName.stl"
-	echo "Generate '$stlName'"
-	"$scadBin" "$scadFile" -o "$stlName" $partDefinition -D 'debug=0' "$@"
 
-	pngName="$baseName.png"
-	echo "Generate '$pngName'"
-	"$scadBin" "$scadFile" -o "$pngName" $partDefinition -D 'debug=0' "$@"
+
+	if $DO_GENERATE_STL ; then
+	    stlName="$baseName.stl"
+	    echo "Generate '$stlName'"
+	    $scadBin "$scadFile" -o "$stlName" $partDefinition -D 'debug=0' "$@"
+	fi
+
+	if $DO_GENERATE_PNG ; then
+	    pngName="$baseName.png"
+	    echo "Generate '$pngName'"
+	    $scadBin "$scadFile" -o "$pngName" $partDefinition -D 'debug=0' "$@"
+	fi
 }  
 
 function generateAllFiles {
@@ -65,12 +74,16 @@ cat /tmp/scadDirts.txt | while read dir; do
     (
 	cd $dir
 	echo "Create Files in $dir"
+
 	
 	# ==================================================================
 	mkdir -p stl
-	rm -f stl/*.stl
-	rm -f stl/*.png
-	
+	if $DO_GENERATE_STL ; then
+	    rm -f stl/*.stl
+	fi
+	if $DO_GENERATE_PNG ; then
+	    rm -f stl/*.png
+	fi
 	
 	# ==================================================================
 	for scadFile in *.scad; do
@@ -81,9 +94,16 @@ cat /tmp/scadDirts.txt | while read dir; do
 		echo "!!!!!!!! ERROR: missing FIle $scadFile"
 		exit;
 	    fi
-	    
-	    generateAllFiles
-	    
+
+	    if $DO_GENERATE_STL_PNG ; then
+  		generateAllFiles
+	    fi
+
+	    find stl -name "*.png" | while read f ; do
+		name="`basename $f`"
+		name="${name%.png}"
+		echo "![$name]($f)"
+	    done >README-images.md
 	done
     )
 done

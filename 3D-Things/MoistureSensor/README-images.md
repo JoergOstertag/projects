@@ -1,0 +1,1 @@
+![moistureSensorHolder](stl/moistureSensorHolder.png)

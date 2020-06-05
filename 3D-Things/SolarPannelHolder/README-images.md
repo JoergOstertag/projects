@@ -1,0 +1,1 @@
+![SolarPannelHolder](stl/SolarPannelHolder.png)

@@ -1,0 +1,1 @@
+![LampenVorsatzFilter](stl/LampenVorsatzFilter.png)

@@ -1,0 +1,1 @@
+![GearMotor](stl/GearMotor.png)
