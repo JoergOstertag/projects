@@ -56,24 +56,33 @@ function generateAllFiles {
 }
 
 
-# ==================================================================
-mkdir -p stl
-rm -f stl/*.stl
-rm -f stl/*.png
+find . -name "*.scad" | while read a ; do echo `dirname "$a"`; done | sort -u >/tmp/scadDirts.txt
 
-
-# ==================================================================
-for scadFile in *.scad; do
-
-    fileName="${scadFile%.scad}"
-
-    if ! [ -s "$scadFile" ]; then
-	echo "!!!!!!!! ERROR: missing FIle $scadFile"
-	exit;
-    fi
-
-    generateAllFiles
-
+cat /tmp/scadDirts.txt | while read dir; do
+    (
+	cd $dir
+	echo "Create Files in $dir"
+	
+	# ==================================================================
+	mkdir -p stl
+	rm -f stl/*.stl
+	rm -f stl/*.png
+	
+	
+	# ==================================================================
+	for scadFile in *.scad; do
+	    
+	    fileName="${scadFile%.scad}"
+	    
+	    if ! [ -s "$scadFile" ]; then
+		echo "!!!!!!!! ERROR: missing FIle $scadFile"
+		exit;
+	    fi
+	    
+	    generateAllFiles
+	    
+	done
+    )
 done
 
 exit
