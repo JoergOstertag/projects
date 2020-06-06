@@ -1,6 +1,7 @@
 ESP8266
 =======
 
+[English translation](https://translate.google.com/translate?hl=&sl=de&tl=en&u=https%3A%2F%2Fgithub.com%2FJoergOstertag%2Fprojects%2Ftree%2Fmaster%2FESP8266)
 
 [ESP8266](https://en.wikipedia.org/wiki/ESP8266)
 ------------------------------------------------
