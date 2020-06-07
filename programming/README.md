@@ -6,7 +6,7 @@ Allgemeiner Einstieg in die Embedded Programmierung
 ---------------------------------------------------------
 Wir fangen mit der [installation der Entwicklungsumgebung](ESP8266/README.md) an.
 Danach machen wir mit einfachen Programmierbeispiele weiter. Das zeigt uns auch gleich ob die Entwicklungsumgebung richtig installiert ist.
-Hierzu verwenden wir das einfache Blink Beispiel, das beim Compiler fÃ¼r den ESP8266 dankenswerterweise gleich als Beispiel mit kommt.
+Hierzu verwenden wir das einfache Blink Beispiel, das beim Compiler für den ESP8266 dankenswerter Weise gleich als Beispiel mit kommt.
 
 
 
@@ -15,62 +15,67 @@ Planung und Strukturierung eines Projektes
 
  - *Ermitteln der Zeilstellung:*
 
-   In unserem Fall gilt es eine kleines Embedded GerÃ¤t zu designen, zu bauen und zu programmieren.
-   Da unser aller Leben gerade durch Covid sehr geprÃ¤gt ist wollen wir einen Bezug dazu herstellen.
-   Inspiriert durch andere Programmiereer und deren Projekte wollen wir daher einen "Hand Wasch Timer" bauen.
+   In unserem Fall gilt es eine kleines Embedded Gerät zu designen, zu bauen und zu programmieren.
+   Da unser aller Leben gerade durch Covid sehr geprägt ist wollen wir einen Bezug dazu herstellen.
+   Inspiriert durch andere Programmierer und deren Projekte wollen wir daher einen "Hand Wasch Timer" bauen.
 
  - *Brainstorming:*
 
-   Am Anfang eines Projektes liegt Ã¼blicherweise die Brainstorming Phase.
-   Dieser Phase Ã¼berlegen wir uns wie wir unser Ziel erreichen kÃ¶nnen.
-   Welche Funktionen soll das GerÃ¤t am Ende haben?
-   Unser Ziel ist es ja, daÃŸ wir dabei unterstÃ¼tzt werden unsere HÃ¤nde lange genug mit Seife zu waschen.
-   Daher brauchen wir irgend etwas, daÃŸ uns signalisiert wenn wir unsere HÃ¤nde lange genug gewaschen haben.
-   Da wir auch wissen, daÃŸ die minimale Zeit zum HÃ¤ndewaschen 20 Sekunden sein sollte ist eine weitere Vorraussetzung diese 20Sekunden zu timern.
+   Am Anfang eines Projektes liegt üblicherweise die Brainstorming Phase.
+   Dieser Phase überlegen wir uns wie wir unser Ziel erreichen können.
+   Welche Funktionen soll das Gerät am Ende haben?
+   Unser Ziel ist es ja, daß wir dabei unterstützt werden unsere Hände lange genug mit Seife zu waschen.
+   Daher brauchen wir irgend etwas, daß uns signalisiert wenn wir unsere Hände lange genug gewaschen haben.
+   Da wir auch wissen, daß die minimale Zeit zum Händewaschen 20 Sekunden sein sollte ist eine weitere Vorraussetzung diese 20Sekunden zu timern.
    Jetzt fehlt uns noch irgendwas das den ganzen Vorgang einleitet; sozusagen ein Start Trigger.
-   Da wir als Menschen gerne ungeduldig sind wollen wir auch gerne wissen, wie lange es noch dauert. Also wÃ¤re ein nettes plus fÃ¼r uns wÃ¤hrend des Timers zu sehen wie lange wir noch waschen mÃ¼ssen.
+   Da wir als Menschen gerne ungeduldig sind wollen wir auch gerne wissen, wie lange es noch dauert. Also wäre ein nettes plus für uns während des Timers zu sehen wie lange wir noch waschen müssen.
 
 
- - *Welche Komponenten werden benÃ¶tigt*:
+ - *Welche Komponenten werden benötigt*:
 
-   Im nÃ¤chsten Schritt ermitteln wir welche Komponenten wir brauchen um dieses Ziel zu erreichen. In unserem Fall brauchen wir also
-    - Etwas zu triggern des Anfangs (Wir haben hier einen Distanzsensor gewÃ¤hlt)
-    - Eine komponente, die uns die 20 Sekunden ermittelt (als Timer wÃ¤hlen wir entweder die Funktion sleep() oder miliseconds() )
-    - Eine komponente, die uns sagt wie weit wir sind und diese als Fortschrittsanzeige visualisiert (Als Fortschrittsanzeige wÃ¤hlen wir entweder einen Modelbau Servo mit Zeiger oder einen Neopixel Ring) 
+   Im nächsten Schritt ermitteln wir welche Komponenten wir brauchen um dieses Ziel zu erreichen. In unserem Fall brauchen wir also
+    - Etwas zu triggern des Anfangs (Wir haben hier einen Distanzsensor gewählt)
+    - Eine Komponente, die uns die 20 Sekunden ermittelt (als Timer wählen wir entweder die Funktion sleep() oder miliseconds() )
+    - Eine Komponente, die uns sagt wie weit wir sind und diese als Fortschrittsanzeige visualisiert (Als Fortschrittsanzeige wählen wir entweder einen Modelbau-Servo mit Zeiger oder einen Neopixel Ring) 
     - Eine Komponente die uns das Ende signalisiert (Hier kann die Fortschrittsanzeige verwendet werden)
 
-Dadurch ergeben sich dann auch die Komponenten die fÃ¼r das Projekt gebraucht werden.
+Dadurch ergeben sich dann auch die Komponenten die für das Projekt gebraucht werden.
 
-Ein nÃ¤chster Schritt ist es die einzelnen Komponenten Komponenten separiert voneinander ans laufen zu bekommen.
-FÃ¼r den ersten Versuch verwenden wir die Variante mit einem Modellbauservo als Fortschrittsanzeige.
+Ein nächster Schritt ist es die einzelnen Komponenten Komponenten separiert voneinander ans laufen zu bekommen.
+Für den ersten Versuch verwenden wir die Variante mit einem Modellbau-Servo als Fortschrittsanzeige.
 In unserem Fall sind es also
  - Das Grundsystem (Die embedded CPU mit der Platine)
- - Der Modellbauservo
+ - Der Modellbau-Servo
  - Der Distanzsensor.
 Jede diese Komponenten kann man einzeln testen und sich mit der Bedienung und Verwendung vertraut machen.
 
 Das Grundsystem (Die embedded CPU mit der Platine)
 --------------------------------------------------
-Fangen wir mit der CPU Platine an. In unserem Fall verwenden wir einen wemos D1 Mini.
-Der Vorteil dieser Platine ist dass man sehr wenig LÃ¶ten muss um sie ans laufen zu bekommen.
+Fangen wir mit der CPU Platine an. In unserem Fall verwenden wir einen Wemos D1 Mini.
+Der Vorteil dieser Platine ist dass man sehr wenig Löten muss um sie ans laufen zu bekommen.
 Als Beispiel verwenden wir das Standard Blink example das in der Entwicklungsumgebung schon mitgeliefert wird.
 
 Grundaufbau von Arduino Sketches
 --------------------------------
-# setup()
+ - ``setup()``
+ 	Dieser Teil im code wird beim Booten des Embeded Gerätes einmalig ausgeführt. Hier kann man Initialisierungen 
+ 	und einmal aus zu führende Aufgaben unter bringen.
+ 	Beispiel:
+ 	
 
-## loop()
+ - ``loop()``
+ 	Dieser Teil wird immer wieder ausgeführt. Hier spielt sich normalerweise das Hauptgeschehen unseres Programmes ab.
 
 
-Bibliotheken fÃ¼r weitere Komponenten
+Bibliotheken für weitere Komponenten
 ------------------------------------
-Viele verschiedene GerÃ¤te (Sensoren und Aktoren) kÃ¶nnen von so einem Embeded System angesteuert/abgefragt werden.
-Damit sich nicht jeder Entwickler wieder von neuem mit der Programmierung der Low-Level Funktionen dieser GerÃ¤te kÃ¼mmern muss
-haben einige Programmierer sich die MÃ¼he gemacht und die grundsÃ¤tzliche Ansteuerung solcher GerÃ¤te in eine Bibliothek zu verpacken.
+Viele verschiedene Geräte (Sensoren und Aktoren) können von so einem Embeded System angesteuert/abgefragt werden.
+Damit sich nicht jeder Entwickler wieder von neuem mit der Programmierung der Low-Level Funktionen dieser Geräte kümmern muss
+haben einige Programmierer sich die Mühe gemacht und die grundsätzliche Ansteuerung solcher Geräte in eine Bibliothek zu verpacken.
 Dieser Umstand macht uns das Leben sehr viel leichter.
-Daher schauen wir als aller erste nach, ob es denn schon eine Bibliothek zur Verwendung des von uns gewÃ¼nschten GerÃ¤tes gibt.
+Daher schauen wir als aller erste nach, ob es denn schon eine Bibliothek zur Verwendung des von uns gewünschten Gerätes gibt.
 
-Hierbei gehen wir so vor, daÃŸ wir zuerst die benÃ¶tigte Bibliothek anhand der Typenbezeichnung des Sensors oder GerÃ¤tes identifizieren.
+Hierbei gehen wir so vor, daß wir zuerst die benötigte Bibliothek anhand der Typenbezeichnung des Sensors oder Gerätes identifizieren.
 Viele der Bibliotheken sind schon direkt in der ["Bibliotheksverwaltung"](img/Libs-search-Wemos-Matrix.png) innerhalb der IDE direkt herunterladbar.
 Wenn man hier die entsprechende Bibliothek gefunden hat einfach auswählen und installieren.
 
@@ -82,23 +87,25 @@ Die Beispiele findet man unter ![Datei Beispiele](img/Open-Example-for-Lib.png)
 Das klappt natürlich nur, nachdem die Bibliothek in der Arduino-IDE installiert wurde.
 Üblicherweise bringen die Bibliotheken schon Beispiele mit, die die Verwendung der Bibliothek und die Ansteuerung des Sensors zeigen.
 
-Viele Bibliotheken haben einen sehr ähnlichen Aufbau und sind zur Verwending in ihrem Interface (Das was ein anderer Programmierer wissen muss) recht ähnlich aufgebaut.
+Viele Bibliotheken haben einen sehr ähnlichen Aufbau und sind zur Verwendung in ihrem Interface (Das was ein anderer Programmierer wissen muss) recht ähnlich aufgebaut.
 
 EInbinden der Bibliothek:
- - #include<BbibliotheksName.h>
+ - ``#include<BbibliotheksName.h>``
  	Es wird die Header Datei der Bibliothek mit einem #include<> Statement eingebunden.
  	Bsp.: #include <Servo.h>
  		
  - Objekt definition in den Bibliotheken:
- 	Als nächstes wird ein Objekt definiert mittels dessen später auf die Resoutrce (Sensor/Aktor) zugegriffen werden kann.
- 	
-	Example:
-		Servo myservo;  // create servo object to control a servo
-		// twelve servo objects can be created on most boards
+ 	Als nächstes wird ein Objekt definiert mittels dessen später auf die Resource (Sensor/Aktor) zugegriffen werden kann.
  	Dieses generierte Objekt könnte auch optionale Parameter beinhalten. 
  	
- 	Example:
+	Beispiel 1:
+		``Servo myservo;  // create servo object to control a servo
+		// twelve servo objects can be created on most boards``
+ 	
+ 	Beispiel 2:
+ 		``
  		MLED mled(4); // Hier wird die Helligkeit der LEDs in der LED-Matrix mit angegeben.
+ 		``
  		
  
 
