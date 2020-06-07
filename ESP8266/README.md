@@ -154,3 +154,6 @@ Diese fertigen Binaries arbeiten üblicherweise mit einem Home-Automation System
 Hier wird zur Kommunikation MQTT verwendet. Als MQTT Server kann z.B. [mosquito](https://mosquitto.org/) verwendet werden.
 
 Als Home-Automation System wird unter anderem gerne [OpenHab](https://www.openhab.org/) verwendet.
+
+
+

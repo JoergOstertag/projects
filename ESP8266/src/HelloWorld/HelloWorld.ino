@@ -14,7 +14,7 @@ void setup() {
   // Seriell Monitor in der IDE (Symbol rechts oben) zur Anzeige gebracht werden.
 
   // Der default für die serialle Schnittstelle ist in der IDE auf 9600 eingestellt. 
-  // Da viele Beispiele aber 115200 als Baurate verwenden starten wir hier auch mit 
+  // Da viele Beispiele aber 115200 als Baudrate verwenden starten wir hier auch mit
   // 115200 Baud. Dazu in der IDE bei geöffnetem Seriell Monitor rechts unten die 
   // Baudrate umstellen.
   Serial.begin(115200);
