@@ -108,14 +108,17 @@ EInbinden der Bibliothek:
 		// twelve servo objects can be created on most boards``
  	
  	Beispiel 2:
- 		``
- 		MLED mled(4); // Hier wird die Helligkeit der LEDs in der LED-Matrix mit angegeben.
- 		``
+		``
+		MLED mled(4); // Hier wird die Helligkeit der LEDs in der LED-Matrix mit angegeben.
+		``
  		
  
 
 Projektstruktur mit Dateien
 ---------------------------
+
+Die Arduino-IDE verwaltet ihre Projekte immer in Unterordnern. Dieser Unterordner muss den gleichen Namen haben wie das Hauptprogramm. Das Hauptprogramm hat dann die Endung ".ino".
+In dem Order dürfen dann noch weitere Dateien sein.
 
 
 Pinbezeichnungen
