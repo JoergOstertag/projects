@@ -6,7 +6,7 @@ Allgemeiner Einstieg in die Embedded Programmierung
 ---------------------------------------------------------
 Wir fangen mit der [installation der Entwicklungsumgebung](ESP8266/README.md) an.
 Danach machen wir mit einfachen Programmierbeispiele weiter. Das zeigt uns auch gleich ob die Entwicklungsumgebung richtig installiert ist.
-Hierzu verwenden wir das einfache Blink Baispil, das beim Compiler fÃ¼r den ESP8266 dankenswerterweise gleich als Beispiel mit kommt.
+Hierzu verwenden wir das einfache Blink Beispiel, das beim Compiler fÃ¼r den ESP8266 dankenswerterweise gleich als Beispiel mit kommt.
 
 
 
@@ -55,42 +55,64 @@ Fangen wir mit der CPU Platine an. In unserem Fall verwenden wir einen wemos D1 
 Der Vorteil dieser Platine ist dass man sehr wenig LÃ¶ten muss um sie ans laufen zu bekommen.
 Als Beispiel verwenden wir das Standard Blink example das in der Entwicklungsumgebung schon mitgeliefert wird.
 
+Grundaufbau von Arduino Sketches
+--------------------------------
+# setup()
+
+## loop()
+
+
 Bibliotheken fÃ¼r weitere Komponenten
 ------------------------------------
 Viele verschiedene GerÃ¤te (Sensoren und Aktoren) kÃ¶nnen von so einem Embeded System angesteuert/abgefragt werden.
-Damit sich nicht jeder Entwickler wieder von neuem mit der Programmierung der LowLevel Funktionen dieser GerÃ¤te kÃ¼mmern muss
-haben eineige Programmierer sich die MÃ¼he gemacht und die grundsÃ¤tzliche Ansteuerung solcher GerÃ¤te in eine Bibliothek zu verpacken.
+Damit sich nicht jeder Entwickler wieder von neuem mit der Programmierung der Low-Level Funktionen dieser GerÃ¤te kÃ¼mmern muss
+haben einige Programmierer sich die MÃ¼he gemacht und die grundsÃ¤tzliche Ansteuerung solcher GerÃ¤te in eine Bibliothek zu verpacken.
 Dieser Umstand macht uns das Leben sehr viel leichter.
-Daher schauen wir als allererste nach, ob es denn schon eine Bibliothek zur Verwendung des von uns gewÃ¼nschten GerÃ¤tes gibt.
+Daher schauen wir als aller erste nach, ob es denn schon eine Bibliothek zur Verwendung des von uns gewÃ¼nschten GerÃ¤tes gibt.
 
 Hierbei gehen wir so vor, daÃŸ wir zuerst die benÃ¶tigte Bibliothek anhand der Typenbezeichnung des Sensors oder GerÃ¤tes identifizieren.
-Viele der Bibliotheken sind schon direkt in der "Bibliotheksverwaltung" innerhalb der IDE direkt herunterladbar.
-Unser nÃ¤chster Schritt ist dann das installieren der Bibliothe auf diesem Wege.
-Wenn die Bibliothek in der IDE istalliert ist schauen wir uns die zur Bibliothek mit gelieferten Beispiele an.
-Denn Ã¼blicherweise bringen die Bibliotheken auch schon Beispiele mit, die die Verwendung der Bibliothek und die Ansteuerung des Sensors zeigen.
+Viele der Bibliotheken sind schon direkt in der ["Bibliotheksverwaltung"](img/Libs-search-Wemos-Matrix.png) innerhalb der IDE direkt herunterladbar.
+Wenn man hier die entsprechende Bibliothek gefunden hat einfach auswählen und installieren.
 
-
-#include<>
-Objekt definition in den Bibliotheken
-Was bedeutet loop()
-setup()
-
-Projektstruktur mit Dateien
-Nur eine Arduino IDE öffnen wegen der Seriellen
-
-
-
-Anfangen mit Beispielen
------------------------
+Vertraut machen durch Beispiele
+-------------------------------
 
 Um sich mit einer Bibliothek und einem neuen Gerät vertraut zu machen, ist ein schöner Einstieg die Beispiele zu dieser Bibliothek.
-Die Beispiele findet man unter []()
+Die Beispiele findet man unter ![Datei Beispiele](img/Open-Example-for-Lib.png)
+Das klappt natürlich nur, nachdem die Bibliothek in der Arduino-IDE installiert wurde.
+Üblicherweise bringen die Bibliotheken schon Beispiele mit, die die Verwendung der Bibliothek und die Ansteuerung des Sensors zeigen.
+
+Viele Bibliotheken haben einen sehr ähnlichen Aufbau und sind zur Verwending in ihrem Interface (Das was ein anderer Programmierer wissen muss) recht ähnlich aufgebaut.
+
+EInbinden der Bibliothek:
+ - #include<BbibliotheksName.h>
+ 	Es wird die Header Datei der Bibliothek mit einem #include<> Statement eingebunden.
+ 	Bsp.: #include <Servo.h>
+ 		
+ - Objekt definition in den Bibliotheken:
+ 	Als nächstes wird ein Objekt definiert mittels dessen später auf die Resoutrce (Sensor/Aktor) zugegriffen werden kann.
+ 	
+	Example:
+		Servo myservo;  // create servo object to control a servo
+		// twelve servo objects can be created on most boards
+ 	Dieses generierte Objekt könnte auch optionale Parameter beinhalten. 
+ 	
+ 	Example:
+ 		MLED mled(4); // Hier wird die Helligkeit der LEDs in der LED-Matrix mit angegeben.
+ 		
+ 
+
+Projektstruktur mit Dateien
+
+
+
 
 
 Debugging
 ---------
 
-Debugging:
+Für das Debugging eines Arduino scetches wird gerne die serielle Verbindung verwendet.  
  - Serieller Monitor
- - Änderung erzwingen, die eine Auswirkung haben muss
-  
+ []()
+ - Tip: Änderung erzwingen, die eine Auswirkung haben muss
+
