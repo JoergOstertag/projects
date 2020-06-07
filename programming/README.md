@@ -61,7 +61,12 @@ Grundaufbau von Arduino Sketches
  	Dieser Teil im code wird beim Booten des Embeded Gerätes einmalig ausgeführt. Hier kann man Initialisierungen 
  	und einmal aus zu führende Aufgaben unter bringen.
  	Beispiel:
- 	
+ 		``
+		void setup() {
+  			myservo.attach(D3);  // attaches the servo on pin D3 to the servo object
+		}``
+		In diesem Beispiel wird z.B. der Servo mit dem Pin D3 verbunden
+
 
  - ``loop()``
  	Dieser Teil wird immer wieder ausgeführt. Hier spielt sich normalerweise das Hauptgeschehen unseres Programmes ab.
@@ -110,7 +115,13 @@ EInbinden der Bibliothek:
  
 
 Projektstruktur mit Dateien
+---------------------------
 
+
+Pinbezeichnungen
+----------------
+
+Unterschied D3 vs. 3 vs. GPIO3
 
 
 
