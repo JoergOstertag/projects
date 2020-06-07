@@ -129,8 +129,31 @@ Unterschied D3 vs. 3 vs. GPIO3
 Debugging
 ---------
 
-Für das Debugging eines Arduino scetches wird gerne die serielle Verbindung verwendet.  
+
+Diese ist bei den Wemos-D1-Mini an den USB-Seriell-Konverter verbunden und kann durch den seriell Monitor in der IDE (Symbol rechts oben) zur Anzeige gebracht werden.
+
+	``
+	// Initialisierung der Seriellen Schnittstelle.
+	Serial.begin(115200);
+	``
+
+	Der default für die serielle Schnittstelle ist in der IDE auf 9600 eingestellt. 
+	Da viele Beispiele aber 115200 als Baudrate verwenden starten wir hier auch mit 
+	115200 Baud. Dazu in der IDE bei geöffnetem Seriell Monitor rechts unten die 
+	Baudrate umstellen.
+
+	Wir fangen eine neue Zeile an, da vorher oft wirre Zeichen in der Konsole zu sehen sind
+  	``Serial.println("");``
+  
+
  - Serieller Monitor
- []()
- - Tip: Änderung erzwingen, die eine Auswirkung haben muss
+ ![Serieller Monitor](img/Serial-monitor.png)
+ 
+Tips:
+ - Es scheint so wie wenn ihr euch verrannt habt. Ihr seid fest davon überzeugt, daß das was ihr gerade geändert habe eigentlich funktionieren sollte. Aber euer Programm reagiert immer noch so wie vor der Änderung, die eigentlich eine Verhaltens-Besserung bringen sollte.
+   Dann könnte es sin, daß eure Änderung gar nicht auf dem Embeded Gerät landet. Ein erster Blick auf die Ausgabe des COmpilers und des Upload Prozesses zeigt hier oft schon einen Hinweis. 
+   Sollte das auch nichts bringen, dann macht einfach mal eine Änderung, bei der ihr sicher seid, daß sie sich auch auswirken muss; ladet diese auf den Arduino/Wemos und schaut ob sich das was ihr erwartet auch ändert.
+   
+  
+
 
