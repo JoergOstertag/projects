@@ -113,31 +113,31 @@ Dazu wird die Header Datei der Bibliothek mit einem ``#include<>`` Statement ein
 ```
 
 Beispiel 1: 
-```
+```C
 \#include <Servo.h>
 ```
 
 Beispiel 2:
-```
+```C
 \#include <WEMOS_Matrix_GFX.h>
 ```
  		
 ### Objekte definieren
 
- - Objekt definition in den Bibliotheken:
- 	Als nächstes wird ein Objekt definiert mittels dessen später auf die Resource (Sensor/Aktor) zugegriffen werden kann.
- 	Dieses generierte Objekt könnte auch optionale Parameter beinhalten. 
+Als nächstes wird ein Objekt definiert mittels dessen später auf die Resource (Sensor/Aktor) zugegriffen werden kann.
+Dieses generierte Objekt könnte auch optionale Parameter beinhalten. 
  	
-	Beispiel 1:
+Beispiel 1:
 ```C
 Servo myservo;  // create servo object to control a servo
-// twelve servo objects can be created on most boards
+                // twelve servo objects can be created on most boards
 ```
  	
- 	Beispiel 2:
-		``
-		MLED mled(4); // Hier wird die Helligkeit der LEDs in der LED-Matrix mit angegeben.
-		``
+Beispiel 2:
+
+```C
+MLED mled(4); // Hier wird die Helligkeit der LEDs in der LED-Matrix mit angegeben.
+``
  		
  
 
