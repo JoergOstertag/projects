@@ -110,8 +110,10 @@ Einbinden der Bibliothek:
  	Dieses generierte Objekt könnte auch optionale Parameter beinhalten. 
  	
 	Beispiel 1:
-		``Servo myservo;  // create servo object to control a servo
-		// twelve servo objects can be created on most boards``
+		```
+		Servo myservo;  // create servo object to control a servo
+		// twelve servo objects can be created on most boards
+		```
  	
  	Beispiel 2:
 		``
