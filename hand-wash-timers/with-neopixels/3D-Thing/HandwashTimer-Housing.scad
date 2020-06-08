@@ -1,9 +1,11 @@
 // use <../LibExternal/Triangles.scad>;
-// use <MCAD/shapes/triangles.scad>;
+//use <MCAD/shapes/triangles.scad>;
 use <MCAD/triangles.scad>;
 
-debug=1;
+debug=1; 
 
+
+part=3; // [ 0:All, 1:Hand Wash Timer Housing, 2:Bottom Lid ,3:Bottom Lid with Mounting holes]
 
 border=2;
 border1=1;
@@ -12,42 +14,64 @@ wemosD1Mini=[26,36,5]+addSpace*[2,2,2];
 wemosD1ExperimentBoard=[26,29,20]+addSpace*[2,2,2];
 
 
-// ---------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------
 // do not need to modify anything below here
-// ---------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------
 /* [Hidden] */
 
 $fn=45;
 numberOfBaseMountingClips=0;
 
-// Main
 difference(){
-    translate([0,debug*20,0]) HandWashTimerHousing();
+    showPart(part=part);
+ 
+    // cube to cut fee for Debugging and seeing inside Objects
+    if ( 0 * debug ) 
+        translate([25,0,-.1]) 
+            cube([90,90,45]);
     
-    // cube to cut fee for Debugging
-    // translate([25,-60,-.1])cube([120,120,20]);
-    // # translate([-25,-60,-14-.1])cube([120,120,20]);
-    // translate([11,border,-.1])cube([28,39,border+.2]);
-}
-//translate([0,90,0]) bottomLid(cutout=0);
-//wemosCutout();
-// neoPixelCutout();
-// translate([70,debug*20,31.7])    bottomLid()
+} 
 
-
-if ( debug ) {
-    translate([-60,0,0]) wemosCutout();
-    translate([-90,50,0]) UltrasonicHousing();
-    translate([0,-60,0]) neoPixelHolder();
-    translate([90,-60,0]) neoPixelCutout();
+module showPart(part=0){
+    if ( part == 0) showAllParts();
+    
+	if ( part == 1) HandWashTimerHousing();
+	if ( part == 2) bottomLid(placeForPrint=1,numberOfBaseMountingClips=0);
+    if ( part == 3) bottomLid(placeForPrint=1,numberOfBaseMountingClips=4);
+            
+    if ( debug ) {
+        if ( part == 11 ) wemoscutOut();
+        if ( part == 12 ) bottomLid(placeForPrint=1,cutOut=1);
+        
+        
+        if ( part == 21 ) UltrasonicHousing(placeForPrint=1);
+        if ( part == 13 ) neoPixelHolder(placeForPrint=1);
+        if ( part == 23 ) neoPixelcutOut(placeForPrint=1);
+       
+    }
 }
+
+module showAllParts(){
+    distX=100;  maxX=5;
+    distY=100; maxY=5;
+
+    for ( i = [1:maxX] )
+            for ( j = [0:maxY] )
+                translate([ (i-1)*distX, j*distY, 0]){
+                    showPart(part= i + j*10);
+                	if ( debug ) 
+                    	debugFrame(size=[distX-3,distY-3,2]);
+            		}
+        
+}
+        
 
 neoPixelRingH=3.2;
 neoPixelRingDInner=72;
 neoPixelRingDOuter=86.5;
 
 
-module HandWashTimerHousing(){
+module HandWashTimerHousing(numberOfBaseMountingClips=0){
 
     connectionHeight=10;
 //    offsetX=9.5;
@@ -70,12 +94,12 @@ module HandWashTimerHousing(){
                 ) 
             cube([47,8,32]);
         
-        // Wemos cutout
+        // Wemos cutOut
         translate( border * [1,1,1] 
                   + borderX*[1,0,0]) 
-            wemosCutout();
+            wemoscutOut();
 
-        // Cutout for Neopixel Cable
+        // cutOut for Neopixel Cable
         translate( border*[1,0,0]
                     + [offsetX + wemosD1Mini[0]/2-4,
                     wemosD1Mini[1] +2-.1 ,18-.01 ]
@@ -102,7 +126,8 @@ module HandWashTimerHousing(){
 
     // Neo Pixel Holder
     translate([borderX+15,7.5,outerSize[2]-1.2*border+2])
-        rotate([0,0,180]) neoPixelHolder();
+        rotate([0,0,180]) 
+        	neoPixelHolder();
     
     // Base Mount Clips
     translate([0,0,0]) 
@@ -113,22 +138,16 @@ module HandWashTimerHousing(){
     }
 
 
-module bottomLid(cutOut=0){
-    cube(
-        [wemosD1Mini[0],wemosD1Mini[1],border]
-        +border*[2,2,1]
-        +cutOut*addSpace*[2,2,2]);
-}
-
-module backLid(cutout=0){
+module backLid(cutOut=0){
     cube([  wemosD1Mini[0] + 2*border,
             1,
             wemosD1Mini[2]+ wemosD1ExperimentBoard[2] ]
-        +cutout*[1,1,2]
+        +cutOut*[1,1,2]
     );
+    
 }
 
-module wemosCutout(){
+module wemoscutOut(){
         hBase=wemosD1Mini[2];
         height=hBase
             +wemosD1ExperimentBoard[2];
@@ -139,11 +158,11 @@ module wemosCutout(){
             cube(wemosD1ExperimentBoard
                 +[.1,.1,.1]);
         
-        // Usb Cutout
+        // Usb cutOut
         translate([6,31,-3])
             cube([14,15,9+4]); 
 
-        // SC04 4-Pin Plug cutout
+        // SC04 4-Pin Plug cutOut
         // y direction is larger so we can slide in the SR04
         translate([6,-3,7])
             cube([14,16,13]);
@@ -151,21 +170,23 @@ module wemosCutout(){
 
 }
 
-module neoPixelHolder(){
+module neoPixelHolder(placeForPrint=0){
     dOuter=neoPixelRingDOuter +addSpace +border +4;
     dInner=0;
     // dInner=neoPixelRingDInner -addSpace -border -14;
     hTotal=neoPixelRingH                +border;
+    
+    translate(placeForPrint*[dOuter/2,dOuter/2,0])
     difference(){
         cylinder(h=hTotal,d=dOuter);
         translate([0,0,-.01])
             cylinder(h=hTotal+.02,d=dInner);
         
-        translate([0,0,.01+border-3])
+        translate([0,0,.01+border-2.3])
             rotate([0,0,180])
-                neoPixelCutout();
+                neoPixelcutOut();
         
-        // cutout for SR04
+        // cutOut for SR04
         translate([-22.5,2,-.01])
             cube([45,21,hTotal+1]);
         
@@ -173,79 +194,148 @@ module neoPixelHolder(){
 }
 
 
-module neoPixelCutout(){
+module neoPixelcutOut(placeForPrint=0){
     dOuter=neoPixelRingDOuter+addSpace;
     dInner=neoPixelRingDInner-addSpace;
     hTotal=neoPixelRingH;
-    difference(){
-        cylinder(h=hTotal,d=dOuter);
-        translate([0,0,-.01])
-            cylinder(h=hTotal+.02,d=dInner);
-    }
-
-    translate([-3,dOuter/2-.2,0])    cube([6,6,hTotal]);
-
-    // for cables
-    translate([-10,dInner/2,-3])        cube([20,7,3.1]);
-
-    // for cable tie to fix cables
-    rotate([0,0,-12])
-        translate([-6,dInner/2-3,-3]) 
-        cube([8,12,hTotal+6]);
-
-    numLeds=24;
-    for ( i=[0:360/numLeds:360] ){
-        rotate([0,0,i])
-            translate( [-3 , dInner/2+1, hTotal-0.01 ] )
-                cube([6,6,2]);
+    
+    translate(placeForPrint*[dOuter/2,dOuter/2,0]){
+	    difference(){
+	        cylinder(h=hTotal,d=dOuter);
+	        translate([0,0,-.01])
+	            cylinder(h=hTotal+.02,d=dInner);
+	    }
+	
+	    translate([-3,dOuter/2-.2,0])    cube([6,6,hTotal]);
+	
+	    // for cables
+	    translate([-10,dInner/2,-3])        cube([20,7,3.1]);
+	
+	    // for cable tie to fix cables
+	    rotate([0,0,-12])
+	        translate([-6,dInner/2-3,-3]) 
+	        cube([8,12,hTotal+6]);
+	
+	    numLeds=24;
+	    for ( i=[0:360/numLeds:360] ){
+	        rotate([0,0,i])
+	            translate( [-3 , dInner/2+1, hTotal-0.01 ] )
+	                cube([6,6,2]);
+	    }
     }
 }
 
 
 
 // Modules
-module UltrasonicHousing(){
-    innerCutout=[45.5,3.4,20]+border1*[1,0,1];
+module UltrasonicHousing(placeForPrint=0){
+    innercutOut=[45.5,3.4,20]+border1*[1,0,1];
 
     tubeLen=12;
 
     holeDistance=26;
     diameter=16.3+1;
 
-	outerBase = innerCutout
+	outerBase = innercutOut
                 + [0,tubeLen,0]
                 + 2*border*[1,0,1];
 
 	color("blue")
-    difference(){
-    // union(){
-        translate([-outerBase[0]/2,0,0])
-            cube(outerBase);
-
-        // Inner cutout
-        translate(  [ -innerCutout[0]/2 ,-.01,border])
-            cube(  innerCutout
-                   +border*[0,1,0]
-                   );
+	translate(placeForPrint*[outerBase[0]/2,0,0])
+	    difference(){
+	    // union(){
+	        translate([-outerBase[0]/2,0,0])
+	            cube(outerBase);
 	
-        // IC / Pinrow cutout
-	    translate( [ -6, 0 , border ] )
-	            cube([12,6,innerCutout[2]]);
-         // cutout for Pins
-        translate([-6,-3,-2])
-            cube([12,6,3.5]); 	
+	        // Inner cutOut
+	        translate(  [ -innercutOut[0]/2 ,-.01,border])
+	            cube(  innercutOut
+	                   +border*[0,1,0]
+	                   );
+		
+	        // IC / Pinrow cutOut
+		    translate( [ -6, 0 , border ] )
+		            cube([12,6,innercutOut[2]]);
+	         // cutOut for Pins
+	        translate([-6,-3,-2])
+	            cube([12,6,3.5]); 	
+	
+			// Holes for sonic Receiver and Transmitter
+		    translate([0,innercutOut[1],0])
+	            for ( x=[-holeDistance/2,holeDistance/2] )
+	                translate([x,0,border+innercutOut[2]/2])
+	                    rotate([-90,0,0])
+	                        cylinder(d=diameter,h=12.3);
+	    }
+}
 
-		// Holes for sonic Receiver and Transmitter
-	    translate([0,innerCutout[1],0])
-            for ( x=[-holeDistance/2,holeDistance/2] )
-                translate([x,0,border+innerCutout[2]/2])
-                    rotate([-90,0,0])
-                        cylinder(d=diameter,h=12.3);
+
+
+module bottomLid(cutOut=0,placeForPrint=0,numberOfBaseMountingClips=0){
+
+
+    bottomHeight=3;
+    addY=15;
+    addYcutOut=10*cutOut;
+    
+    
+    X= wemosD1Mini[0] + 2*border + cutOut*addSpace*2;
+    Y= wemosD1Mini[1] + 2*border + cutOut*addSpace*2 
+        + addY +addYcutOut;
+                
+    translate(placeForPrint*[14,19,bottomHeight]){
+        difference(){
+            union(){
+                // large bottom plate
+                bottomBorderX=10;
+                bottomBorderY=6;
+                
+                basePlate=[X+2*bottomBorderX,Y+2*bottomBorderY,bottomHeight];
+                translate([-bottomBorderX,-bottomBorderY,
+                            -bottomHeight+cutOut*addSpace]) {
+                    cube(basePlate);
+		        
+		        	// Base Mount Clips
+			    	translate([0,0,0]) 
+			        	BaseMountingClips(
+			            	numberOfBaseMountingClips=numberOfBaseMountingClips,
+			            	outerSize=basePlate);
+	            	}
+                
+                // fit size of wemos
+                    cube(
+                        [X,Y, 2*border  +cutOut*addSpace*2]);
+
+                // small fitting brim to allow sliding Housing into Bottom plate
+                sizeFitting=.5;
+                translate(sizeFitting*[-1,-1,0]+[0,0,2])
+                    cube(
+                        [X,Y, cutOut*addSpace*2]
+                        +sizeFitting*[2,2,1]);
+                
+                
+                // small fitting brim snap Housing into fixed position against Bottom plate
+                sizeSnap=.5;
+                translate(sizeSnap*[0,-1,0]
+                        +[0,Y-2,2*border  +cutOut*addSpace*2-.1])
+                    cube(
+                        [X,0, 0]
+                        +sizeSnap*[0,2,1]);
+
+            }
+                 
+            // Cut out for USB Plug
+            if(! cutOut)
+                translate([8,-1,0])
+                    cube([15,Y+2,15]);
+        }
+
+
     }
 }
 
 
-module BaseMountingClips(numberOfBaseMountingClips=4,outerSize){
+module BaseMountingClips(numberOfBaseMountingClips=4,outerSize=10){
 
     diameterBaseClipHoles=3;
     
@@ -305,4 +395,13 @@ module BaseMountingClip(diameterBaseClipHoles=3){
         
 
     }        
+}
+
+module debugFrame( size=[60,60,2], border=.1) {
+    translate([0,0,-2])
+	    difference(){
+	        cube(size);
+	        translate([0,0,-1])
+	            cube(size - border*[1,1,0]+[0,0,2]);
+	    }
 }
