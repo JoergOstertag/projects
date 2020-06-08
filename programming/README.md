@@ -109,7 +109,7 @@ Um eine Bibliothek ztu verwenden müssen wir dem compiler sagen, welche Biblioth
 Dazu wird die Header Datei der Bibliothek mit einem ``#include<>`` Statement eingebunden.
 
 ```C
-#include<BibliotheksName.h>
+	#include<BibliotheksName.h>
 ```
 
 Beispiel 1: 
@@ -119,7 +119,7 @@ Beispiel 1:
 
 Beispiel 2:
 ```C
-#include <WEMOS_Matrix_GFX.h>
+	#include <WEMOS_Matrix_GFX.h>
 ```
  		
 ### Objekte definieren
