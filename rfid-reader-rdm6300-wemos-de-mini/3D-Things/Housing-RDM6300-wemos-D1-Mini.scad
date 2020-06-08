@@ -374,4 +374,3 @@ module debugFrame(size=[60,60,2],border=.1){
             cube(size - border*[1,1,0]+[0,0,2]);
     }
 }
-                
