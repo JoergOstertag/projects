@@ -51,14 +51,16 @@ Jede diese Komponenten kann man einzeln testen und sich mit der Bedienung und Ve
 
 
 
+
 Das Grundsystem (Die embedded CPU mit der Platine)
 --------------------------------------------------
+
 Fangen wir mit der CPU Platine an. In unserem Fall verwenden wir einen Wemos D1 Mini.
 
 ![Wemos D1 Mini](img/Wemos-D1-Mini-small.jpg)
 
 Der Vorteil dieser Platine ist dass man sehr wenig Löten muss um sie ans laufen zu bekommen.
-Als Beispiel verwenden wir das Standard [Blink example](https://github.com/wemos/D1_mini_Examples/blob/master/examples/02.Special/DeepSleep/Blink/Blink.ino) das in der Entwicklungsumgebung schon mitgeliefert wird.
+Zudem gibt es schon fertige [Shields](../ESP8266/Hardware/img/Wemos-D1-Mini) mit denen man schon recht viel anfangen kann. 
 
 
 
@@ -68,6 +70,7 @@ Vertraut machen durch Beispiele
 
 Um sich mit einer Bibliothek und einem neuen Gerät vertraut zu machen, ist ein schöner Einstieg die Beispiele zu dieser Bibliothek.
 
+Als erstes Beispiel verwenden wir das Standard [Blink example](https://github.com/wemos/D1_mini_Examples/blob/master/examples/02.Special/DeepSleep/Blink/Blink.ino) das in der Entwicklungsumgebung schon mitgeliefert wird.
 
 
 ### Beispiele laden
