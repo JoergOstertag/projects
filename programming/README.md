@@ -49,11 +49,55 @@ In unserem Fall sind es also
  - Der Distanzsensor.
 Jede diese Komponenten kann man einzeln testen und sich mit der Bedienung und Verwendung vertraut machen.
 
+
+
 Das Grundsystem (Die embedded CPU mit der Platine)
 --------------------------------------------------
 Fangen wir mit der CPU Platine an. In unserem Fall verwenden wir einen Wemos D1 Mini.
+
+![Wemos D1 Mini](img/Wemos-D1-Mini-small.jpg)
+
 Der Vorteil dieser Platine ist dass man sehr wenig Löten muss um sie ans laufen zu bekommen.
-Als Beispiel verwenden wir das Standard Blink example das in der Entwicklungsumgebung schon mitgeliefert wird.
+Als Beispiel verwenden wir das Standard [Blink example](https://github.com/wemos/D1_mini_Examples/blob/master/examples/02.Special/DeepSleep/Blink/Blink.ino) das in der Entwicklungsumgebung schon mitgeliefert wird.
+
+
+
+Bibliotheken für weitere Komponenten
+------------------------------------
+Viele verschiedene Geräte (Sensoren und Aktoren) können von so einem Embeded System angesteuert/abgefragt werden.
+Damit sich nicht jeder Entwickler wieder von neuem mit der Programmierung der Low-Level Funktionen dieser Geräte kümmern muss
+haben einige Programmierer sich die Mühe gemacht und die grundsätzliche Ansteuerung solcher Geräte in eine Bibliothek zu verpacken.
+Dieser Umstand macht uns das Leben sehr viel leichter.
+Daher schauen wir als aller erste nach, ob es denn schon eine Bibliothek zur Verwendung des von uns gewünschten Gerätes gibt.
+
+Hierbei gehen wir so vor, daß wir zuerst die benötigte Bibliothek anhand der Typenbezeichnung des Sensors oder Gerätes identifizieren.
+Viele der Bibliotheken sind schon direkt in der Bibliotheksverwaltung innerhalb der IDE direkt herunterladbar.
+
+!["Bibliotheksverwaltung"](img/Bibliotheksverwaltung.png)
+
+Wenn man hier die entsprechende Bibliothek gefunden hat einfach auswählen und installieren.
+
+
+
+Vertraut machen durch Beispiele
+-------------------------------
+
+Um sich mit einer Bibliothek und einem neuen Gerät vertraut zu machen, ist ein schöner Einstieg die Beispiele zu dieser Bibliothek.
+
+
+
+### Beispiele laden
+
+Die Beispiele findet man unter Datei --> Beispiele.
+
+![Datei Beispiele](img/Open-Example-for-Lib.png)
+
+Das klappt natürlich nur, nachdem die Bibliothek in der Arduino-IDE installiert wurde.
+Üblicherweise bringen die Bibliotheken schon Beispiele mit, die die Verwendung der Bibliothek und die Ansteuerung des Sensors zeigen.
+
+Viele Bibliotheken haben einen sehr ähnlichen Aufbau und sind zur Verwendung in ihrem Interface (Das was ein anderer Programmierer wissen muss) recht ähnlich aufgebaut.
+
+
 
 Grundaufbau von Arduino Sketches
 --------------------------------
@@ -72,36 +116,6 @@ Grundaufbau von Arduino Sketches
  	Dieser Teil wird immer wieder ausgeführt. Hier spielt sich normalerweise das Hauptgeschehen unseres Programmes ab.
 
 
-Bibliotheken für weitere Komponenten
-------------------------------------
-Viele verschiedene Geräte (Sensoren und Aktoren) können von so einem Embeded System angesteuert/abgefragt werden.
-Damit sich nicht jeder Entwickler wieder von neuem mit der Programmierung der Low-Level Funktionen dieser Geräte kümmern muss
-haben einige Programmierer sich die Mühe gemacht und die grundsätzliche Ansteuerung solcher Geräte in eine Bibliothek zu verpacken.
-Dieser Umstand macht uns das Leben sehr viel leichter.
-Daher schauen wir als aller erste nach, ob es denn schon eine Bibliothek zur Verwendung des von uns gewünschten Gerätes gibt.
-
-Hierbei gehen wir so vor, daß wir zuerst die benötigte Bibliothek anhand der Typenbezeichnung des Sensors oder Gerätes identifizieren.
-Viele der Bibliotheken sind schon direkt in der Bibliotheksverwaltung innerhalb der IDE direkt herunterladbar.
-
-!["Bibliotheksverwaltung"](img/Bibliotheksverwaltung.png)
-
-Wenn man hier die entsprechende Bibliothek gefunden hat einfach auswählen und installieren.
-
-Vertraut machen durch Beispiele
--------------------------------
-
-Um sich mit einer Bibliothek und einem neuen Gerät vertraut zu machen, ist ein schöner Einstieg die Beispiele zu dieser Bibliothek.
-
-### Beispiele laden
-
-Die Beispiele findet man unter Datei --> Beispiele.
-
-![Datei Beispiele](img/Open-Example-for-Lib.png)
-
-Das klappt natürlich nur, nachdem die Bibliothek in der Arduino-IDE installiert wurde.
-Üblicherweise bringen die Bibliotheken schon Beispiele mit, die die Verwendung der Bibliothek und die Ansteuerung des Sensors zeigen.
-
-Viele Bibliotheken haben einen sehr ähnlichen Aufbau und sind zur Verwendung in ihrem Interface (Das was ein anderer Programmierer wissen muss) recht ähnlich aufgebaut.
 
 ### Einbinden der Bibliothek
 
@@ -129,14 +143,14 @@ Dieses generierte Objekt könnte auch optionale Parameter beinhalten.
  	
 Beispiel 1:
 ```C
-Servo myservo;  // create servo object to control a servo
-                // twelve servo objects can be created on most boards
+	Servo myservo;  // create servo object to control a servo
+                	// twelve servo objects can be created on most boards
 ```
  	
 Beispiel 2:
 
 ```C
-MLED mled(4); // Hier wird die Helligkeit der LEDs in der LED-Matrix mit angegeben.
+	MLED mled(4); // Hier wird die Helligkeit der LEDs in der LED-Matrix mit angegeben.
 ```
  		
  
