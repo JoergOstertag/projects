@@ -65,12 +65,12 @@ Zudem gibt es schon fertige [Shields](../ESP8266/Hardware/img/Wemos-D1-Mini) mit
 
 
 
-Vertraut machen durch Beispiele
--------------------------------
+Mitgelieferte Beispiele
+-----------------------
 
 Um sich mit einer Bibliothek und einem neuen Gerät vertraut zu machen, ist ein schöner Einstieg die Beispiele zu dieser Bibliothek.
 
-Als erstes Beispiel verwenden wir das Standard [Blink example](https://github.com/wemos/D1_mini_Examples/blob/master/examples/02.Special/DeepSleep/Blink/Blink.ino) das in der Entwicklungsumgebung schon mitgeliefert wird.
+Als erstes Beispiel verwenden wir das Standard [Blink example](https://github.com/wemos/D1_mini_Examples/blob/master/examples/02.Special/DeepSleep/Blink/Blink.ino) das in der [Entwicklungsumgebung](./README.md#Entwicklungsumgebung) schon mitgeliefert wird.
 
 
 ### Beispiele laden
