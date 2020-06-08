@@ -85,8 +85,6 @@ Das Blink
 Das klappt natürlich nur, nachdem die Bibliothek in der Arduino-IDE installiert wurde.
 Üblicherweise bringen die Bibliotheken schon Beispiele mit, die die Verwendung der Bibliothek und die Ansteuerung des Sensors zeigen.
 
-Viele Bibliotheken haben einen sehr ähnlichen Aufbau und sind zur Verwendung in ihrem Interface (Das was ein anderer Programmierer wissen muss) recht ähnlich aufgebaut.
-
 
 
 Grundaufbau von Arduino Sketches
@@ -137,9 +135,12 @@ Viele der Bibliotheken sind schon direkt in der Bibliotheksverwaltung innerhalb 
 Wenn man hier die entsprechende Bibliothek gefunden hat einfach auswählen und installieren.
 
 
+Viele Bibliotheken haben einen sehr ähnlichen Aufbau und sind zur Verwendung in ihrem Interface (Das was ein anderer Programmierer wissen muss) recht ähnlich aufgebaut.
+Daher versuche ich hier anhand verschiedener Beispiele die Hauptkomponenten zur Verwendung einer Bibliothek zu erläutern.
+
 ### Einbinden der Bibliothek
 
-Um eine Bibliothek ztu verwenden müssen wir dem compiler sagen, welche Bibliothek er mit verwenden soll.
+Um eine Bibliothek zu verwenden müssen wir dem compiler sagen, welche Bibliothek er mit verwenden soll.
 Dazu wird die Header Datei der Bibliothek mit einem ``#include<>`` Statement eingebunden.
 
 ```C
