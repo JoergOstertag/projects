@@ -62,22 +62,6 @@ Als Beispiel verwenden wir das Standard [Blink example](https://github.com/wemos
 
 
 
-Bibliotheken für weitere Komponenten
-------------------------------------
-Viele verschiedene Geräte (Sensoren und Aktoren) können von so einem Embeded System angesteuert/abgefragt werden.
-Damit sich nicht jeder Entwickler wieder von neuem mit der Programmierung der Low-Level Funktionen dieser Geräte kümmern muss
-haben einige Programmierer sich die Mühe gemacht und die grundsätzliche Ansteuerung solcher Geräte in eine Bibliothek zu verpacken.
-Dieser Umstand macht uns das Leben sehr viel leichter.
-Daher schauen wir als aller erste nach, ob es denn schon eine Bibliothek zur Verwendung des von uns gewünschten Gerätes gibt.
-
-Hierbei gehen wir so vor, daß wir zuerst die benötigte Bibliothek anhand der Typenbezeichnung des Sensors oder Gerätes identifizieren.
-Viele der Bibliotheken sind schon direkt in der Bibliotheksverwaltung innerhalb der IDE direkt herunterladbar.
-
-!["Bibliotheksverwaltung"](img/Bibliotheksverwaltung.png)
-
-Wenn man hier die entsprechende Bibliothek gefunden hat einfach auswählen und installieren.
-
-
 
 Vertraut machen durch Beispiele
 -------------------------------
@@ -131,7 +115,21 @@ Dieser Teil wird immer wieder ausgeführt. Hier spielt sich normalerweise das Ha
 
 
 
-# Bibliotheken
+Bibliotheken für weitere Komponenten
+------------------------------------
+Viele verschiedene Geräte (Sensoren und Aktoren) können von so einem Embeded System angesteuert/abgefragt werden.
+Damit sich nicht jeder Entwickler wieder von neuem mit der Programmierung der Low-Level Funktionen dieser Geräte kümmern muss
+haben einige Programmierer sich die Mühe gemacht und die grundsätzliche Ansteuerung solcher Geräte in eine Bibliothek zu verpacken.
+Dieser Umstand macht uns das Leben sehr viel leichter.
+Daher schauen wir als aller erste nach, ob es denn schon eine Bibliothek zur Verwendung des von uns gewünschten Gerätes gibt.
+
+Hierbei gehen wir so vor, daß wir zuerst die benötigte Bibliothek anhand der Typenbezeichnung des Sensors oder Gerätes identifizieren.
+Viele der Bibliotheken sind schon direkt in der Bibliotheksverwaltung innerhalb der IDE direkt herunterladbar.
+
+!["Bibliotheksverwaltung"](img/Bibliotheksverwaltung.png)
+
+Wenn man hier die entsprechende Bibliothek gefunden hat einfach auswählen und installieren.
+
 
 ### Einbinden der Bibliothek
 
