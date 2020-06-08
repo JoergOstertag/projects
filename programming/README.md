@@ -91,7 +91,10 @@ Vertraut machen durch Beispiele
 -------------------------------
 
 Um sich mit einer Bibliothek und einem neuen Gerät vertraut zu machen, ist ein schöner Einstieg die Beispiele zu dieser Bibliothek.
-Die Beispiele findet man unter Datei Beispiele.
+
+### Beispiele laden
+
+Die Beispiele findet man unter Datei --> Beispiele.
 
 ![Datei Beispiele](img/Open-Example-for-Lib.png)
 
@@ -100,20 +103,30 @@ Das klappt natürlich nur, nachdem die Bibliothek in der Arduino-IDE installiert
 
 Viele Bibliotheken haben einen sehr ähnlichen Aufbau und sind zur Verwendung in ihrem Interface (Das was ein anderer Programmierer wissen muss) recht ähnlich aufgebaut.
 
-Einbinden der Bibliothek:
- - ```#include<BbibliotheksName.h>```
- 	Es wird die Header Datei der Bibliothek mit einem #include<> Statement eingebunden.
- 	Bsp.: #include <Servo.h>
+### Einbinden der Bibliothek
+
+Um eine Bibliothek ztu verwenden müssen wir dem compiler sagen, welche Bibliothek er mit verwenden solll.
+Dazu wird die Header Datei der Bibliothek mit einem #include<> Statement eingebunden.
+
+```#include<BibliotheksName.h>```
+
+Beispiel 1: 
+```#include <Servo.h>```
+
+Beispiel 2:
+```#include <WEMOS_Matrix_GFX.h>```
  		
+### Objekte definieren
+
  - Objekt definition in den Bibliotheken:
  	Als nächstes wird ein Objekt definiert mittels dessen später auf die Resource (Sensor/Aktor) zugegriffen werden kann.
  	Dieses generierte Objekt könnte auch optionale Parameter beinhalten. 
  	
 	Beispiel 1:
-		```
-		Servo myservo;  // create servo object to control a servo
-		// twelve servo objects can be created on most boards
-		```
+```C
+Servo myservo;  // create servo object to control a servo
+// twelve servo objects can be created on most boards
+```
  	
  	Beispiel 2:
 		``
