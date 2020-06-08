@@ -101,21 +101,37 @@ Viele Bibliotheken haben einen sehr ähnlichen Aufbau und sind zur Verwendung in
 
 Grundaufbau von Arduino Sketches
 --------------------------------
- - ``setup()``
- 	Dieser Teil im code wird beim Booten des Embeded Gerätes einmalig ausgeführt. Hier kann man Initialisierungen 
- 	und einmal aus zu führende Aufgaben unter bringen.
- 	Beispiel:
- 		``
+
+### setup
+ 
+```C
+ setup()
+```
+ 	
+Dieser Teil im code wird beim Booten des Embeded Gerätes einmalig ausgeführt. Hier kann man Initialisierungen 
+und einmal aus zu führende Aufgaben unter bringen.
+Beispiel:
+
+```C
 		void setup() {
   			myservo.attach(D3);  // attaches the servo on pin D3 to the servo object
-		}``
-		In diesem Beispiel wird z.B. der Servo mit dem Pin D3 verbunden
+		}
+```
+
+In diesem Beispiel wird z.B. der Servo mit dem Pin D3 verbunden
 
 
- - ``loop()``
- 	Dieser Teil wird immer wieder ausgeführt. Hier spielt sich normalerweise das Hauptgeschehen unseres Programmes ab.
+### loop
+
+```C
+	loop()
+```
+
+Dieser Teil wird immer wieder ausgeführt. Hier spielt sich normalerweise das Hauptgeschehen unseres Programmes ab.
 
 
+
+# Bibliotheken
 
 ### Einbinden der Bibliothek
 
