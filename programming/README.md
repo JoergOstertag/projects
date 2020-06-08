@@ -70,14 +70,16 @@ Mitgelieferte Beispiele
 
 Um sich mit einer Bibliothek und einem neuen Gerät vertraut zu machen, ist ein schöner Einstieg die Beispiele zu dieser Bibliothek.
 
-Als erstes Beispiel verwenden wir das Standard [Blink example](https://github.com/wemos/D1_mini_Examples/blob/master/examples/02.Special/DeepSleep/Blink/Blink.ino) das in der [Entwicklungsumgebung](./README.md#Entwicklungsumgebung) schon mitgeliefert wird.
+Als erstes Beispiel verwenden wir das 
+[Standard Blink example](https://github.com/wemos/D1_mini_Examples/blob/master/examples/02.Special/DeepSleep/Blink/Blink.ino) 
+das in der oben installierten [Entwicklungsumgebung](./README.md#Entwicklungsumgebung) schon mitgeliefert wird.
 
 
 ### Beispiele laden
 
 Die Beispiele findet man unter Datei --> Beispiele.
 
-![Datei Beispiele](img/Open-Example-for-Lib.png)
+![Datei Beispiele](img/Open-Example-Blink-small.png)
 
 Das klappt natürlich nur, nachdem die Bibliothek in der Arduino-IDE installiert wurde.
 Üblicherweise bringen die Bibliotheken schon Beispiele mit, die die Verwendung der Bibliothek und die Ansteuerung des Sensors zeigen.
