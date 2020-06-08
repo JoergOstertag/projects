@@ -81,6 +81,7 @@ Die Beispiele findet man unter Datei --> Beispiele.
 
 ![Datei Beispiele](img/Open-Example-Blink-small.png)
 
+Das Blink 
 Das klappt natürlich nur, nachdem die Bibliothek in der Arduino-IDE installiert wurde.
 Üblicherweise bringen die Bibliotheken schon Beispiele mit, die die Verwendung der Bibliothek und die Ansteuerung des Sensors zeigen.
 
