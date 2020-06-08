@@ -81,21 +81,27 @@ Dieser Umstand macht uns das Leben sehr viel leichter.
 Daher schauen wir als aller erste nach, ob es denn schon eine Bibliothek zur Verwendung des von uns gewünschten Gerätes gibt.
 
 Hierbei gehen wir so vor, daß wir zuerst die benötigte Bibliothek anhand der Typenbezeichnung des Sensors oder Gerätes identifizieren.
-Viele der Bibliotheken sind schon direkt in der ["Bibliotheksverwaltung"](img/Libs-search-Wemos-Matrix.png) innerhalb der IDE direkt herunterladbar.
+Viele der Bibliotheken sind schon direkt in der Bibliotheksverwaltung innerhalb der IDE direkt herunterladbar.
+
+!["Bibliotheksverwaltung"](img/Bibliotheksverwaltung.png)
+
 Wenn man hier die entsprechende Bibliothek gefunden hat einfach auswählen und installieren.
 
 Vertraut machen durch Beispiele
 -------------------------------
 
 Um sich mit einer Bibliothek und einem neuen Gerät vertraut zu machen, ist ein schöner Einstieg die Beispiele zu dieser Bibliothek.
-Die Beispiele findet man unter ![Datei Beispiele](img/Open-Example-for-Lib.png)
+Die Beispiele findet man unter Datei Beispiele.
+
+![Datei Beispiele](img/Open-Example-for-Lib.png)
+
 Das klappt natürlich nur, nachdem die Bibliothek in der Arduino-IDE installiert wurde.
 Üblicherweise bringen die Bibliotheken schon Beispiele mit, die die Verwendung der Bibliothek und die Ansteuerung des Sensors zeigen.
 
 Viele Bibliotheken haben einen sehr ähnlichen Aufbau und sind zur Verwendung in ihrem Interface (Das was ein anderer Programmierer wissen muss) recht ähnlich aufgebaut.
 
-EInbinden der Bibliothek:
- - ``#include<BbibliotheksName.h>``
+Einbinden der Bibliothek:
+ - ```#include<BbibliotheksName.h>```
  	Es wird die Header Datei der Bibliothek mit einem #include<> Statement eingebunden.
  	Bsp.: #include <Servo.h>
  		
