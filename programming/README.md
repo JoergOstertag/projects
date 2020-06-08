@@ -105,16 +105,22 @@ Viele Bibliotheken haben einen sehr ähnlichen Aufbau und sind zur Verwendung in
 
 ### Einbinden der Bibliothek
 
-Um eine Bibliothek ztu verwenden müssen wir dem compiler sagen, welche Bibliothek er mit verwenden solll.
-Dazu wird die Header Datei der Bibliothek mit einem #include<> Statement eingebunden.
+Um eine Bibliothek ztu verwenden müssen wir dem compiler sagen, welche Bibliothek er mit verwenden soll.
+Dazu wird die Header Datei der Bibliothek mit einem ``#include<>`` Statement eingebunden.
 
-```#include<BibliotheksName.h>```
+```C
+#include<BibliotheksName.h>
+```
 
 Beispiel 1: 
-```#include <Servo.h>```
+```
+#include <Servo.h>
+```
 
 Beispiel 2:
-```#include <WEMOS_Matrix_GFX.h>```
+```
+#include <WEMOS_Matrix_GFX.h>
+```
  		
 ### Objekte definieren
 
