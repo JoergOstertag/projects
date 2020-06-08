@@ -4,7 +4,7 @@ Allgemeiner Einstieg in die Embedded Programmierung
 
 [Installation der Entwicklungsumgebung](ESP8266/README.md)
 ---------------------------------------------------------
-Wir fangen mit der [installation der Entwicklungsumgebung](ESP8266/README.md) an.
+Wir fangen mit der [installation der Entwicklungsumgebung](../ESP8266/README.md) an.
 Danach machen wir mit einfachen Programmierbeispiele weiter. Das zeigt uns auch gleich ob die Entwicklungsumgebung richtig installiert ist.
 Hierzu verwenden wir das einfache Blink Beispiel, das beim Compiler für den ESP8266 dankenswerter Weise gleich als Beispiel mit kommt.
 
