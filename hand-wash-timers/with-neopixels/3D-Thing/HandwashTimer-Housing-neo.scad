@@ -4,10 +4,11 @@ use <MCAD/triangles.scad>;
 
 debug=1; 
 
+debugFrames=0*debug;
 
 part=1; // [ 0:All, 1:Hand Wash Timer Housing, 2:Bottom Lid ,3:Bottom Lid with Mounting holes]
 
-border=2;
+border=1.3;
 border1=1;
 addSpace=.5;
 wemosD1Mini=[26,36,5]+addSpace*[2,2,2];
@@ -27,8 +28,8 @@ difference(){
  
     // cube to cut fee for Debugging and seeing inside Objects
     if ( 0 * debug ) 
-        translate([-44,20,-11.1]) 
-            cube([90,90,45]);
+        translate([-44,2,-11.1]) 
+            cube([90,190,55]);
     
 } 
 
@@ -64,7 +65,7 @@ module showAllParts(){
             for ( j = [0:maxY] )
                 translate([ (i-1)*distX, j*distY, 0]){
                     showPart(part= i + j*10);
-                	if ( debug ) 
+                	if ( debugFrames ) 
                     	debugFrame(size=[distX-3,distY-3,1]);
             		}
         
@@ -110,14 +111,16 @@ module HandWashTimerHousing(numberOfBaseMountingClips=0,placeForPrint=0){
 		            wemoscutOut();
 		
 		        // cutOut for Neopixel Cable
+		        hCableCutout=12;
 		        translate( border*[1,0,0]
-		                    + [offsetX + wemosD1Mini[0]/2-4,
-		                    wemosD1Mini[1] +2-.1 ,18-.01 ]
+		                    + [ offsetX + wemosD1Mini[0]/2-4,
+		                    	wemosD1Mini[1] ,
+		                    	29-hCableCutout-.01 ]
 		                ) 
-		            cube([16,border+2,10]);
+		            #cube([16,border+2,hCableCutout]);
 		
 		        // remove border bottom
-		        translate([borderX,0,0]
+		        translate([borderX,1,0]
 		                    +border*[0,1,0]
 		                    +addSpace*[-1,-1,-1])
 		            bottomLid(cutOut=1);
@@ -129,19 +132,19 @@ module HandWashTimerHousing(numberOfBaseMountingClips=0,placeForPrint=0){
 		                +.2*[0,1,1]);
 
 			    // Cut outs for inserting Neo Pixel Ring
-	    	    translate([borderX+15, 7.5, outerSize[2]-6])
+	    	    translate([borderX+15, 8.5, outerSize[2]-1])
 		            rotate([0,0,180])
-        		        neoPixelcutOut(cutOut4Insert=1,cutOut=1);
+        		        neoPixelcutOut(cutOut4Insert=1);
 
 	        }
 	
 	    // SR04
-	    translate([borderX+15,8,border+14+4.4])
+	    translate([borderX+14.3,8,border+14+4.4])
 	        rotate([90,0,0])
 	            UltrasonicHousing();
 	
 	    // Neo Pixel Holder
-	    translate([borderX+15,7.5,outerSize[2]-1.2*border+2])
+	    translate([borderX+15,8.5,outerSize[2]-1.2*border+2])
 	        rotate([0,0,180]) 
 	        	neoPixelHolder();
 	    
@@ -214,13 +217,14 @@ module neoPixelHolder(placeForPrint=0){
 module neoPixelcutOut(placeForPrint=0,cutOut4Insert=0){
     dOuter=neoPixelRingDOuter+addSpace;
     dInner=neoPixelRingDInner-addSpace;
-    hTotal=neoPixelRingH + cutOut4Insert*10;
+    hTotal=neoPixelRingH + 6;
     
-    translate(placeForPrint*[dOuter/2,dOuter/2,0]){
+    
+    translate(placeForPrint*[dOuter/2,dOuter/2,0]+[0,0,-6]){
 	    difference(){
 	        cylinder(h=hTotal,d1=dOuter+2,d2=dOuter);
 	        translate([0,0,-.01])
-	            cylinder(h=hTotal+.02,d1=dInner-2,d2=dInner);
+	            cylinder(h=hTotal+.02,d1=dInner-1,d2=dInner);
 	    }
 	
 		// Nibble at the side (probably for orientation)
