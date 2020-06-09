@@ -183,11 +183,27 @@ Die Arduino-IDE verwaltet ihre Projekte immer in Unterordnern. Dieser Unterordne
 In dem Order dürfen dann noch weitere Dateien sein.
 
 
+
+Versionsverwaltung
+------------------
+
+Bevor ihr tiefer in die Programmierung einsteigt, kann ich noch empfehlen, sich mit einem Versionsverwaltungssystem zu beschäftigen.
+Es macht Sinn, nach jedem Schritt, den man ans laufen bekommen hat diesen im Versionsverwaltungssystem zu sichern. Prominente Versionsverwaltungssysteme sind SVN oder GIT.
+
+
+
+Arduino SPrachreferenz
+----------------------
+
+Zur eigentlichen Programmierung mit der Arduino IDE und über die Sprache finden sich viele Links. Die Original Referenz bei arduino.cc ist für das meisste ein guter Einstieg. 
+ - [Sprachreferenz](https://www.arduino.cc/reference/en/)
+
+
 Pinbezeichnungen
 ----------------
 
-Unterschied D3 vs. 3 vs. GPIO3
-
+Bei den Bezeichnungen für Pins muss man ein wenig aufpassen. Es gibt einen Unterschied zwischen D3 vs. 3 vs. GPIO3. Ein wenig mehr dazu findet ihr unter:
+[Pinouts-Specialties](../ESP8266/Wemos-D1-Mini/Pinouts-Specialties/)
 
 
 
