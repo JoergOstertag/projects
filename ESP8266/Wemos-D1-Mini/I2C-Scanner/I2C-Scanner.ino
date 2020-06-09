@@ -60,6 +60,20 @@ void loop()
       Serial.print(address, HEX);
       Serial.println("  !");
 
+      switch (address) {
+        case 0x3C: Serial.println("\t\tOLED Display"); break;
+        case 0x1E: Serial.println("\t\tHMC5883L"); break;
+        case 0x77: Serial.println("\t\tBMP Sensor"); break;
+        case 0x50: Serial.println("\t\tRTC DS1307"); break;
+        case 0x68: Serial.println("\t\tRTC DS1307|GY-521"); break;
+        case 0x48: Serial.println("\t\tPCF-8591 AD-Converter"); break;
+        case 0x03: Serial.println("\t\tGrove LCD RGB"); break;
+        case 0x62: Serial.println("\t\tGrove LCD RGB"); break;
+        case 0x70: Serial.println("\t\tGrove LCD RGB"); break;
+        default:
+          break;
+      };
+
       nDevices++;
     } else if (error == 4)    {
       Serial.print("Unknow error at address 0x");
@@ -71,7 +85,7 @@ void loop()
   if (nDevices == 0)
     Serial.println("No I2C devices found\n");
   else
-    Serial.println("done\n");
+    Serial.println("I2C scanning done\n");
 
   delay(2000);           // wait 5 seconds for next scan
 }
