@@ -213,18 +213,21 @@ Debugging
 
 Diese ist bei den Wemos-D1-Mini an den USB-Seriell-Konverter verbunden und kann durch den seriell Monitor in der IDE (Symbol rechts oben) zur Anzeige gebracht werden.
 
-	``
+```
 	// Initialisierung der Seriellen Schnittstelle.
 	Serial.begin(115200);
-	``
+```
 
-	Der default für die serielle Schnittstelle ist in der IDE auf 9600 eingestellt. 
-	Da viele Beispiele aber 115200 als Baudrate verwenden starten wir hier auch mit 
-	115200 Baud. Dazu in der IDE bei geöffnetem Seriell Monitor rechts unten die 
-	Baudrate umstellen.
+Der default für die serielle Schnittstelle ist in der IDE auf 9600 eingestellt. 
+Da viele Beispiele aber 115200 als Baudrate verwenden starten wir hier auch mit 
+115200 Baud. Dazu in der IDE bei geöffnetem Seriell Monitor rechts unten die 
+Baudrate umstellen.
 
-	Wir fangen eine neue Zeile an, da vorher oft wirre Zeichen in der Konsole zu sehen sind
-  	``Serial.println("");``
+Als erstes fangen wir eine neue Zeile an, da vorher oft wirre Zeichen in der Konsole zu sehen sind.
+
+```
+	Serial.println("");
+```
   
 
  - Serieller Monitor
