@@ -5,7 +5,7 @@ use <MCAD/triangles.scad>;
 debug=1; 
 
 
-part=0; // [ 0:All, 1:Hand Wash Timer Housing, 2:Bottom Lid ,3:Bottom Lid with Mounting holes]
+part=1; // [ 0:All, 1:Hand Wash Timer Housing, 2:Bottom Lid ,3:Bottom Lid with Mounting holes]
 
 border=2;
 border1=1;
@@ -27,7 +27,7 @@ difference(){
  
     // cube to cut fee for Debugging and seeing inside Objects
     if ( 0 * debug ) 
-        translate([25,0,-.1]) 
+        translate([-44,20,-11.1]) 
             cube([90,90,45]);
     
 } 
@@ -49,6 +49,10 @@ module showPart(part=0){
         if ( part == 23 ) neoPixelcutOut(placeForPrint=1);
        
 		if ( part == 31) HandWashTimerHousing(placeForPrint=0);
+		if ( part == 32) {
+			translate([0,0,0.1])	HandWashTimerHousing(placeForPrint=0);
+			translate([43,43,0])	bottomLid(placeForPrint=0,numberOfBaseMountingClips=0,cutOut=0);
+			}
     }
 }
 
@@ -132,7 +136,7 @@ module HandWashTimerHousing(numberOfBaseMountingClips=0,placeForPrint=0){
 	        }
 	
 	    // SR04
-	    translate([borderX+15,8,border+14+4.5])
+	    translate([borderX+15,8,border+14+4.4])
 	        rotate([90,0,0])
 	            UltrasonicHousing();
 	
@@ -177,8 +181,8 @@ module wemoscutOut(){
 
         // SC04 4-Pin Plug cutOut
         // y direction is larger so we can slide in the SR04
-        translate([6,-3,7])
-            cube([14,16,13]);
+        translate([7,0,6])
+            cube([12,16,15]);
 
 
 }
@@ -244,13 +248,14 @@ module UltrasonicHousing(placeForPrint=0){
     tubeLen=12;
 
     holeDistance=26;
-    diameter=16.3+1;
+    diameter= 16.0    // diameter Speaker/Microphone 
+    		+ 2*0.15; // Additional Space
 
 	outerBase = innercutOut
                 + [0,tubeLen,0]
                 + 2*border*[1,0,1];
 
-	color("blue")
+	//color("blue")
 	translate(placeForPrint*[outerBase[0]/2,0,0])
 	    difference(){
 	    // union(){
@@ -264,10 +269,16 @@ module UltrasonicHousing(placeForPrint=0){
 	                   );
 		
 	        // IC / Pinrow cutOut
-		    translate( [ -6, 0 , border ] )
-		            cube([12,6,innercutOut[2]]);
-	         // cutOut for Pins
-	        translate([-6,-3,-2])
+		    translate( [ -6, 2 , border+innercutOut[2]-4 ] )
+	            cube([12,6,4]);
+
+	        // Quartz cutOut
+		    translate( [ -6, 4 , border ] )
+	            cube([12,6,5]);
+
+     	   	
+            // cutOut for Pins
+	        translate([-6,-3,-1])
 	            cube([12,6,3.5]); 	
 	
 			// Holes for sonic Receiver and Transmitter
@@ -275,22 +286,22 @@ module UltrasonicHousing(placeForPrint=0){
 	            for ( x=[-holeDistance/2,holeDistance/2] )
 	                translate([x,0,border+innercutOut[2]/2])
 	                    rotate([-90,0,0])
-	                        cylinder(d=diameter,h=12.3);
+	                        cylinder(d1=diameter+2,d2=diameter,h=12.3);
+	                        
+	                        
 	    }
 }
 
 
 
 module bottomLid(cutOut=0,placeForPrint=0,numberOfBaseMountingClips=0){
-
-
-    bottomHeight=3;
-    addY=15;
-    addYcutOut=10*cutOut;
+    bottomHeight=2.5;
+    addY=1;
+    addYcutOut=.0*cutOut;
     
     
     X= wemosD1Mini[0] + 2*border + cutOut*addSpace*2;
-    Y= wemosD1Mini[1] + 2*border + cutOut*addSpace*2 
+    Y= wemosD1Mini[1] + 1*border + cutOut*addSpace*2 
         + addY +addYcutOut;
                 
     translate(placeForPrint*[14,19,bottomHeight]){
@@ -313,11 +324,11 @@ module bottomLid(cutOut=0,placeForPrint=0,numberOfBaseMountingClips=0){
 	            	}
                 
                 // fit size of wemos
-                    cube(
+                cube(
                         [X,Y, 2*border  +cutOut*addSpace*2]);
 
                 // small fitting brim to allow sliding Housing into Bottom plate
-                sizeFitting=.5;
+                sizeFitting=.8;
                 translate(sizeFitting*[-1,-1,0]+[0,0,2])
                     cube(
                         [X,Y, cutOut*addSpace*2]
@@ -325,9 +336,9 @@ module bottomLid(cutOut=0,placeForPrint=0,numberOfBaseMountingClips=0){
                 
                 
                 // small fitting brim snap Housing into fixed position against Bottom plate
-                sizeSnap=.5;
+                sizeSnap=.7;
                 translate(sizeSnap*[0,-1,0]
-                        +[0,Y-2,2*border  +cutOut*addSpace*2-.1])
+                        +[0,Y-5, 2*border  +cutOut*addSpace*2-.1])
                     cube(
                         [X,0, 0]
                         +sizeSnap*[0,2,1]);
