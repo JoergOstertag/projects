@@ -236,7 +236,7 @@ Tips:
    - Ihr seid fest davon überzeugt, daß das was ihr gerade geändert habe eigentlich funktionieren sollte.
    - Aber euer Programm reagiert immer noch so wie vor der Änderung, die eigentlich eine Verhaltens-Besserung bringen sollte.
    
-   --> Dann könnte es sin, daß eure Änderung gar nicht auf dem Embeded Gerät landet. Ein erster Blick auf die Ausgabe des COmpilers und des Upload Prozesses zeigt hier oft schon einen Hinweis. 
+   --> Dann könnte es sein, daß eure Änderung gar nicht auf dem Embeded Gerät landet. Ein erster Blick auf die Ausgabe des Compilers und des Upload Prozesses zeigt hier oft schon einen Hinweis. 
    Sollte das auch nichts bringen, dann macht einfach mal eine Änderung, bei der ihr sicher seid, daß sie sich auch auswirken muss; ladet diese auf den Arduino/Wemos und schaut ob sich das was ihr erwartet auch ändert.
    
   
