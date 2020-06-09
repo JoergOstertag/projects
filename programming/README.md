@@ -231,7 +231,10 @@ Als erstes fangen wir eine neue Zeile an, da vorher oft wirre Zeichen in der Kon
   
 
  - Serieller Monitor
+ Um die Ausgaben sehen zu können verwenden wir den seriellen Monitor. Dieser kann mit dem Button 
  ![Serieller Monitor](img/Serial-monitor.png)
+ aktiviert werden.
+ 
  
 Tips:
  - Falscher Code wird ausgeführt
