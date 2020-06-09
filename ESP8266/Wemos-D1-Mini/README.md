@@ -68,6 +68,8 @@ Im Beispiel [ESP_WiFiManager show Time](ESP_WifiManager-show-NTP-time) wird eine
 Wemos DOT Matrix Display
 ------------------------
 
-Library [WEMOS_Matrix_LED](https://github.com/wemos/WEMOS_Matrix_LED_Shield_Arduino_Library)
-../libraries/WEMOS_Matrix_LED_Shield_Arduino_Library-master/examples/draw_dot/draw_dot.ino
+DIe Bibliothek [WEMOS_Matrix_LED](https://github.com/wemos/WEMOS_Matrix_LED_Shield_Arduino_Library) kann zur Ansteuerung des LED Matrix Shields verwendet werden. Am einfachsten steigt man hier mit dem
+[Beispiel draw_dot](https://github.com/wemos/WEMOS_Matrix_LED_Shield_Arduino_Library/tree/master/examples/draw_dot) ein.
+
+
 
