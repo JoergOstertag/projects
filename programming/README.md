@@ -192,7 +192,7 @@ Es macht Sinn, nach jedem Schritt, den man ans laufen bekommen hat diesen im Ver
 
 
 
-Arduino SPrachreferenz
+Arduino Sprachreferenz
 ----------------------
 
 Zur eigentlichen Programmierung mit der Arduino IDE und über die Sprache finden sich viele Links. Die Original Referenz bei arduino.cc ist für das meisste ein guter Einstieg. 
@@ -241,4 +241,7 @@ Tips:
    
   
 
+Mehr Beispiele
+--------------
 
+Weitere Beispiele für den Wmos-D1-Mini findest du [in der Sektion Wemos-D1-Mini](../ESP8266/Wemos-D1-Mini/).
