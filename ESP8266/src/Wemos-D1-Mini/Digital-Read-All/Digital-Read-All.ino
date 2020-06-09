@@ -21,10 +21,12 @@ String espPinNames[] = { "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8"};
 int numOfPins = sizeof(espPins) / sizeof(int);
 
 long loopCount = 0;
-  
+
+char data[100]; // for sprintf
+
 /**
- * Set All pins (Except D1) to input
- */
+   Set All pins (Except D1) to input
+*/
 void setupAsInput() {
   Serial.print("Number of Pins: ");
   Serial.println(numOfPins);
@@ -32,63 +34,69 @@ void setupAsInput() {
   for (int i = 0; i < numOfPins; i++ ) {
     // pinMode(espPins[i], INPUT_PULLUP);
 
-    // If we would set D1 to input nothing can be seen on console
-    if ( i != D1 ){
-      pinMode(espPins[i], INPUT);
-    }
+    pinMode(espPins[i], INPUT);
   }
 }
 
 /**
- *  Read all defined Pins and return result as String
- * Every 10 Lines Add Headers
+ * returns a header String lokking like:
+ * D0     D1     D2     D3     D4     D5     D6     D7     D8          Named Pin Dx
+ * GPIO16 GPIO5  GPIO4  GPIO0  GPIO2  GPIO14 GPIO12 GPIO13 GPIO15      Pin Number GPIOx
+ *
  */
+String headerString() {
+  String result = "\n";
+  for (int i = 0; i < numOfPins; i++ ) {
+    result +=  espPinNames[i];
+    result +=  "     ";
+  }
+
+  result += "     Named Pin Dx\n";
+  for (int i = 0; i < numOfPins; i++ ) {
+    sprintf(data, "GPIO%-2i ", espPins[i]);
+    result += data;
+  }
+  result += "     Pin Number GPIOx\n";
+
+  return result;
+}
+
+
+/**
+    Read all defined Pins and return result as String
+   Every 10 Lines Add Headers
+*/
 String readAllPins() {
   String result = "";
-  char data[100];
-
-  // insert Header about Pin Numbers
-  if ( !(loopCount++ % 10) ) {
-    for (int i = 0; i < numOfPins; i++ ) {
-      result += espPinNames[i] + " ";
-    }
-    result += "     Named Pin\n";
-    for (int i = 0; i < numOfPins; i++ ) {
-      sprintf(data,"%02i",espPins[i]);
-      result += data;
-      result += " ";
-    }
-    result += "     Pin Number GPIOx\n";
-  
-  }
 
   // Add values of each Pin
   for (int i = 0; i < numOfPins; i++ ) {
-    result += readPin( espPins[i]);
+    sprintf(data, "%-1i      ", digitalRead(espPins[i]));
+    result += data;
   }
-  return result;
-}
 
-/**
- *  Read a single Pin and return result as String
- */
-String readPin( int pin) {
-  String result = "";
-  result += digitalRead(pin);
-  result += "  ";
   return result;
+
 }
 
 
 void setup() {
   Serial.begin(115200);
+  Serial.println("\n");
   Serial.println("Read All Digital Inputs");
 
-  // If I do this on Wemos D1 Mini nothing can be seen on serial console
+  headerString();
+
   setupAsInput();
 }
 
 void loop() {
+
+   // insert Header about Pin Numbers
+  if ( !(loopCount++ % 10) ) {
+    Serial.println(headerString());
+  }
+  
   Serial.println(readAllPins());
   delay(500);
 }
