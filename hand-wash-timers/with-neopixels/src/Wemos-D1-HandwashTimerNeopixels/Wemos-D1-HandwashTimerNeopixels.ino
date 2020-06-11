@@ -25,8 +25,8 @@ Adafruit_NeoPixel pixels(NUM_PIXELS, D4, NEO_GRB | NEO_KHZ800);
 
 
 // The Distance Sensor is directly attached to the pins
-#define SR04_TRIGGER  D1
-#define SR04_ECHO     D2
+#define SR04_TRIGGER  D2
+#define SR04_ECHO     D1
 
 // The Distance where the timer gets started normal in cm
 #define DISTANCE_TIMER_START 30.0
@@ -46,10 +46,10 @@ UltraSonicDistanceSensor distanceSensor(SR04_TRIGGER, SR04_ECHO);
 #define TIMER_STEPS    0.3
 
 // Time needed to measure distance in seconds
-#define TIME_MEASURING 0.1
+#define TIME_FOR_MEASURING_DISTANCE 0.1
 
 // Delay for each loop
-#define DELAY 1000.0*(TIMER_STEPS-TIME_MEASURING)
+#define DELAY 1000.0 * (TIMER_STEPS - TIME_FOR_MEASURING_DISTANCE)
 
 // Global variable for time left in seconds
 double timeLeft     = 0.0;

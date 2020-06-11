@@ -6,7 +6,7 @@ debug=1;
 
 debugFrames=1*debug;
 
-part=12; // [ 0:All, 1:Hand Wash Timer Housing, 2:Bottom Lid ,3:Bottom Lid with Mounting holes,4:Hand Wash Timer Housing No SR04, 5:Neopixel Holder plain]
+part=13; // [ 0:All, 1:Hand Wash Timer Housing, 2:Bottom Lid ,3:Bottom Lid with Mounting holes,4:Hand Wash Timer Housing No SR04, 5:Neopixel Holder plain]
 
 // Border for walls 
 border=1.3;
@@ -17,8 +17,8 @@ border1=1;
 addSpace=.3;
 
 // Dimensions Wemos D1 Mini
-wemosD1Mini=[26,35,5]+addSpace*[2,2,2];
-wemosD1ExperimentBoard=[26,29+6,12]+addSpace*[2,2,2];
+wemosD1Mini=[26,35,7]+addSpace*[2,2,2];
+wemosD1ExperimentBoard=[26,28,12]+addSpace*[2,2,2];
 
 
 // -----------------------------------------------------------------
@@ -34,7 +34,7 @@ difference(){
     //for Debugging 
     // to see inside Objects
     // cube to cut object apart 
-    if ( 0 * debug ) 
+    if ( 1 * debug ) 
         translate([59,2,-11.1]) 
         // translate([-14,2,-31.1]) 
             cube([120,190,55]);
@@ -116,28 +116,31 @@ module HandWashTimerHousing(numberOfBaseMountingClips=0,placeForPrint=0,withUltr
 					        rotate([0,0,180]) 
 					        	neoPixelHolder(placeForPrint=0);
 					    
-					    outerBase = [45.5,21,12]
+						// Cube around SR04
+					    outerBase = [45.5,21,outerSize[2]]
 					                + border*[2,2,1];
 						color("blue")
 						        translate(1*[-outerBase[0]/2,-outerBase[1],-outerBase[2]]
 						        		+ 1*[outerSize[0]/2,0,outerSize[2]] 
 						        		+ 1*border*[0,0,2]
-						        		+ [0,0,-2.6])
-						            cube(outerBase); 
+						        		+ [0,7,-2.6])
+						            cube(outerBase
+						            	+ [0,outerSize[1],0] 
+						        		); 
 
 
 				}
 		        
-		        // Cut away outer part for fitting SR04
+		        // Cut out SR04
 				if (withUltrasonic)
 		            translate(border*[1,0,1]
-			                    + [4+wemosD1Mini[0]/2,border-.5 ,6+2.5 ]
+			                    + [4+wemosD1Mini[0]/2,border-.5+7 ,4.5+2.6 ]
 			                )
 			                rotate([0,0,180]) 
 				                UltrasonicCutout();
 		        
 		        // Wemos cutOut
-		        translate( border * [1,1,1] 
+		        translate( border * [1,1,2] 
 		                  + borderX*[1,0,0]) 
 		            wemoscutOut();
 		
