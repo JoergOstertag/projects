@@ -6,14 +6,20 @@
    If you get closer to the sonar distance sensor a timer starts
    and counts down from 20seconds to zero.
 
-   Displaing the timer is done with a standard Neopixel ring WS2812
+   Displaing the timer is done with a standard Neopixel Ring equiped with WS2812-LEDs
 
+  Normally a Clock is Displayed on the Neopixel Ring
+  If you get closer than 30cm the timer starts counting down
+  If you get closer than 10cm the timer restarts even if already started
+  if  you get nearer MAX_DIST the clock stops and the distance os shown on the Ring 
+    The Distance has blue LEDs. the range where the counter is started is shown as green area
+
+  The start position of the counter is the maximum number of pixel defined (24) and is relatively adapted to the time
+  Allowing retriggering while timer is active might interfer with too much power usage when both (SR04 and Neopixel) are active; which leads to distance flaws
+    
    place for improvement:
     - use real time/timer (instead of delay) to check how much time is left
-    - adapt start position to max number of pixel defined
     - switch off leds after some time
-    - Allow retriggering while timer is active. This might interfer with too much power usage when both are active; which leads to distance flaws
-    - Advanced: Display normal clock unless triggered
 */
 
 
@@ -277,8 +283,8 @@ void loop () {
     }
 
     // Display CLock if noting is seen by SR04
-    if (dist >= DISTANCE_MAX && timeLeft == 0.0 ) {
-       // Get current Time and Print it on Serial
+    if (dist >= DISTANCE_MAX && timeLeft <= 0.0 ) {
+      // Get current Time and Print it on Serial
       time_t now = time(nullptr);
       String time = String(ctime(&now));
       Serial.print( time);
