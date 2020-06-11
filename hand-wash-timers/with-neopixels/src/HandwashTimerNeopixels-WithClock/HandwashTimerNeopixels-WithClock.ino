@@ -277,8 +277,8 @@ void loop () {
     }
 
     // Display CLock if noting is seen by SR04
-    if (dist >= DISTANCE_MAX ) {
-      // Get current Time and Print it on Serial
+    if (dist >= DISTANCE_MAX && timeLeft == 0.0 ) {
+       // Get current Time and Print it on Serial
       time_t now = time(nullptr);
       String time = String(ctime(&now));
       Serial.print( time);
