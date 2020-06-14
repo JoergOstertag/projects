@@ -11,17 +11,41 @@
   Normally a Clock is Displayed on the Neopixel Ring
   If you get closer than 30cm the timer starts counting down
   If you get closer than 10cm the timer restarts even if already started
-  if  you get nearer MAX_DIST the clock stops and the distance os shown on the Ring 
+  if  you get nearer MAX_DIST the clock stops and the distance os shown on the Ring
     The Distance has blue LEDs. the range where the counter is started is shown as green area
 
   The start position of the counter is the maximum number of pixel defined (24) and is relatively adapted to the time
   Allowing retriggering while timer is active might interfer with too much power usage when both (SR04 and Neopixel) are active; which leads to distance flaws
-    
+
    place for improvement:
     - use real time/timer (instead of delay) to check how much time is left
     - switch off leds after some time
 */
 
+
+#define NUM_PIXELS    24
+#define NEOPIXEL_PIN  D4
+
+
+
+// The Distance Sensor is directly attached to the pins
+#define SR04_TRIGGER  D2
+#define SR04_ECHO     D1
+
+// The Distance where the timer gets started normal in cm
+#define DISTANCE_TIMER_START 35.0
+
+// The distance where you can trigger a timer Reset.
+// This starts the timer again each time you get nearer than this distance  in cm
+#define DISTANCE_TIMER_RESET 10.0
+
+#define DISTANCE_MAX 50.0
+
+// Define my Time Zone to Germany
+#define MYTZ TZ_Europe_Berlin
+
+// Time for complete countdown in seconds
+#define WASH_TIME_SEC 20.0
 
 // -----------------------------------------------------------
 // Libs for Wifi Connection
@@ -36,6 +60,7 @@
 ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 
 
+
 // -----------------------------------------------------------
 // Libraries for Time handling and NTP(Network time protocoll)
 #include <time.h>                       // time() ctime()         1)
@@ -44,12 +69,7 @@ ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 
 #include <Adafruit_NeoPixel.h>
 
-#define NUM_PIXELS    24
-#define NEOPIXEL_PIN  D4
-
 Adafruit_NeoPixel pixels(NUM_PIXELS, D4, NEO_GRB | NEO_KHZ800);
-
-
 // Define LED color for hour,minute,second
 int intens = 100;
 uint32_t colorBackground = pixels.Color(0, 0, 0);
@@ -58,26 +78,8 @@ uint32_t colorHour     = pixels.Color(0, intens, 0);
 uint32_t colorSecond   = pixels.Color(intens, intens, 0);
 
 
-
-// The Distance Sensor is directly attached to the pins
-#define SR04_TRIGGER  D2
-#define SR04_ECHO     D1
-
-// The Distance where the timer gets started normal in cm
-#define DISTANCE_TIMER_START 30.0
-
-// The distance where you can trigger a timer Reset.
-// This starts the timer again each time you get nearer than this distance  in cm
-#define DISTANCE_TIMER_RESET 10.0
-
-#define DISTANCE_MAX 160.0
-
 // Initialize sensor that uses digital pins for trigger and echo.
 UltraSonicDistanceSensor distanceSensor(SR04_TRIGGER, SR04_ECHO);
-
-
-// Time for complete countdown in seconds
-#define WASH_TIME_SEC 20.0
 
 // Time for each loop in seconds
 #define TIMER_STEPS    0.3
@@ -90,10 +92,6 @@ UltraSonicDistanceSensor distanceSensor(SR04_TRIGGER, SR04_ECHO);
 
 // Global variable for time left in seconds
 double timeLeft     = 0.0;
-
-
-// Define my Time Zone to Germany
-#define MYTZ TZ_Europe_Berlin
 
 /**
    set all Neopixels to Background Color
@@ -174,13 +172,11 @@ void setup () {
   Serial.println("\n");
   Serial.println("Starting ESP Neo Pixel Clock ... ");
 
+  // Setup Wifi Manager
   ESP_wifiManager.setDebugOutput(true);
-
   // ESP_wifiManager.setMinimumSignalQuality(-1);
-
   // To reset the configuration simply diconnect from the current Wifi
   // WiFi.disconnect();
-
   ESP_wifiManager.autoConnect();
 
   // Set timezone to get the resulting time as local time (not as GMT)
@@ -195,26 +191,26 @@ void setTimeLeft(double newTimeLeft ) {
   timeLeft = newTimeLeft;
 }
 
-
+/**
+   Set all Color to given color
+*/
 void initColors(uint32_t color) {
   for (int i = 0; i < NUM_PIXELS; i++) {
     pixels.setPixelColor(i, color);
     pixels.show();
-    delay(20);
+    delay(15);
   }
 }
 
 void showDistance(double distance) {
 
-  // Only show Distance if not in Timer mode
-  if ( timeLeft > 0.0) {
-    return;
-  }
+
   uint32_t color1 = pixels.Color(0, 1, 0);
   uint32_t color2 = pixels.Color(0, 0, 20);
 
-  int pixelNumMin = (int)(DISTANCE_TIMER_START - DISTANCE_TIMER_RESET) / 3;
-  int pixelNumMax = (int)(distance - DISTANCE_TIMER_RESET) / 3;
+  // DISTANCE_MAX
+  int pixelNumMin = (int)(DISTANCE_TIMER_START - DISTANCE_TIMER_RESET) / 2;
+  int pixelNumMax = (int)(distance - DISTANCE_TIMER_RESET) / 2;
   for (int i = 0; i < NUM_PIXELS; i++) {
     if ( i >= pixelNumMin && i <= pixelNumMax ) {
       pixels.setPixelColor(i, color2);
@@ -281,15 +277,17 @@ void loop () {
       Serial.printf("Timer started nearer than %.0f cm\n", DISTANCE_TIMER_RESET);
       setTimeLeft(WASH_TIME_SEC);
     }
+  }
 
-    // Display CLock if noting is seen by SR04
-    if (dist >= DISTANCE_MAX && timeLeft <= 0.0 ) {
+  // Display CLock if noting is seen by SR04
+  if ( timeLeft <= 0.0 ) {
+    if (dist >= DISTANCE_MAX  ) {
       // Get current Time and Print it on Serial
       time_t now = time(nullptr);
       String time = String(ctime(&now));
       Serial.print( time);
 
-      // SHow time on Neopixel Ring
+      // Show time on Neopixel Ring
       showTime();
     } else {
       showDistance(dist);
