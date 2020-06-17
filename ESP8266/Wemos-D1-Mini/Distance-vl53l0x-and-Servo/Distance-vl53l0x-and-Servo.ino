@@ -36,8 +36,8 @@ ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 #define PIN_SERVO D8
 #define SERVO_POS_MIN 30
 #define SERVO_POS_MAX 150
-#define SERVO_INCREMENT 5
-#define SERVO_TO_DEGREE .5
+#define SERVO_INCREMENT 2
+#define SERVO_TO_DEGREE 1.0
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
@@ -51,6 +51,52 @@ float result[SERVO_POS_MAX + 2];
 
 int servoPos = SERVO_POS_MIN;
 int servoIncrement = 5;
+
+
+void drawRoomLayout() {
+  String out;
+  out.reserve(2600);
+  char temp[70];
+  out += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"800\" height=\"800\">\n";
+  out += "<rect width=\"800\" height=\"800\" fill=\"rgb(50, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
+  out += "<g stroke=\"black\">\n";
+  int y = -1;
+  int x = -1;
+
+  for ( int i = SERVO_POS_MIN ; i <= SERVO_POS_MAX; i += SERVO_INCREMENT) {
+    float degree = 90 - (i * SERVO_TO_DEGREE);
+    float rad = (degree * 71) / 4068;
+    float dist = result[i];
+    float distPixel = dist * 5;
+    int y2 = 400.0 + cos(rad) * distPixel;
+    int x2 = 400.0 + sin(rad) * distPixel;
+    /*
+        Serial.print("deg: ");
+        Serial.println(degree);
+        Serial.print("rad: ");
+        Serial.print(rad);
+        Serial.print("\tdist: ");
+        Serial.print(dist);
+        Serial.print("\tdistPixel: ");
+        Serial.print(distPixel);
+        Serial.print(x2);
+        Serial.print("\t");
+        Serial.print(y2);
+        Serial.println();
+    */
+    if ( x >= 0 && y >= 0 && x2 >= 0 && y2 >= 0) {
+      sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, y, x2, y2);
+      out += temp;
+    }
+    y = y2;
+    x = x2;
+  }
+  out += "<line x1=\"400\" y1=\"0\" x2=\"400\" y2=\"800\" stroke=\"white\" stroke-width=\"1\" />\n";
+  out += "<line x1=\"0\" y1=\"400\" x2=\"800\" y2=\"400\" stroke=\"white\" stroke-width=\"1\" />\n";
+  out += "</g>\n</svg>\n";
+
+  server.send(200, "image/svg+xml", out);
+}
 
 
 void printStatus(int i , float dist_cm) {
@@ -68,12 +114,12 @@ void printStatus(int i , float dist_cm) {
 
 
 void handleRoot() {
-  char temp[400];
+  char temp[600];
   int sec = millis() / 1000;
   int min = sec / 60;
   int hr = min / 60;
 
-  snprintf(temp, 400,
+  snprintf(temp, 600,
 
            "<html>\
   <head>\
@@ -84,15 +130,22 @@ void handleRoot() {
     </style>\
   </head>\
   <body>\
-    <h1>Hello from ESP8266 Distance Sensor</h1>\
-    <p>Uptime: %02d:%02d:%02d</p>\
+    <h1>ESP8266 Distance Sensor</h1>\
     \
-    <p><a href=\"/result.scad\">result.scad</a></p>\
+    Uptime: %02d:%02d:%02d \
+    <a href=\"/result.scad\">result.scad</a>\
     \
-   <img src=\"/test.svg\" />\
-   </body>\
+    <div>Room Layout:<p/>\
+    <img src=\"/roomLayout.svg\" />\
+    </div>\
+    \
+    <div>\
+    Distances:<p/>\
+    <img src=\"/test.svg\" />\
+    </div>\
+    \
+</body>\
 </html>",
-
            hr, min % 60, sec % 60
           );
   server.send(200, "text/html", temp);
@@ -168,9 +221,11 @@ void drawGraph() {
   int y = 0;
   int x = 0;
 
-  for ( int i = SERVO_POS_MIN ; i <= SERVO_POS_MAX; i += SERVO_INCREMENT) {
+//  for ( int i = SERVO_POS_MIN ; i <= SERVO_POS_MAX; i += SERVO_INCREMENT) {
+  for ( int i = 0 ; i <= SERVO_POS_MAX; i += 1 ) {
     int y2 = result[i];
-    int x2 = i * SERVO_TO_DEGREE;
+    int x2 = i;
+//    int x2 = i * SERVO_TO_DEGREE;
     sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, 140 - y, x2, 140 - y2);
     out += temp;
     y = y2;
@@ -221,6 +276,7 @@ void setup() {
     server.on("/", handleRoot);
     server.on("/test.svg", drawGraph);
     server.on("/result.scad", handleScad);
+    server.on("/roomLayout.svg", drawRoomLayout);
     server.onNotFound(handleNotFound);
     server.begin();
   }
@@ -261,7 +317,7 @@ void loop() {
   }
 
   myservo.write(servoPos );
-  delay(100);
+  delay(50);
 
   if (ACTIVATE_WEBSERVER) {
     server.handleClient();
