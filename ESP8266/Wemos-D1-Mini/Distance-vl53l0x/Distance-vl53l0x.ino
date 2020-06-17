@@ -3,6 +3,8 @@
 /**
   Example taken from
     http://www.esp8266learning.com/vl53l0x-time-of-flight-sensor-and-esp8266.php
+  Library:
+    https://github.com/adafruit/Adafruit_VL53L0X
 
   Datasheet:
     https://www.st.com/resource/en/datasheet/vl53l0x.pdf
@@ -21,6 +23,10 @@
   Buy:
     https://www.aliexpress.com/item/32842745623.html
     Price: 3.15€
+
+
+
+  VL53L1X
   
 **/
 

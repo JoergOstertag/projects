@@ -36,12 +36,13 @@ ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 #define PIN_SERVO D8
 #define SERVO_POS_MIN 30
 #define SERVO_POS_MAX 150
-#define SERVO_INCREMENT 2
+#define SERVO_INCREMENT 5
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
 Servo myservo;  // create servo object to control a servo
 
+#define ACTIVATE_WEBSERVER true
 
 ESP8266WebServer server(80);
 
@@ -59,47 +60,7 @@ void printStatus(int i , float dist_cm) {
   Serial.print(" d=");
 
   Serial.print(dist_cm );
-  Serial.print("\r");
-}
-
-void printResult(int i , float dist_cm) {
-  Serial.print("segment(i=");
-  Serial.print(servoPos );
-  // Serial.print("Distance (cm): ");
-  Serial.print("\t");
-  Serial.print(",d=");
-
-  Serial.print(dist_cm );
-  Serial.println(");");
-}
-
-void printResults() {
-
   Serial.println();
-  Serial.println();
-  Serial.println("# ===========================================================");
-
-  for ( int i = SERVO_POS_MIN ; i <= SERVO_POS_MAX; i++) {
-    printResult(i, result[i]);
-  }
-
-  Serial.println();
-  Serial.println();
-  Serial.println();
-  Serial.println("module segment(i=0,d=20){");
-  Serial.println("  if ( d < 0) {");
-  Serial.println("    outOfRange(i=i);");
-  Serial.println("  } else {");
-  Serial.println("    rotate([0,90,i]) cylinder(d1=1,d2=0.4226*d,h=d);");
-  Serial.println("  }");
-  Serial.println("}");
-  Serial.println("");
-  Serial.println("module outOfRange(i=0){");
-  Serial.println("      color(\"red\")");
-  Serial.println("        rotate([0,90,i]) cylinder(d1=1,d2=1,h=1200);");
-  Serial.println("    }");
-  Serial.println("}");
-  Serial.println("");
 }
 
 
@@ -124,6 +85,9 @@ void handleRoot() {
   <body>\
     <h1>Hello from ESP8266 Distance Sensor</h1>\
     <p>Uptime: %02d:%02d:%02d</p>\
+    \
+    <p><a href=\"/result.scad\">result.scad</a></p>\
+    \
    <img src=\"/test.svg\" />\
    </body>\
 </html>",
@@ -131,7 +95,47 @@ void handleRoot() {
            hr, min % 60, sec % 60
           );
   server.send(200, "text/html", temp);
-  
+
+}
+
+void handleScad() {
+  String output;
+  output.reserve(64);
+
+  output = "\n";
+  output += "\n";
+  output += "\n";
+  output += "// ===========================================================\n";
+  output += "// Distance Sensor\n";
+  output += "// ===========================================================\n";
+
+  for ( int i = SERVO_POS_MIN ; i <= SERVO_POS_MAX; i++) {
+    output += "segment(i=";
+    output += i ;
+    output += "\t";
+    output += ",d=";
+    output += result[i];
+    output += ");\n";
+  }
+
+  output += "\n";
+  output += "\n";
+  output += "\n";
+  output += "module segment(i=0,d=20){\n";
+  output += "  if ( d < 0) {\n";
+  output += "    outOfRange(i=i);\n";
+  output += "  } else {\n";
+  output += "    rotate([0,90,i]) cylinder(d1=1,d2=0.4226*d,h=d);\n";
+  output += "  }\n";
+  output += "}\n";
+  output += "\n";
+  output += "module outOfRange(i=0){\n";
+  output += "      color(\"red\")\n";
+  output += "        rotate([0,90,i]) cylinder(d1=1,d2=1,h=1200);\n";
+  output += "}\n";
+  output += "\n";
+  server.sendContent(output);
+  server.chunkedResponseFinalize();
 }
 
 
@@ -208,15 +212,19 @@ void setup() {
   }
 
   // Register URLs to answer
-  server.on("/", handleRoot);
-  server.on("/test.svg", drawGraph);
-  server.onNotFound(handleNotFound);
-  server.begin();
+  if ( ACTIVATE_WEBSERVER ) {
+    server.on("/", handleRoot);
+    server.on("/test.svg", drawGraph);
+    server.on("/result.scad", handleScad);
+    server.onNotFound(handleNotFound);
+    server.begin();
+  }
   Serial.println("HTTP server started");
 }
 
 
 void loop() {
+
   VL53L0X_RangingMeasurementData_t measure;
 
   // Serial.print("Reading a measurement... ");
@@ -237,16 +245,18 @@ void loop() {
     servoPos = SERVO_POS_MAX;
     // servoPos = SERVO_POS_MIN ;
     servoIncrement = -SERVO_INCREMENT;
-    printResults();
   }
   if ( servoPos < SERVO_POS_MIN ) {
     servoPos = SERVO_POS_MIN;
     servoIncrement = SERVO_INCREMENT;
-    printResults();
   }
+
+  delay(100);
   myservo.write(servoPos );
   delay(200);
 
-  server.handleClient();
-  MDNS.update();
+  if (ACTIVATE_WEBSERVER) {
+    server.handleClient();
+    MDNS.update();
+  }
 }
