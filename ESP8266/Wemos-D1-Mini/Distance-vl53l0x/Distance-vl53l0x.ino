@@ -8,11 +8,13 @@
     https://www.st.com/resource/en/datasheet/vl53l0x.pdf
 
   Features of sensor:
-    940 nm laser
-    Field of view covered (FOV = 25 degrees)
-    Range (normal 1.2m) (long distance 2m)
-    Measuring Time 20ms(default +/-5%) 300ms(High Accuracy +/-3%)
+    Measuring Field of view covered (FOV = 25 degrees)
+    Measuring Range: (normal 1.2m) (long distance 2m)
+    Measuring Time: 
+      Total time including processing: 33ms(typical)
+      Measuring only: 20ms(default Accurycy +/-5%) 300ms(High Accuracy +/-3%)
     Operating voltage 2.6 to 3.5 V
+    940 nm laser
     I2C Up to 400 kHz (FAST mode) serial bus
     I2C Address: 0x52
 
