@@ -29,6 +29,7 @@
 #include "Adafruit_VL53L0X.h"
 #include <Servo.h>
 #include <ESP_WiFiManager.h>              //https://github.com/khoih-prog/ESP_WiFiManager
+#include "htmlFormHandler.h"
 
 ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 
@@ -54,36 +55,12 @@ float result[SERVO_MAX_VALUES];
 int servoPos = SERVO_POS_MIN;
 int servoIncrement = 5;
 
-boolean parseParameterInt(String name, int &value ) {
-  String parameterString = server.arg(name);
-  if (parameterString != "") {
-    int newValue = parameterString.toInt();
-    if ( newValue != value ) {
-      value = newValue;
-      return true;
-    }
-  }
-  return false;
-}
-
-boolean parseParameterFloat(String name, float &value ) {
-  String parameterString = server.arg(name);
-  if (parameterString != "") {
-    int newValue = parameterString.toFloat();
-    if ( newValue != value ) {
-      value = newValue;
-      return true;
-    }
-  }
-  return false;
-}
-
 boolean handleParameters() {
   boolean changes = false;
-  changes |= parseParameterInt("servoPosMin",    SERVO_POS_MIN);
-  changes |= parseParameterInt("servoPosMax",    SERVO_POS_MAX);
-  changes |= parseParameterInt("servoIncrement", SERVO_INCREMENT);
-  changes |= parseParameterFloat("servoToDegree",  SERVO_TO_DEGREE);
+  changes |= parseParameterInt(server,"servoPosMin",    SERVO_POS_MIN);
+  changes |= parseParameterInt(server,"servoPosMax",    SERVO_POS_MAX);
+  changes |= parseParameterInt(server,"servoIncrement", SERVO_INCREMENT);
+ // changes |= parseParameterFloat(server,"servoToDegree",  SERVO_TO_DEGREE);
   return changes;
 }
 
