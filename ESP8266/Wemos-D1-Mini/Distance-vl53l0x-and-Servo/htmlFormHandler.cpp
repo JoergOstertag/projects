@@ -28,23 +28,19 @@ boolean parseParameter(ESP8266WebServer &server, String name, float &value ) {
 
 
 String formString(String name, int value) {
-  String output = "     <form action=\"/\">\n";
-  output += "      " + name + ": <input type=\"text\" name=\"" + name + "\" value=\"";
+  String output = "\n";
+  output += "      <tr><td>" + name + ": </td><td><input type=\"text\" name=\"" + name + "\" value=\"";
   output += value;
-  output += "\">\n";
-  output += "       <input type=\"submit\" value=\"Submit\">\n";
-  output += "     </form><br>\n";
-
+  output += "\"></td></tr>\n";
+  
   return output;
 }
 
 String formString(String name, float value) {
-  String output = "     <form action=\"/\">\n";
-  output += "      " + name + ": <input type=\"text\" name=\"" + name + "\" value=\"";
+  String output = "\n";
+  output += "      <tr><td>" + name + ": </td><td><input type=\"text\" name=\"" + name + "\" value=\"";
   output += value;
-  output += "\">\n";
-  output += "       <input type=\"submit\" value=\"Submit\">\n";
-  output += "     </form><br>\n";
+  output += "\"></td></tr>\n";
 
   return output;
 }

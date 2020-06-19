@@ -159,8 +159,12 @@ String upTimeString() {
 String inputForms() {
   String output = "\n";
 
-  output += "<div>\n";
-
+  // border: 1px solid green;
+  output += "<div style=\"text-align:left; margin:8px; \">\n";
+  output += "Parameters:\n";
+  output += "<form action=\"/\">\n";
+  
+  output += "       <table>\n";
   output += formString("servoPosMin",       servoPosMin);
   output += formString("servoPosMax",       servoPosMax);
   output += formString("servoStep",         servoStep);
@@ -172,7 +176,10 @@ String inputForms() {
     output += "          <input type=\"range\" min=\"1\" max=\"100\" value=\"50\" class=\"slider\" id=\"myRange\">\n\n";
     output += "    </div>\n\n";
   }
-
+  
+  output += "       </table>\n";
+  output += "       <input type=\"submit\" value=\"Submit\">\n";
+  output += "     </form><br>\n";
   output += "   </div>\n\n";
 
   return output;
@@ -210,7 +217,7 @@ void handleRoot() {
   output += "  <h1>ESP8266 2D-Scanner</h1>\n\n";
 
   {
-    output += "  <div style=\"text-align:left; margin:2px auto 2px auto;\">\n";
+    output += "  <div style=\"text-align:left; margin:8px;\">\n";
 
     // Uptime
     output += "      <p>" + upTimeString() + "</p>\n";
@@ -223,11 +230,11 @@ void handleRoot() {
   }
 
   {
-    output += "   <div style=\"border: 2px solid blue;\">\n";
+    output += "   <div style=\"float:left; width:100%; margin:8px;\">\n";
     {
       // Room Layout img Reference
       output += "\n";
-      output += "      <div style=\"float:left; height:" + String( SIZE_2D_GRAPH + 20 ) + "; width:" + String(SIZE_2D_GRAPH ) + "\">\n";
+      output += "      <div style=\"float:left; height:" + String( SIZE_2D_GRAPH + 40 ) + "; width:" + String(SIZE_2D_GRAPH ) + "\">\n";
       output += "          <p>Room Layout:</p>\n";
       output += "          <img src=\"/roomLayout.svg\" />\n";
       output += "      </div>\n";
@@ -235,7 +242,7 @@ void handleRoot() {
 
     {
       // HTML Forms
-      output += "      <div style=\"text-align:right; margin:2px auto 2px auto;\">\n";
+      output += "      <div style=\"text-align:right; margin: 8px;\">\n";
       output +=           inputForms();
       output += "      </div>\n\n";
     }
@@ -246,12 +253,10 @@ void handleRoot() {
 
   // Distances Graf img reference
   output += "\n";
-  output += "    <p>\n";
-  output += "       <div style=\"float:left\">\n";
+  output += "       <div style=\"float:left; margin:8px;\">\n";
   output += "          <p>Distances:<p/>\n";
   output += "          <img src=\"/distGraph.svg\" />\n";
   output += "       </div>\n";
-  output += "    </p>\n";
   output += "\n";
 
   // html End
