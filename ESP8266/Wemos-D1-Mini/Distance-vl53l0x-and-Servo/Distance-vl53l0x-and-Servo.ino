@@ -37,10 +37,16 @@ ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 #define PIN_SERVO D8
 #define SERVO_MAX_VALUES 300
 
-int SERVO_POS_MIN = 10;
-int SERVO_POS_MAX = 175;
-int SERVO_INCREMENT = 1;
-float SERVO_TO_DEGREE = 1.0;
+int servoPosMin = 10;
+int servoPosMax = 175;
+int servoStep = 2;
+float servoToDegree = 1.0;
+float servoOffsetDegree = 0.0;
+
+int servoIncrement = servoStep;
+
+#define DIST_MIN 0
+#define DIST_MAX 500*10
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
@@ -50,17 +56,21 @@ Servo myservo;  // create servo object to control a servo
 
 ESP8266WebServer server(80);
 
-float result[SERVO_MAX_VALUES];
+/**
+   Result Values in mm
+   nagative values are invalid/out of range
+*/
+int result[SERVO_MAX_VALUES];
 
-int servoPos = SERVO_POS_MIN;
-int servoIncrement = 5;
+int servoPos = servoPosMin;
 
 boolean handleParameters() {
   boolean changes = false;
-  changes |= parseParameterInt(server,"servoPosMin",    SERVO_POS_MIN);
-  changes |= parseParameterInt(server,"servoPosMax",    SERVO_POS_MAX);
-  changes |= parseParameterInt(server,"servoIncrement", SERVO_INCREMENT);
- // changes |= parseParameterFloat(server,"servoToDegree",  SERVO_TO_DEGREE);
+  changes |= parseParameter(server, "servoPosMin",    servoPosMin);
+  changes |= parseParameter(server, "servoPosMax",    servoPosMax);
+  changes |= parseParameter(server, "servoStep",      servoStep);
+  changes |= parseParameter(server, "servoToDegree",  servoToDegree);
+  changes |= parseParameter(server, "servoOffsetDegree",  servoOffsetDegree);
   return changes;
 }
 
@@ -68,42 +78,53 @@ void drawRoomLayout() {
   String out;
   out.reserve(2600);
   char temp[70];
-  out += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"800\" height=\"800\">\n";
-  out += "<rect width=\"800\" height=\"800\" fill=\"rgb(50, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
+
+  int height = 600;
+  int width  = 600;
+
+  out += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"" + String(width) + "\" height=\"" + String(height) + "\">\n";
+  out += "<rect width=\"" + String(width) + "\" height=\"" + String(height) + "\" fill=\"rgb(50, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
   out += "<g stroke=\"black\">\n";
   int y = -1;
   int x = -1;
 
-  for ( int i = SERVO_POS_MIN ; i <= SERVO_POS_MAX; i += SERVO_INCREMENT) {
-    float degree = 90 - (i * SERVO_TO_DEGREE);
-    float rad = (degree * 71) / 4068;
-    float dist = result[i];
-    float distPixel = dist * 5;
-    int y2 = 400.0 + cos(rad) * distPixel;
-    int x2 = 400.0 + sin(rad) * distPixel;
-    /*
-        Serial.print("deg: ");
-        Serial.println(degree);
-        Serial.print("rad: ");
-        Serial.print(rad);
-        Serial.print("\tdist: ");
-        Serial.print(dist);
-        Serial.print("\tdistPixel: ");
-        Serial.print(distPixel);
-        Serial.print(x2);
-        Serial.print("\t");
-        Serial.print(y2);
-        Serial.println();
-    */
-    if ( x >= 0 && y >= 0 && x2 >= 0 && y2 >= 0) {
-      sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, y, x2, y2);
-      out += temp;
+  int maxVal = resultMax();
+
+  for ( int i = servoPosMin ; i <= servoPosMax; i += 1 ) {
+    int dist = result[i] * max(height, width) / maxVal / 2;
+
+    if ( ( dist >= DIST_MIN) && ( dist < DIST_MAX) ) {
+      float degree = 0 - (i * servoToDegree) + servoOffsetDegree;
+      float rad = (degree * 71) / 4068;
+      float distPixel = dist * 1;
+      int y2 = (width / 2)  + cos(rad) * distPixel;
+      int x2 = (height / 2) + sin(rad) * distPixel;
+
+      /*
+            Serial.print(i);
+            Serial.print("\tdeg: ");
+            Serial.print(degree);
+            Serial.print("\trad: ");
+            Serial.print(rad);
+            Serial.print("\tdist: ");
+            Serial.print(dist);
+            Serial.print("\tdistPixel: ");
+            Serial.print(distPixel);
+            Serial.print(x2);
+            Serial.print("\t");
+            Serial.print(y2);
+            Serial.println();
+      */
+      if ( x >= 0 && y >= 0 && x2 >= 0 && y2 >= 0) {
+        sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, y, x2, y2);
+        out += temp;
+      }
+      y = y2;
+      x = x2;
     }
-    y = y2;
-    x = x2;
   }
-  out += "<line x1=\"400\" y1=\"0\" x2=\"400\" y2=\"800\" stroke=\"white\" stroke-width=\"1\" />\n";
-  out += "<line x1=\"0\" y1=\"400\" x2=\"800\" y2=\"400\" stroke=\"white\" stroke-width=\"1\" />\n";
+  out += "<line x1=\"" + String(width / 2) + "\" y1=\"0\" x2=\"" + String(width / 2) + "\" y2=\"" + String(height) + "\" stroke=\"white\" stroke-width=\"1\" />\n";
+  out += "<line x1=\"0\" y1=\"" + String(height / 2) + "\" x2=\"" + String(width) + "\" y2=\"" + String(height / 2) + "\" stroke=\"white\" stroke-width=\"1\" />\n";
   out += "</g>\n</svg>\n";
 
   server.send(200, "image/svg+xml", out);
@@ -133,45 +154,25 @@ String upTimeString() {
   return result;
 }
 
-String formStringInt(String name, int value) {
-  String output = "     <form action=\"/\">\n";
-  output += "      " + name + ": <input type=\"text\" name=\"" + name + "\" value=\"";
-  output += value;
-  output += "\">\n";
-  output += "       <input type=\"submit\" value=\"Submit\">\n";
-  output += "     </form><br>\n";
-
-  return output;
-}
-String formStringFloat(String name, float value) {
-  String output = "     <form action=\"/\">\n";
-  output += "      " + name + ": <input type=\"text\" name=\"" + name + "\" value=\"";
-  output += value;
-  output += "\">\n";
-  output += "       <input type=\"submit\" value=\"Submit\">\n";
-  output += "     </form><br>\n";
-
-  return output;
-}
-
 String inputForms() {
   String output = "\n";
 
   output += "<div>\n";
 
-  output += formStringInt("servoPosMin", SERVO_POS_MIN);
-  output += formStringInt("servoPosMax", SERVO_POS_MAX);
-  output += formStringInt("servoIncrement", SERVO_INCREMENT);
-  output += formStringFloat("servoToDegree", SERVO_TO_DEGREE);
+  output += formString("servoPosMin",       servoPosMin);
+  output += formString("servoPosMax",       servoPosMax);
+  output += formString("servoStep",         servoStep);
+  output += formString("servoToDegree",     servoToDegree);
+  output += formString("servoOffsetDegree", servoOffsetDegree);
 
-  output += "\
-     <div class=\"slidecontainer\"> \
-       <input type=\"range\" min=\"1\" max=\"100\" value=\"50\" class=\"slider\" id=\"myRange\">\
-      </div>\
-    </div>\
-    \
-    ";
-  output += "</div>\n\n";
+  if ( false) {
+    output += "    <div class=\"slidecontainer\"> \n\n";
+    output += "          <input type=\"range\" min=\"1\" max=\"100\" value=\"50\" class=\"slider\" id=\"myRange\">\n\n";
+    output += "    </div>\n\n";
+  }
+
+  output += "   </div>\n\n";
+
   return output;
 
 }
@@ -199,41 +200,40 @@ void handleRoot() {
   </head>\
 ";
 
-  output += "<body>\n";
-  output += "<h1>ESP8266 Distance Sensor</h1>\n\n";
+  output += "  <body>\n";
+  output += "  <h1>ESP8266 Distance Sensor</h1>\n\n";
 
-  output += "<div style=\"float:right; text-align:left; margin:0px auto 0px auto;\">\n";
-  // Uptime
-  output += "<p>" + upTimeString() + "</p>\n";
-
-  // Open Scad Reference
-  output += "<p><a href=\"/scan-2D.scad\">scan-2D.scad</a></p>\n\n";
-
-
-  // HTML Forms
-  output += inputForms();
 
   // Room Layout img Reference
-  output += "<div style=\"float:left\">Room Layout:<p/>\
-      <img src=\"/roomLayout.svg\" />\
-    </div>\
-    \
-    ";
+  output += "<div style=\"float:left\">Room Layout:<p/>\n\n";
+  output += "    <img src=\"/roomLayout.svg\" />\n\n";
+  output += "    </div>\n\n";
+
+  {
+    output += "<div style=\"text-align:left; margin:0px auto 0px auto;\">\n";
+    // Uptime
+    output += "<p>" + upTimeString() + "</p>\n";
+
+    // Open Scad Reference
+    output += "<p><a href=\"/scan-2D.scad\">scan-2D.scad</a></p>\n\n";
+
+
+    // HTML Forms
+    output += inputForms();
+
+    output += "   </div>\n\n";
+  }
 
   // Distances Graf img reference
-  output += "\
-    <br/> <div>\
-    Distances:<p/>\
-    <img src=\"/distGraph.svg\" />\
-    </div>\
-    ";
+  output += "   <div style=\"float:left\">Distances:<p/>\n";
+  output += "         <img src=\"/distGraph.svg\" />\n";
+  output += "   </div>\n\n";
 
   // html End
-  output += "\
-    \
-</body>\
-</html>";
-  server.send(200, "text/html", output);
+  output += "\n\n";
+  output += "  </body>\n";
+  output += "</html > \n";
+  server.send(200, "text / html", output);
 
 }
 
@@ -248,7 +248,7 @@ void handleScad() {
   output += "// Distance Sensor\n";
   output += "// ===========================================================\n";
 
-  for ( int i = SERVO_POS_MIN ; i <= SERVO_POS_MAX; i++) {
+  for ( int i = servoPosMin ; i <= servoPosMax; i++) {
     output += "segment(i=";
     output += i ;
     output += "\t";
@@ -297,25 +297,46 @@ void handleNotFound() {
 }
 
 
-void drawGraph() {
+int resultMax() {
+  int max = 0;
+  for ( int i = 0 ; i <= servoPosMax; i += 1 ) {
+    int dist = result[i];
+    if ( dist < DIST_MAX && dist > max) {
+      max = dist;
+    }
+  }
+  return max;
+}
+
+void distanceGraph() {
   String out;
   out.reserve(2600);
   char temp[70];
-  out += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"400\" height=\"150\">\n";
-  out += "<rect width=\"400\" height=\"150\" fill=\"rgb(250, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
+  int width = 900;
+  int height = 300;
+
+  out += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"";
+  out += String(width) + "\" height=\"" + String( height) + "\">\n";
+
+  out += "<rect width=\"" + String(width) + "\" height=\"" + String(height) + "\" fill=\"rgb(250, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
   out += "<g stroke=\"black\">\n";
   int y = 0;
   int x = 0;
 
-  //  for ( int i = SERVO_POS_MIN ; i <= SERVO_POS_MAX; i += SERVO_INCREMENT) {
-  for ( int i = 0 ; i <= SERVO_POS_MAX; i += 1 ) {
-    int y2 = result[i];
-    int x2 = i;
-    //    int x2 = i * SERVO_TO_DEGREE;
-    sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, 140 - y, x2, 140 - y2);
-    out += temp;
-    y = y2;
-    x = x2;
+  int maxVal = 10 + resultMax();
+
+  //  for ( int i = servoPosMin ; i <= servoPosMax; i += servoIncrement) {
+  for ( int i = 0 ; i <= servoPosMax; i += 1 ) {
+    int y2 = result[i] * height / maxVal;
+    if ( y2 < DIST_MAX && y2 > 0 ) {
+      int x2 = i * width / servoPosMax;
+      if ( y > 0) {
+        sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, height - y, x2, height - y2);
+        out += temp;
+      }
+      y = y2;
+      x = x2;
+    }
   }
   out += "</g>\n</svg>\n";
 
@@ -344,6 +365,7 @@ void setup() {
   Serial.println("Conneting Adafruit VL53L0X ...");
   if (!lox.begin()) {
     Serial.println(F("Failed to boot VL53L0X"));
+    delay(5 * 1000);
     while (1);
   }
   // power
@@ -355,17 +377,16 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("esp8266")) {
+  if (MDNS.begin("2d-SCANNER")) {
     Serial.println("MDNS responder started");
   }
 
   // Register URLs to answer
   if ( ACTIVATE_WEBSERVER ) {
     server.on("/", handleRoot);
-    server.on("/distGraph.svg", drawGraph);
+    server.on("/distGraph.svg", distanceGraph);
     server.on("/scan-2D.scad", handleScad);
     server.on("/roomLayout.svg", drawRoomLayout);
-    //    server.on("/get", handleGet);
     server.onNotFound(handleNotFound);
     server.begin();
   }
@@ -381,12 +402,12 @@ void loop() {
   lox.rangingTest(&measure, false); // pass in 'true' to get debug data printout!
 
   if (measure.RangeStatus != 4) {  // phase failures have incorrect data
-    float dist_cm = measure.RangeMilliMeter / 10.0;
-    // printStatus(servoPos, dist_cm);
-    if ( dist_cm > 800) {
+    int dist_mm = measure.RangeMilliMeter;
+    // printStatus(servoPos, dist_mm);
+    if ( dist_mm > 800) {
       result[servoPos] = -1;
     } else {
-      result[servoPos] = dist_cm;
+      result[servoPos] = dist_mm;
     }
   } else {
     result[servoPos] = -1;
@@ -395,14 +416,14 @@ void loop() {
 
   // Move Servo
   servoPos += servoIncrement;
-  if ( servoPos > SERVO_POS_MAX ) {
-    servoPos = SERVO_POS_MAX;
-    // servoPos = SERVO_POS_MIN ;
-    servoIncrement = -SERVO_INCREMENT;
+  if ( servoPos > servoPosMax ) {
+    servoPos = servoPosMax;
+    // servoPos = servoPosMin ;
+    servoIncrement = -servoStep;
   }
-  if ( servoPos < SERVO_POS_MIN ) {
-    servoPos = SERVO_POS_MIN;
-    servoIncrement = SERVO_INCREMENT;
+  if ( servoPos < servoPosMin ) {
+    servoPos = servoPosMin;
+    servoIncrement = servoStep;
   }
 
   myservo.write(servoPos );
