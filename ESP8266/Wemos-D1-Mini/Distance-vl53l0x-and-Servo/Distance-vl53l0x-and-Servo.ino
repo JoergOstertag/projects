@@ -34,10 +34,12 @@ ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 
 
 #define PIN_SERVO D8
-#define SERVO_POS_MIN 10
-#define SERVO_POS_MAX 175
-#define SERVO_INCREMENT 1
-#define SERVO_TO_DEGREE 1.0
+#define SERVO_MAX_VALUES 300
+
+int SERVO_POS_MIN = 10;
+int SERVO_POS_MAX = 175;
+int SERVO_INCREMENT = 1;
+float SERVO_TO_DEGREE = 1.0;
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
@@ -47,13 +49,42 @@ Servo myservo;  // create servo object to control a servo
 
 ESP8266WebServer server(80);
 
-float result[SERVO_POS_MAX + 2];
+float result[SERVO_MAX_VALUES];
 
 int servoPos = SERVO_POS_MIN;
 int servoIncrement = 5;
 
-void handleGet(){
-  
+boolean parseParameterInt(String name, int &value ) {
+  String parameterString = server.arg(name);
+  if (parameterString != "") {
+    int newValue = parameterString.toInt();
+    if ( newValue != value ) {
+      value = newValue;
+      return true;
+    }
+  }
+  return false;
+}
+
+boolean parseParameterFloat(String name, float &value ) {
+  String parameterString = server.arg(name);
+  if (parameterString != "") {
+    int newValue = parameterString.toFloat();
+    if ( newValue != value ) {
+      value = newValue;
+      return true;
+    }
+  }
+  return false;
+}
+
+boolean handleParameters() {
+  boolean changes = false;
+  changes |= parseParameterInt("servoPosMin",    SERVO_POS_MIN);
+  changes |= parseParameterInt("servoPosMax",    SERVO_POS_MAX);
+  changes |= parseParameterInt("servoIncrement", SERVO_INCREMENT);
+  changes |= parseParameterFloat("servoToDegree",  SERVO_TO_DEGREE);
+  return changes;
 }
 
 void drawRoomLayout() {
@@ -125,7 +156,61 @@ String upTimeString() {
   return result;
 }
 
+String formStringInt(String name, int value) {
+  String output = "     <form action=\"/\">\n";
+  output += "      " + name + ": <input type=\"text\" name=\"" + name + "\" value=\"";
+  output += value;
+  output += "\">\n";
+  output += "       <input type=\"submit\" value=\"Submit\">\n";
+  output += "     </form><br>\n";
+
+  return output;
+}
+String formStringFloat(String name, float value) {
+  String output = "     <form action=\"/\">\n";
+  output += "      " + name + ": <input type=\"text\" name=\"" + name + "\" value=\"";
+  output += value;
+  output += "\">\n";
+  output += "       <input type=\"submit\" value=\"Submit\">\n";
+  output += "     </form><br>\n";
+
+  return output;
+}
+
+String inputForms() {
+  String output = "\n";
+
+  output += "<div>\n";
+
+  output += formStringInt("servoPosMin", SERVO_POS_MIN);
+  output += formStringInt("servoPosMax", SERVO_POS_MAX);
+  output += formStringInt("servoIncrement", SERVO_INCREMENT);
+  output += formStringFloat("servoToDegree", SERVO_TO_DEGREE);
+
+  output += "\
+     <div class=\"slidecontainer\"> \
+       <input type=\"range\" min=\"1\" max=\"100\" value=\"50\" class=\"slider\" id=\"myRange\">\
+      </div>\
+    </div>\
+    \
+    ";
+  output += "</div>\n\n";
+  return output;
+
+}
+
+void resetResults() {
+  Serial.println("Reset Results");
+  for ( int i = 0 ; i <= SERVO_MAX_VALUES; i += 1 ) {
+    result[i] = -1;
+  }
+}
+
 void handleRoot() {
+
+  if (   handleParameters()) {
+    resetResults();
+  }
 
   String output = "<html>\
   <head>\
@@ -140,32 +225,19 @@ void handleRoot() {
   output += "<body>\n";
   output += "<h1>ESP8266 Distance Sensor</h1>\n\n";
 
-
+  output += "<div style=\"float:right; text-align:left; margin:0px auto 0px auto;\">\n";
   // Uptime
-  output += upTimeString();
+  output += "<p>" + upTimeString() + "</p>\n";
 
   // Open Scad Reference
-  output += " < a href=\"/result.scad\">result.scad</a>\n\n";
+  output += "<p><a href=\"/scan-2D.scad\">scan-2D.scad</a></p>\n\n";
 
 
-  // HTML FORM
-  
-    output += "\
-    <div>\
-     <form action=\"/get\">\
-        input1: <input type=\"text\" name=\"input1\">\
-       <input type=\"submit\" value=\"Submit\">\
-     </form><br>\
-     <div class=\"slidecontainer\"> \
-       <input type=\"range\" min=\"1\" max=\"100\" value=\"50\" class=\"slider\" id=\"myRange\">\
-      </div>\
-    </div>\
-    \
-    ";
-  
+  // HTML Forms
+  output += inputForms();
+
   // Room Layout img Reference
-  output += "\
-    <div>Room Layout:<p/>\
+  output += "<div style=\"float:left\">Room Layout:<p/>\
       <img src=\"/roomLayout.svg\" />\
     </div>\
     \
@@ -173,7 +245,7 @@ void handleRoot() {
 
   // Distances Graf img reference
   output += "\
-    <div>\
+    <br/> <div>\
     Distances:<p/>\
     <img src=\"/distGraph.svg\" />\
     </div>\
@@ -244,6 +316,7 @@ void handleNotFound() {
   }
 
   server.send(404, "text/plain", message);
+  Serial.println("Sent 2D Scad File");
 }
 
 
@@ -274,6 +347,8 @@ void drawGraph() {
 
 void setup() {
   Serial.begin(115200);
+
+  resetResults();
 
   ESP_wifiManager.setDebugOutput(true);
 
@@ -311,9 +386,9 @@ void setup() {
   if ( ACTIVATE_WEBSERVER ) {
     server.on("/", handleRoot);
     server.on("/distGraph.svg", drawGraph);
-    server.on("/result.scad", handleScad);
+    server.on("/scan-2D.scad", handleScad);
     server.on("/roomLayout.svg", drawRoomLayout);
-    server.on("/get", handleGet);
+    //    server.on("/get", handleGet);
     server.onNotFound(handleNotFound);
     server.begin();
   }
@@ -330,7 +405,7 @@ void loop() {
 
   if (measure.RangeStatus != 4) {  // phase failures have incorrect data
     float dist_cm = measure.RangeMilliMeter / 10.0;
-    printStatus(servoPos, dist_cm);
+    // printStatus(servoPos, dist_cm);
     if ( dist_cm > 800) {
       result[servoPos] = -1;
     } else {
@@ -338,7 +413,7 @@ void loop() {
     }
   } else {
     result[servoPos] = -1;
-    printStatus(servoPos, -1);
+    // printStatus(servoPos, -1);
   }
 
   // Move Servo
