@@ -34,9 +34,9 @@ ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 
 
 #define PIN_SERVO D8
-#define SERVO_POS_MIN 30
-#define SERVO_POS_MAX 150
-#define SERVO_INCREMENT 2
+#define SERVO_POS_MIN 10
+#define SERVO_POS_MAX 175
+#define SERVO_INCREMENT 1
 #define SERVO_TO_DEGREE 1.0
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
@@ -52,6 +52,9 @@ float result[SERVO_POS_MAX + 2];
 int servoPos = SERVO_POS_MIN;
 int servoIncrement = 5;
 
+void handleGet(){
+  
+}
 
 void drawRoomLayout() {
   String out;
@@ -111,17 +114,20 @@ void printStatus(int i , float dist_cm) {
 }
 
 
-
-
-void handleRoot() {
-  char temp[600];
+String upTimeString() {
+  char temp[100];
   int sec = millis() / 1000;
   int min = sec / 60;
   int hr = min / 60;
 
-  snprintf(temp, 600,
+  snprintf(temp, 100, "Uptime: %02d:%02d:%02d ", hr, min % 60, sec % 60 );
+  String result = String(temp);
+  return result;
+}
 
-           "<html>\
+void handleRoot() {
+
+  String output = "<html>\
   <head>\
     <meta http-equiv='refresh' content='5'/>\
     <title>ESP8266 Distance</title>\
@@ -129,26 +135,56 @@ void handleRoot() {
       body { background-color: #cccccc; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; }\
     </style>\
   </head>\
-  <body>\
-    <h1>ESP8266 Distance Sensor</h1>\
-    \
-    Uptime: %02d:%02d:%02d \
-    <a href=\"/result.scad\">result.scad</a>\
-    \
-    <div>Room Layout:<p/>\
-    <img src=\"/roomLayout.svg\" />\
+";
+
+  output += "<body>\n";
+  output += "<h1>ESP8266 Distance Sensor</h1>\n\n";
+
+
+  // Uptime
+  output += upTimeString();
+
+  // Open Scad Reference
+  output += " < a href=\"/result.scad\">result.scad</a>\n\n";
+
+
+  // HTML FORM
+  
+    output += "\
+    <div>\
+     <form action=\"/get\">\
+        input1: <input type=\"text\" name=\"input1\">\
+       <input type=\"submit\" value=\"Submit\">\
+     </form><br>\
+     <div class=\"slidecontainer\"> \
+       <input type=\"range\" min=\"1\" max=\"100\" value=\"50\" class=\"slider\" id=\"myRange\">\
+      </div>\
     </div>\
     \
+    ";
+  
+  // Room Layout img Reference
+  output += "\
+    <div>Room Layout:<p/>\
+      <img src=\"/roomLayout.svg\" />\
+    </div>\
+    \
+    ";
+
+  // Distances Graf img reference
+  output += "\
     <div>\
     Distances:<p/>\
-    <img src=\"/test.svg\" />\
+    <img src=\"/distGraph.svg\" />\
     </div>\
+    ";
+
+  // html End
+  output += "\
     \
 </body>\
-</html>",
-           hr, min % 60, sec % 60
-          );
-  server.send(200, "text/html", temp);
+</html>";
+  server.send(200, "text/html", output);
 
 }
 
@@ -167,7 +203,7 @@ void handleScad() {
     output += "segment(i=";
     output += i ;
     output += "\t";
-    output += ",d=";
+    output += ",dist=";
     output += result[i];
     output += ");\n";
   }
@@ -176,17 +212,17 @@ void handleScad() {
   output += "\n";
   output += "\n";
   output += "module segment(i=0,d=20){\n";
-  output += "  if ( d < 0) {\n";
-  output += "    outOfRange(i=i);\n";
-  output += "  } else {\n";
-  output += "    rotate([0,90,i]) cylinder(d1=1,d2=0.4226*d,h=d);\n";
-  output += "  }\n";
+  output += "  if ( d > 0 && dist <800 ) {\n";
+  output += "    sinVal=0.422618261740699;\n";
+  output += "    deltaDist= .1;\n";
+  output += "    dist1= dist-deltaDist;\n";
+  output += "\n";
+  output += "    rotate( [0,90,i] )\n";
+  output += "       translate([0,0,dist1])\n";
+  output += "            cylinder(d1=sinVal*dist1,d2=sinVal*dist,h=deltaDist);\n";
+  output += "    }\n";
   output += "}\n";
   output += "\n";
-  output += "module outOfRange(i=0){\n";
-  output += "      color(\"red\")\n";
-  output += "        rotate([0,90,i]) cylinder(d1=1,d2=1,h=1200);\n";
-  output += "}\n";
   output += "\n";
   server.sendContent(output);
   server.chunkedResponseFinalize();
@@ -221,11 +257,11 @@ void drawGraph() {
   int y = 0;
   int x = 0;
 
-//  for ( int i = SERVO_POS_MIN ; i <= SERVO_POS_MAX; i += SERVO_INCREMENT) {
+  //  for ( int i = SERVO_POS_MIN ; i <= SERVO_POS_MAX; i += SERVO_INCREMENT) {
   for ( int i = 0 ; i <= SERVO_POS_MAX; i += 1 ) {
     int y2 = result[i];
     int x2 = i;
-//    int x2 = i * SERVO_TO_DEGREE;
+    //    int x2 = i * SERVO_TO_DEGREE;
     sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, 140 - y, x2, 140 - y2);
     out += temp;
     y = y2;
@@ -274,9 +310,10 @@ void setup() {
   // Register URLs to answer
   if ( ACTIVATE_WEBSERVER ) {
     server.on("/", handleRoot);
-    server.on("/test.svg", drawGraph);
+    server.on("/distGraph.svg", drawGraph);
     server.on("/result.scad", handleScad);
     server.on("/roomLayout.svg", drawRoomLayout);
+    server.on("/get", handleGet);
     server.onNotFound(handleNotFound);
     server.begin();
   }
@@ -317,7 +354,7 @@ void loop() {
   }
 
   myservo.write(servoPos );
-  delay(50);
+  delay(0);
 
   if (ACTIVATE_WEBSERVER) {
     server.handleClient();
