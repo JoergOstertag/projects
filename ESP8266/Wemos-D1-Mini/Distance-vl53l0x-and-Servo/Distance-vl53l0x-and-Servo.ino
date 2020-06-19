@@ -48,6 +48,8 @@ int servoIncrement = servoStep;
 #define DIST_MIN 0
 #define DIST_MAX 500*10
 
+#define SIZE_2D_GRAPH 600
+
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
 Servo myservo;  // create servo object to control a servo
@@ -79,8 +81,8 @@ void drawRoomLayout() {
   out.reserve(2600);
   char temp[70];
 
-  int height = 600;
-  int width  = 600;
+  int height = SIZE_2D_GRAPH;
+  int width  = SIZE_2D_GRAPH;
 
   out += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"" + String(width) + "\" height=\"" + String(height) + "\">\n";
   out += "<rect width=\"" + String(width) + "\" height=\"" + String(height) + "\" fill=\"rgb(50, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
@@ -207,18 +209,9 @@ void handleRoot() {
   output += "\n";
   output += "  <h1>ESP8266 2D-Scanner</h1>\n\n";
 
-
-  // Room Layout img Reference
-  output += "\n";
-  output += "    <div style=\"float:left\">\n";
-  output += "        <p>Room Layout:</p>\n";
-  output += "        <img src=\"/roomLayout.svg\" />\n";
-  output += "    </div>\n";
-  output += "\n";
-
   {
     output += "  <div style=\"text-align:left; margin:2px auto 2px auto;\">\n";
-    
+
     // Uptime
     output += "      <p>" + upTimeString() + "</p>\n";
 
@@ -226,12 +219,29 @@ void handleRoot() {
     output += "      <p>\n";
     output += "         <a href=\"/scan-2D.scad\">scan-2D.scad</a>\n";
     output += "      </p>\n\n";
-
-
-    // HTML Forms
-    output += inputForms();
-
     output += "   </div>\n\n";
+  }
+
+  {
+    output += "   <div style=\"border: 2px solid blue;\">\n";
+    {
+      // Room Layout img Reference
+      output += "\n";
+      output += "      <div style=\"float:left; height:" + String( SIZE_2D_GRAPH + 20 ) + "; width:" + String(SIZE_2D_GRAPH ) + "\">\n";
+      output += "          <p>Room Layout:</p>\n";
+      output += "          <img src=\"/roomLayout.svg\" />\n";
+      output += "      </div>\n";
+    }
+
+    {
+      // HTML Forms
+      output += "      <div style=\"text-align:right; margin:2px auto 2px auto;\">\n";
+      output +=           inputForms();
+      output += "      </div>\n\n";
+    }
+    
+    output += "    </div>\n";
+    output += "\n";
   }
 
   // Distances Graf img reference
@@ -353,7 +363,8 @@ void distanceGraph() {
       x = x2;
     }
   }
-  out += "</g>\n</svg>\n";
+  out += "</g>\n";
+  out += "</svg>\n";
 
   server.send(200, "image/svg+xml", out);
 }
