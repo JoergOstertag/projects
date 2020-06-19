@@ -190,32 +190,42 @@ void handleRoot() {
     resetResults();
   }
 
-  String output = "<html>\
-  <head>\
-    <meta http-equiv='refresh' content='5'/>\
-    <title>ESP8266 Distance</title>\
-    <style>\
-      body { background-color: #cccccc; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; }\
-    </style>\
-  </head>\
-";
+  String output = "<html>\n\
+  <head>\n\
+    <meta http-equiv='refresh' content='5'/>\n\
+    <title>ESP8266 Distance</title>\n\
+    <style>\n\
+      body {\n\
+       background-color: #cccccc;\n\
+       font-family: Arial, Helvetica, Sans-Serif;\n\
+       Color: #000088;\n\
+       }\n\
+    </style>\n\
+  </head>\n\n";
 
   output += "  <body>\n";
-  output += "  <h1>ESP8266 Distance Sensor</h1>\n\n";
+  output += "\n";
+  output += "  <h1>ESP8266 2D-Scanner</h1>\n\n";
 
 
   // Room Layout img Reference
-  output += "<div style=\"float:left\">Room Layout:<p/>\n\n";
-  output += "    <img src=\"/roomLayout.svg\" />\n\n";
-  output += "    </div>\n\n";
+  output += "\n";
+  output += "    <div style=\"float:left\">\n";
+  output += "        <p>Room Layout:</p>\n";
+  output += "        <img src=\"/roomLayout.svg\" />\n";
+  output += "    </div>\n";
+  output += "\n";
 
   {
-    output += "<div style=\"text-align:left; margin:0px auto 0px auto;\">\n";
+    output += "  <div style=\"text-align:left; margin:2px auto 2px auto;\">\n";
+    
     // Uptime
-    output += "<p>" + upTimeString() + "</p>\n";
+    output += "      <p>" + upTimeString() + "</p>\n";
 
     // Open Scad Reference
-    output += "<p><a href=\"/scan-2D.scad\">scan-2D.scad</a></p>\n\n";
+    output += "      <p>\n";
+    output += "         <a href=\"/scan-2D.scad\">scan-2D.scad</a>\n";
+    output += "      </p>\n\n";
 
 
     // HTML Forms
@@ -225,9 +235,14 @@ void handleRoot() {
   }
 
   // Distances Graf img reference
-  output += "   <div style=\"float:left\">Distances:<p/>\n";
-  output += "         <img src=\"/distGraph.svg\" />\n";
-  output += "   </div>\n\n";
+  output += "\n";
+  output += "    <p>\n";
+  output += "       <div style=\"float:left\">\n";
+  output += "          <p>Distances:<p/>\n";
+  output += "          <img src=\"/distGraph.svg\" />\n";
+  output += "       </div>\n";
+  output += "    </p>\n";
+  output += "\n";
 
   // html End
   output += "\n\n";
