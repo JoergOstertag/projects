@@ -163,7 +163,7 @@ String inputForms() {
   output += "<div style=\"text-align:left; margin:8px; \">\n";
   output += "Parameters:\n";
   output += "<form action=\"/\">\n";
-  
+
   output += "       <table>\n";
   output += formString("servoPosMin",       servoPosMin);
   output += formString("servoPosMax",       servoPosMax);
@@ -176,7 +176,7 @@ String inputForms() {
     output += "          <input type=\"range\" min=\"1\" max=\"100\" value=\"50\" class=\"slider\" id=\"myRange\">\n\n";
     output += "    </div>\n\n";
   }
-  
+
   output += "       </table>\n";
   output += "       <input type=\"submit\" value=\"Submit\">\n";
   output += "     </form><br>\n";
@@ -246,7 +246,7 @@ void handleRoot() {
       output +=           inputForms();
       output += "      </div>\n\n";
     }
-    
+
     output += "    </div>\n";
     output += "\n";
   }
@@ -429,11 +429,29 @@ void loop() {
 
   VL53L0X_RangingMeasurementData_t measure;
 
-  // Serial.print("Reading a measurement... ");
-  lox.rangingTest(&measure, false); // pass in 'true' to get debug data printout!
+  int retryCount = 0;
+  int dist_mm = -1;
+  boolean doRetry=true;
+  do {
+    // Serial.print("Reading a measurement... ");
+    lox.rangingTest(&measure, false); // pass in 'true' to get debug data printout!
+    dist_mm = measure.RangeMilliMeter;
+    if ( dist_mm>1 && dist_mm > 800 && measure.RangeStatus != 4) {
+      doRetry=false;
+      if ( retryCount >0 2 ){
+        Serial.println"Retry succeded");
+      }
+    } else if ( retryCount++ < 2 ){
+      Serial.print("Retry ");
+      Serial.println(retryCount);
+      delay(100);
+      yield();
+    } else {
+      doRetry=false;
+    }
+  } while ( doRetry );
 
   if (measure.RangeStatus != 4) {  // phase failures have incorrect data
-    int dist_mm = measure.RangeMilliMeter;
     // printStatus(servoPos, dist_mm);
     if ( dist_mm > 800) {
       result[servoPos] = -1;
@@ -458,7 +476,7 @@ void loop() {
   }
 
   myservo.write(servoPos );
-  delay(0);
+  delay(10);
 
   if (ACTIVATE_WEBSERVER) {
     server.handleClient();
