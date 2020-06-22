@@ -198,7 +198,7 @@ void initColors(uint32_t color) {
   for (int i = 0; i < NUM_PIXELS; i++) {
     pixels.setPixelColor(i, color);
     pixels.show();
-    delay(15);
+    delay(10);
   }
 }
 
@@ -279,9 +279,8 @@ void loop () {
     }
   }
 
-  // Display CLock if noting is seen by SR04
-  if ( timeLeft <= 0.0 ) {
-    if (dist >= DISTANCE_MAX  ) {
+  // Display Clock if noting is seen by SR04
+  if ( ! isTimerActive() ) {
       // Get current Time and Print it on Serial
       time_t now = time(nullptr);
       String time = String(ctime(&now));
@@ -289,9 +288,6 @@ void loop () {
 
       // Show time on Neopixel Ring
       showTime();
-    } else {
-      showDistance(dist);
-    }
   }
 
 
