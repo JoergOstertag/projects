@@ -27,6 +27,8 @@
 #define NEOPIXEL_PIN  D4
 
 
+// Delay for each loop
+#define DELAY 100
 
 // The Distance Sensor is directly attached to the pins
 #define SR04_TRIGGER  D2
@@ -39,13 +41,11 @@
 // This starts the timer again each time you get nearer than this distance  in cm
 #define DISTANCE_TIMER_RESET 10.0
 
-#define DISTANCE_MAX 50.0
-
 // Define my Time Zone to Germany
 #define MYTZ TZ_Europe_Berlin
 
 // Time for complete countdown in seconds
-#define WASH_TIME_SEC 20.0
+#define WASH_TIME_SEC 20
 
 // -----------------------------------------------------------
 // Libs for Wifi Connection
@@ -73,25 +73,36 @@ Adafruit_NeoPixel pixels(NUM_PIXELS, D4, NEO_GRB | NEO_KHZ800);
 // Define LED color for hour,minute,second
 int intens = 100;
 uint32_t colorBackground = pixels.Color(0, 0, 0);
-uint32_t colorMinute   = pixels.Color(0, 0, intens);
-uint32_t colorHour     = pixels.Color(0, intens, 0);
-uint32_t colorSecond   = pixels.Color(intens, intens, 0);
+uint32_t colorMinute     = pixels.Color(0, 0, intens);
+uint32_t colorHour       = pixels.Color(0, intens, 0);
+uint32_t colorSecond     = pixels.Color(intens, intens, 0);
 
 
 // Initialize sensor that uses digital pins for trigger and echo.
 UltraSonicDistanceSensor distanceSensor(SR04_TRIGGER, SR04_ECHO);
 
-// Time for each loop in seconds
-#define TIMER_STEPS    0.3
+// Timer handling
+unsigned long timerEnd = 0;
+void timerStart() {
+  Serial.println("Timer Start");
+  timerEnd = millis() + ( 1000 * WASH_TIME_SEC );
+  Serial.print("Timer Ends at ");
+  Serial.println(timerEnd);
+}
+// function for time left in seconds
+double timeLeft() {
+  if ( timerEnd >0){
+    unsigned long millisLeft = timerEnd - millis();
+    return (millisLeft) / 1000.0;
+  } else {
+    return 0.0;
+  }
+}
 
-// Time needed to measure distance in seconds
-#define TIME_FOR_MEASURING_DISTANCE 0.1
+boolean timerActive() {
+  return timeLeft() > 0.0;
+}
 
-// Delay for each loop
-#define DELAY 1000.0 * (TIMER_STEPS - TIME_FOR_MEASURING_DISTANCE)
-
-// Global variable for time left in seconds
-double timeLeft     = 0.0;
 
 /**
    set all Neopixels to Background Color
@@ -99,6 +110,38 @@ double timeLeft     = 0.0;
 void clearPixel() {
   for (int i = 0; i < NUM_PIXELS; i++) {
     pixels.setPixelColor(i, colorBackground);
+  }
+}
+
+/**
+   Set all Color to given color
+*/
+void initColors(uint32_t color) {
+  for (int i = 0; i < NUM_PIXELS; i++) {
+    pixels.setPixelColor(i, color);
+    pixels.show();
+    delay(10);
+  }
+}
+
+void setColors(int num, uint32_t color1, uint32_t color2) {
+  for (int i = 0; i < num; i++) {
+    pixels.setPixelColor(i, color1);
+  }
+  for (int i = num; i < NUM_PIXELS; i++) {
+    pixels.setPixelColor(i, color2);
+  }
+
+  pixels.show();
+}
+
+void ledFlashing(){
+  // Flash LEDs when
+  for ( int i = 0; i < 3; i++) {
+    setColors(NUM_PIXELS, pixels.Color(0, 100, 0) , pixels.Color(0, 0, 0));
+    delay(80);
+    setColors(NUM_PIXELS, pixels.Color(0, 0, 0) , pixels.Color(0, 0, 0));
+    delay(80);
   }
 }
 
@@ -187,75 +230,16 @@ void setup () {
   initColors(  pixels.Color(0, 1, 1));
 }
 
-void setTimeLeft(double newTimeLeft ) {
-  timeLeft = newTimeLeft;
-}
-
-/**
-   Set all Color to given color
-*/
-void initColors(uint32_t color) {
-  for (int i = 0; i < NUM_PIXELS; i++) {
-    pixels.setPixelColor(i, color);
-    pixels.show();
-    delay(10);
-  }
-}
-
-void showDistance(double distance) {
 
 
-  uint32_t color1 = pixels.Color(0, 1, 0);
-  uint32_t color2 = pixels.Color(0, 0, 20);
 
-  // DISTANCE_MAX
-  int pixelNumMin = (int)(DISTANCE_TIMER_START - DISTANCE_TIMER_RESET) / 2;
-  int pixelNumMax = (int)(distance - DISTANCE_TIMER_RESET) / 2;
-  for (int i = 0; i < NUM_PIXELS; i++) {
-    if ( i >= pixelNumMin && i <= pixelNumMax ) {
-      pixels.setPixelColor(i, color2);
-    } else {
-      pixels.setPixelColor(i, color1);
-    }
-  }
+void showTimeLeftOnLeds() {
 
-  pixels.show();
-}
-
-void setColors(int num, uint32_t color1, uint32_t color2) {
-  for (int i = 0; i < num; i++) {
-    pixels.setPixelColor(i, color1);
-  }
-  for (int i = num; i < NUM_PIXELS; i++) {
-    pixels.setPixelColor(i, color2);
-  }
-
-  pixels.show();
-}
-
-boolean isTimerActive() {
-  return timeLeft > 0.0;
-}
-
-void decrementTimeLeft() {
-
-  if ( timeLeft > 0.0 ) {
-    int numLeds = (int)( timeLeft / WASH_TIME_SEC *       NUM_PIXELS);
+  if ( timeLeft() >= 0.5 ) {
+    int numLeds = (int)( timeLeft() / WASH_TIME_SEC *       NUM_PIXELS);
     setColors( numLeds , pixels.Color(10, 0, 0) , pixels.Color(0, 10, 0));
-
-    delay(1000 * TIMER_STEPS);
-
-    timeLeft -= TIMER_STEPS;
-
-    if ( timeLeft <= 0) {
-      // Flash LEDs when ready
-      for ( int i = 0; i < 3; i++) {
-        setColors(NUM_PIXELS, pixels.Color(0, 100, 0) , pixels.Color(0, 0, 0));
-        delay(80);
-        setColors(NUM_PIXELS, pixels.Color(0, 0, 0) , pixels.Color(0, 0, 0));
-        delay(80);
-      }
-    }
+  } else {
+    ledFlashing();
   }
 }
 
@@ -263,24 +247,20 @@ void loop () {
   // do a measurement using the sensor and print the distance in centimeters.
   double dist = distanceSensor.measureDistanceCm();
 
-  if ( dist > 3.0 ) { // Distance of a standerd HCSR04 Sensor can not be below 2.3 cm
+  if  ( timerActive()) {
+    if ( dist > 3.0 &&  dist < DISTANCE_TIMER_RESET ) {
 
-    // If Timer is not triggered yet and you are nearer than 1m
-    if ( isTimerActive() && dist < DISTANCE_TIMER_RESET ) {
       Serial.println("Timer started");
-      setTimeLeft(WASH_TIME_SEC);
+      timerStart();
     }
-
+    showTimeLeftOnLeds();
+  } else { // ! timerActive()
     // This is a nice to have addition
     // If Timer is already triggered yet and you are nearer than 10cm
-    if ( dist < DISTANCE_TIMER_START ) {
+    if ( dist > 3.0 &&  dist < DISTANCE_TIMER_START ) {
       Serial.printf("Timer started nearer than %.0f cm\n", DISTANCE_TIMER_RESET);
-      setTimeLeft(WASH_TIME_SEC);
-    }
-  }
-
-  // Display Clock if noting is seen by SR04
-  if ( ! isTimerActive() ) {
+      timerStart();
+    } else { // Display Clock
       // Get current Time and Print it on Serial
       time_t now = time(nullptr);
       String time = String(ctime(&now));
@@ -288,12 +268,13 @@ void loop () {
 
       // Show time on Neopixel Ring
       showTime();
+    }
   }
 
 
-  decrementTimeLeft();
 
-  Serial.printf("Distance %5.1f cm   Time left %.1f\n", dist, timeLeft);
+
+  Serial.printf("Distance %5.1f cm   Time left %.1f sec\n", dist, timeLeft());
 
   checkWifiStatus();
 
