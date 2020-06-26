@@ -64,7 +64,7 @@ void initCompass() {
       | 2G                | 0x00  |
       | 8G                | 0x10  |
   */
-  byte set_rng = 0x10;
+  byte set_rng = 0x00;
 
   /*
       | OVER SAMPLE RATIO (OSR) | Value |
