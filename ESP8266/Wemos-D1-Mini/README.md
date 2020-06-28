@@ -38,7 +38,7 @@ gibt dazu einen guten Eindruck.
 Zeit messen mit millis()
 ------------------------
 
-Die [Verwendun von milis()](https://github.com/wemos/D1_mini_Examples/blob/master/examples/01.Basics/BlinkWithoutDelay/BlinkWithoutDelay.ino)
+Die [Verwendung von milis()](https://github.com/wemos/D1_mini_Examples/blob/master/examples/01.Basics/BlinkWithoutDelay/BlinkWithoutDelay.ino)
 zeigt, wie man die real vergangene Zeit bestimmen kann und damit DInge auslösen kann.
 Im ersten Moment denkt man, daß die Verwendung von deley() einem die Möglichkeit bietet in regelmäßigen Abständen DInge zu tun. Was aber hier nicht Beachtet ist, daß ja auch das ausführen des Codes dazwischen Zeit dauert. Dadurch würde das timing verfälscht werden.
 Wenn man sich die reale Zeit in milisekunden anschaut kann man dan genau getimt operationen auslösen.
@@ -68,7 +68,7 @@ Im Beispiel [ESP_WiFiManager show Time](ESP_WifiManager-show-NTP-time) wird eine
 Wemos DOT Matrix Display
 ------------------------
 
-DIe Bibliothek [WEMOS_Matrix_LED](https://github.com/wemos/WEMOS_Matrix_LED_Shield_Arduino_Library) kann zur Ansteuerung des LED Matrix Shields verwendet werden. Am einfachsten steigt man hier mit dem
+Die Bibliothek [WEMOS_Matrix_LED](https://github.com/wemos/WEMOS_Matrix_LED_Shield_Arduino_Library) kann zur Ansteuerung des LED Matrix Shields verwendet werden. Am einfachsten steigt man hier mit dem
 [Beispiel draw_dot](https://github.com/wemos/WEMOS_Matrix_LED_Shield_Arduino_Library/tree/master/examples/draw_dot) ein.
 
 
