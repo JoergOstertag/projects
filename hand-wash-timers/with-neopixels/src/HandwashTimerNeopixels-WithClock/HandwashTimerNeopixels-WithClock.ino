@@ -28,7 +28,7 @@
 
 
 // Delay for each loop
-#define DELAY 100
+#define DELAY 200
 
 // The Distance Sensor is directly attached to the pins
 #define SR04_TRIGGER  D2
@@ -46,6 +46,7 @@
 
 // Time for complete countdown in seconds
 #define WASH_TIME_SEC 20
+
 
 // -----------------------------------------------------------
 // Libs for Wifi Connection
@@ -70,8 +71,9 @@ ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 #include <Adafruit_NeoPixel.h>
 
 Adafruit_NeoPixel pixels(NUM_PIXELS, D4, NEO_GRB | NEO_KHZ800);
-// Define LED color for hour,minute,second
-int intens = 100;
+#define BRIGHTNESS_DAY 100
+#define BRIGHTNESS_NIGHT 10
+int intens = BRIGHTNESS_NIGHT;
 uint32_t colorBackground = pixels.Color(0, 0, 0);
 uint32_t colorMinute     = pixels.Color(0, 0, intens);
 uint32_t colorHour       = pixels.Color(0, intens, 0);
@@ -91,8 +93,8 @@ void timerStart() {
 }
 // function for time left in seconds
 double timeLeft() {
-  if ( timerEnd >0){
-    unsigned long millisLeft = timerEnd - millis();
+  if ( timerEnd > 0) {
+    long millisLeft = timerEnd - millis();
     return (millisLeft) / 1000.0;
   } else {
     return 0.0;
@@ -125,7 +127,7 @@ void initColors(uint32_t color) {
 }
 
 void setColors(int num, uint32_t color1, uint32_t color2) {
-  for (int i = 0; i < num; i++) {
+  for (int i = 0; i < min(num, NUM_PIXELS); i++) {
     pixels.setPixelColor(i, color1);
   }
   for (int i = num; i < NUM_PIXELS; i++) {
@@ -135,7 +137,7 @@ void setColors(int num, uint32_t color1, uint32_t color2) {
   pixels.show();
 }
 
-void ledFlashing(){
+void ledFlashing() {
   // Flash LEDs when
   for ( int i = 0; i < 3; i++) {
     setColors(NUM_PIXELS, pixels.Color(0, 100, 0) , pixels.Color(0, 0, 0));
@@ -157,6 +159,17 @@ void showTime() {
 
   tnow = time(nullptr) + 1;
   ti = localtime(&tnow);
+
+  // Define LED color for hour,minute,second
+  if (( ti->tm_hour < 7) || ( ti->tm_hour > 21 ) ) {
+    intens = BRIGHTNESS_NIGHT;
+  } else {
+    intens = BRIGHTNESS_DAY;
+  }
+
+  colorMinute     = pixels.Color(0, 0, intens);
+  colorHour       = pixels.Color(0, intens, 0);
+  colorSecond     = pixels.Color(intens, intens, 0);
 
   // Hour
   int h = ti->tm_hour;
