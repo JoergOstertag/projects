@@ -61,6 +61,7 @@ void loop()
       Serial.println("  !");
 
       switch (address) {
+        case 0x29: Serial.println("\t\tLidar Sensor VL53L0X"); break;
         case 0x3C: Serial.println("\t\tOLED Display"); break;
         case 0x1E: Serial.println("\t\tHMC5883L"); break;
         case 0x77: Serial.println("\t\tBMP Sensor"); break;
