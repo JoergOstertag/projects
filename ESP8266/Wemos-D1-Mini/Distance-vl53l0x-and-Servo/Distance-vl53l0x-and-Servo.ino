@@ -39,13 +39,21 @@ ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 #define SERVO_MAX_VALUES 300
 
 int servoPosAzMin = 10;
-int servoPosAzMax = 170;
-int servoStep = 10;
+int servoPosAzMax = 180;
+int servoStepAz = 20;
+int servoDirAz = 1;
+int servoPosAz = servoPosAzMin;
+
+int servoPosElMin = 80;
+int servoPosElMax = 110;
+int servoStepEl = 10;
+int servoDirEl = 1;
+int servoPosEl = servoPosElMin;
+
 float servoToDegree = 1.0;
 float servoOffsetDegree = 0.0;
-int servoPosEl0 = 90;
 
-int servoIncrement = servoStep;
+
 
 #define DIST_MIN 1
 #define DIST_MAX 500*10
@@ -67,14 +75,11 @@ ESP8266WebServer server(80);
 */
 int result[SERVO_MAX_VALUES];
 
-int servoPosAz = servoPosAzMin;
-int servoPosEl = servoPosEl0;
-
 boolean handleParameters() {
   boolean changes = false;
   changes |= parseParameter(server, "servoPosAzMin",    servoPosAzMin);
   changes |= parseParameter(server, "servoPosAzMax",    servoPosAzMax);
-  changes |= parseParameter(server, "servoStep",      servoStep);
+  changes |= parseParameter(server, "servoStepAz",      servoStepAz);
   changes |= parseParameter(server, "servoToDegree",  servoToDegree);
   changes |= parseParameter(server, "servoOffsetDegree",  servoOffsetDegree);
   return changes;
@@ -98,7 +103,7 @@ void drawRoomLayout() {
 
   for ( int i = 0 ; i <= servoPosAzMax; i += 1 ) {
     int dist = result[i];
-    
+
     if ( ( dist >= DIST_MIN) && ( dist < DIST_MAX) ) {
       float degree = 0 - (i * servoToDegree) + servoOffsetDegree;
       float rad = (degree * 71) / 4068;
@@ -171,7 +176,7 @@ String inputForms() {
   output += "       <table>\n";
   output += formString("servoPosAzMin",       servoPosAzMin);
   output += formString("servoPosAzMax",       servoPosAzMax);
-  output += formString("servoStep",         servoStep);
+  output += formString("servoStepAz",         servoStepAz);
   output += formString("servoToDegree",     servoToDegree);
   output += formString("servoOffsetDegree", servoOffsetDegree);
 
@@ -359,7 +364,6 @@ void distanceGraph() {
 
   int maxVal = 10 + resultMax();
 
-  //  for ( int i = servoPosAzMin ; i <= servoPosAzMax; i += servoIncrement) {
   for ( int i = 0 ; i <= servoPosAzMax; i += 1 ) {
     int y2 = result[i] * height / maxVal;
     if ( y2 < DIST_MAX && y2 > 0 ) {
@@ -405,7 +409,7 @@ void setup() {
   servo_az.attach(PIN_SERVO_AZ);  // attaches the servo
   servo_el.attach(PIN_SERVO_EL);  // attaches the servo
   servo_az.write(servoPosAz );
-  servo_el.write(servoPosAz );
+  servo_el.write(servoPosEl );
 
   // VL53L0X
   Serial.println("Conneting Adafruit VL53L0X ...");
@@ -438,7 +442,7 @@ void setup() {
 }
 
 
-void loop() {
+void measure(){
 
   VL53L0X_RangingMeasurementData_t measure;
 
@@ -455,7 +459,7 @@ void loop() {
         Serial.println("Retry succeded");
       }
     } else if ( retryCount++ < 2 ) {
-      Serial.println("AZ: "+String(servoPosAz) + ": Retry " + String(retryCount));
+      Serial.println("EL: "+String(servoPosEl) + " AZ: " + String(servoPosAz) + ": Retry " + String(retryCount));
       delay(100);
     } else {
       doRetry = false;
@@ -475,19 +479,39 @@ void loop() {
   }
 
   // Move Servo
-  servoPosAz += servoIncrement;
+  servoPosAz += servoDirAz * servoStepAz;
+  if ( ( servoPosAz > servoPosAzMax) || (servoPosAz < servoPosAzMin ) ) {
+    servoPosEl += servoDirEl * servoStepEl;
+    if ( servoPosEl > servoPosElMax ) {
+      servoPosEl = servoPosElMax;
+      servoDirEl = -1;
+    }
+    if ( servoPosEl < servoPosElMin ) {
+      servoPosEl = servoPosElMin;
+      servoDirEl = 1;
+    }
+    Serial.println("New El: "+String(servoPosEl));
+    servo_el.write(servoPosEl );
+  }
+
   if ( servoPosAz > servoPosAzMax ) {
     servoPosAz = servoPosAzMax;
     // servoPosAz = servoPosAzMin ;
-    servoIncrement = -servoStep;
+    servoDirAz = -1;
   }
   if ( servoPosAz < servoPosAzMin ) {
     servoPosAz = servoPosAzMin;
-    servoIncrement = servoStep;
+    servoDirAz = 1;
   }
 
   servo_az.write(servoPosAz );
   delay(10);
+}
+
+void loop() {
+  
+  measure();
+  
 
   if (ACTIVATE_WEBSERVER) {
     server.handleClient();
