@@ -1,15 +1,19 @@
-// Deckel um be einem Gehaeuse die Kabellöcher zu schliessen
+// Deckel um bei einem Gehaeuse die Kabellöcher zu schliessen
 
-dKlein=25.2;
-dGross=40.3;
-dSchraubDurchfuehrung=15.7+.2;
+
+// dInnen=40.3;
+// wallThickness=2.8;
+
+// Obi Wasserfester Strom kasten
+dInnen=25.2;
+dSchraubDurchfuehrung=15.7 + .2;
 scheibenOverlap=5.0;
+wallThickness=1.7 + .4;
 
-wallThickness=2.8;
 $fn=64;
 
-translate([0,0,0]) Part1(hPlaettchenStaerke=2,dInnen=dGross);
-translate([60,0,0]) Part2(hPlaettchenStaerke=3,dInnen=dGross);
+translate([0,0,0]) Part1(hPlaettchenStaerke=2,dInnen=dInnen);
+translate([dInnen+scheibenOverlap+5,0,0]) Part2(hPlaettchenStaerke=3,dInnen=dInnen);
 
 
 module Part1(
