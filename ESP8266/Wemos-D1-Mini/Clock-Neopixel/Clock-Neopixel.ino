@@ -11,12 +11,23 @@
  *****************************************************************************************************************************/
 
 // Uncomment for continuous Debug Output
-#define DEBUG
+// #define DEBUG
 
 // Define Neo Pixel Ring
 #define NUM_PIXELS    150
 #define NEOPIXEL_PIN  D2
 
+int color_hour_r = 0;
+int color_hour_g = 100;
+int color_hour_b = 0;
+
+int color_min_r = 0;
+int color_min_g = 0;
+int color_min_b = 100;
+
+int color_sec_r = 100;
+int color_sec_g = 100;
+int color_sec_b = 0;
 
 
 // -----------------------------------------------------------
@@ -52,11 +63,8 @@ ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB | NEO_KHZ800);
 
 // Define LED color for hour,minute,second
-int intens = 100;
+double intens = 1.0;
 uint32_t colorBackground = pixels.Color(0, 0, 0);
-uint32_t colorMinute   = pixels.Color(0, 0, intens);
-uint32_t colorHour     = pixels.Color(0, intens, 0);
-uint32_t colorSecond   = pixels.Color(intens, intens, 0);
 
 
 // Define my Time Zone to Germany
@@ -71,6 +79,48 @@ void clearPixel() {
   }
 }
 
+
+/**
+ * Sets the pixel with the given number to the specified color.
+ * If NUM_PIXEL is reached we start from the first pixel again
+ */
+void setPixelLimited(int pixel, uint32_t color){
+    if ( pixel >= NUM_PIXELS ){
+      pixel -= NUM_PIXELS;
+    }
+    if ( pixel >= NUM_PIXELS ){
+      Serial.printf("ERROR Pixel Number (%f) too large",pixel);
+      return;
+    }
+    pixels.setPixelColor(pixel, color);
+}
+
+/**
+ * Set pixel at pixelPos to specified color
+ * The number of the pixel is a double which is normalized between 0.0 and 1.0
+ * where 0 is the first pixel. 1.0 is overflow and also the first pixel. 
+ * where 1.0 -(1/NUM_PIXELS) is equivalent to the last pixel.
+ */
+void setFloatingPixel(double pixelPos, int red, int green , int blue){
+
+  double pixel = pixelPos * NUM_PIXELS;
+  double fractionPixel=pixel-floor(pixel);
+  DEBUG_PRINTF(" Pixel(Pos: %6.4f #:%3.0f) ", pixelPos,pixel);
+
+  // fmod()
+  // reminder()
+  
+  double intens1 = intens*(1.0-fractionPixel);
+  uint32_t color = pixels.Color(red*intens1, green*intens1, blue*intens1);
+  setPixelLimited(pixel, color);
+  DEBUG_PRINTF("  Intens1: %5.2f",intens1);
+  
+  intens1 = intens*fractionPixel;
+  color   = pixels.Color(red*intens1, green*intens1, blue*intens1);
+  setPixelLimited(pixel+1, color);
+  DEBUG_PRINTF("  Intens2: %5.2f",intens1);
+}
+
 /**
    Shows the time on the Neo Pixel Ring
 */
@@ -78,7 +128,7 @@ int lastSec=0;
 void showTime() {
   clearPixel();
   
-  double pixel;
+  double pixelPos;
 
   // -----------------------------
   timeval tv;
@@ -88,50 +138,47 @@ void showTime() {
   struct tm *ti;
   ti = localtime(&tnow);
 
+  // Newline for Debugging
+  if ( lastSec != ti->tm_sec){
+    DEBUG_PRINTF("\n");
+    lastSec = ti->tm_sec;
+  }
+
+  double fractionSec=tv.tv_usec/1000000.0;
+  
+  double hour   = ti->tm_hour;
+  double min = ti->tm_min;
+  double sec = ti->tm_sec + fractionSec;
+  // DEBUG_PRINTF("  Usec: %5.2f ",fractionSec);
+
+  // Add fractions to values
+  min  += (sec/60);
+  hour += (min/60);
+  
   // Hour
-  double h = ti->tm_hour;
-  if ( h > 12 ) h -= 12;
-  pixel = h * NUM_PIXELS / 12;
-  DEBUG_PRINTF("  Hour: %2.0f => %5.1f pixel ", h,pixel);
-  pixels.setPixelColor(pixel, colorHour);
+  if ( hour >= 12 ) hour -= 12;
+  pixelPos = hour / 12;
+//  DEBUG_PRINTF("  Hour: %2.0f ", hour);
+  setFloatingPixel(pixelPos, color_hour_r, color_hour_g , color_hour_b);
 
   // Minute
-  double min= ti->tm_min;
-  pixel = min * NUM_PIXELS / 60;
-  DEBUG_PRINTF("  Min: %2.0f => %5.1f pixel ", min,pixel);
-  pixels.setPixelColor(pixel, colorMinute);
+  pixelPos = min / 60;
+//  DEBUG_PRINTF("  Min: %2.0f ", min);
+  setFloatingPixel(pixelPos, color_min_r, color_min_g , color_min_b);
 
   // Seconds
-  double fractionSec=tv.tv_usec/1000000.0;
-  DEBUG_PRINTF("  Usec: %5.2f ",fractionSec);
+  pixelPos = sec  / 60;
+//  DEBUG_PRINTF("  Sec: %2.2f ", sec);
+  setFloatingPixel(pixelPos, color_sec_r, color_sec_g , color_sec_b);
 
-  double sec= ti->tm_sec + fractionSec;
-  pixel = sec * NUM_PIXELS / 60;
-  double fractionPixel=pixel-floor(pixel);
-  DEBUG_PRINTF("  Sec: %5.2f => %5.1f pixel ", sec,pixel);
-  
-  double intens1 = intens*(1.0-fractionPixel);
-  uint32_t colorSecond1   = pixels.Color(intens1, intens1, 0);
-  pixels.setPixelColor(pixel, colorSecond1);
-  DEBUG_PRINTF("  Intens1: %5.2f",intens1);
-  
-  double intens2 = intens*fractionPixel;
-  uint32_t colorSecond2   = pixels.Color(intens2, intens2, 0);
-  pixels.setPixelColor(pixel+1, colorSecond2);
-  DEBUG_PRINTF("  Intens2: %5.2f",intens2);
-  
 
 
   DEBUG_PRINTF("\n");
 
-if ( lastSec != ti->tm_sec){
-  DEBUG_PRINTF("\n");
-  lastSec = ti->tm_sec;
-}
   // Send pixels to display
   pixels.show();
   
-  delay(20);
+  delay(10);
 }
 
 
