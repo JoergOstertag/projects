@@ -10,6 +10,15 @@
 
  *****************************************************************************************************************************/
 
+// Uncomment for continuous Debug Output
+#define DEBUG
+
+// Define Neo Pixel Ring
+#define NUM_PIXELS    150
+#define NEOPIXEL_PIN  D2
+
+
+
 // -----------------------------------------------------------
 // Libs for Wifi Connection
 #include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
@@ -31,14 +40,16 @@
 #include <Adafruit_NeoPixel.h>
 
 
+#ifdef DEBUG
+ #define DEBUG_PRINTF(...)  Serial.printf (__VA_ARGS__)
+#else
+ #define DEBUG_PRINTF(...)
+#endif
+
 // Define Wifimanager
 ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 
-// Define Neo Pixel Ring
-#define NUM_PIXELS    24
-#define NEOPIXEL_PIN  D4
-
-Adafruit_NeoPixel pixels(NUM_PIXELS, D4, NEO_GRB | NEO_KHZ800);
+Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB | NEO_KHZ800);
 
 // Define LED color for hour,minute,second
 int intens = 100;
@@ -63,35 +74,60 @@ void clearPixel() {
 /**
    Shows the time on the Neo Pixel Ring
 */
+int lastSec=0;
 void showTime() {
   clearPixel();
-  int i;
+  
+  double pixel;
 
-  time_t tnow;
+  // -----------------------------
+  timeval tv;
+  gettimeofday(&tv, NULL);
+  
+  time_t tnow = tv.tv_sec;
   struct tm *ti;
-
-  tnow = time(nullptr) + 1;
   ti = localtime(&tnow);
 
   // Hour
-  int h = ti->tm_hour;
+  double h = ti->tm_hour;
   if ( h > 12 ) h -= 12;
-  i = h * NUM_PIXELS / 12;
-  Serial.printf("Hour=%i ", i);
-  pixels.setPixelColor(i, colorHour);
+  pixel = h * NUM_PIXELS / 12;
+  DEBUG_PRINTF("  Hour: %2.0f => %5.1f pixel ", h,pixel);
+  pixels.setPixelColor(pixel, colorHour);
 
   // Minute
-  i = ti->tm_min * NUM_PIXELS / 60;
-  Serial.printf("Min=%i ", i);
-  pixels.setPixelColor(i, colorMinute);
+  double min= ti->tm_min;
+  pixel = min * NUM_PIXELS / 60;
+  DEBUG_PRINTF("  Min: %2.0f => %5.1f pixel ", min,pixel);
+  pixels.setPixelColor(pixel, colorMinute);
 
   // Seconds
-  i = ti->tm_sec * NUM_PIXELS / 60;
-  Serial.printf("Sec=%i ", i);
-  pixels.setPixelColor(i, colorSecond);
-  
-  Serial.println();
+  double fractionSec=tv.tv_usec/1000000.0;
+  DEBUG_PRINTF("  Usec: %5.2f ",fractionSec);
 
+  double sec= ti->tm_sec + fractionSec;
+  pixel = sec * NUM_PIXELS / 60;
+  double fractionPixel=pixel-floor(pixel);
+  DEBUG_PRINTF("  Sec: %5.2f => %5.1f pixel ", sec,pixel);
+  
+  double intens1 = intens*(1.0-fractionPixel);
+  uint32_t colorSecond1   = pixels.Color(intens1, intens1, 0);
+  pixels.setPixelColor(pixel, colorSecond1);
+  DEBUG_PRINTF("  Intens1: %5.2f",intens1);
+  
+  double intens2 = intens*fractionPixel;
+  uint32_t colorSecond2   = pixels.Color(intens2, intens2, 0);
+  pixels.setPixelColor(pixel+1, colorSecond2);
+  DEBUG_PRINTF("  Intens2: %5.2f",intens2);
+  
+
+
+  DEBUG_PRINTF("\n");
+
+if ( lastSec != ti->tm_sec){
+  DEBUG_PRINTF("\n");
+  lastSec = ti->tm_sec;
+}
   // Send pixels to display
   pixels.show();
   
@@ -151,11 +187,13 @@ void loop() {
   // Get current Time and Print it on Serial
   time_t now = time(nullptr);
   String time = String(ctime(&now));
-  Serial.print( time);
+  //Serial.print( time);
 
   // SHow time on Neopixel Ring
   showTime();
 
   // Wait a little bit, so we do not flood the console
-  delay(1.0 * 1000);
+//  delay(1000.0 * 60.0/NUM_PIXELS/5.0);
+  delay(10);
+
 }
