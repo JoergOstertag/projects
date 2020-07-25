@@ -72,7 +72,7 @@ function generateStl {
 }  
 
 function generateAllFiles {
-	DEBUG && echo "generateAllFiles ( $@ )"
+    DEBUG && echo "generateAllFiles ( $@ )"
     
     scadFile="$1"
 	shift 1
@@ -102,13 +102,13 @@ function generateAllFiles {
 
 
 # -----------------------------------------------
-find . -name "*.scad" | while read a ; do echo `dirname "$a"`; done | sort -u >/tmp/scadDirts.txt
+find . -name "*.scad" | while read a ; do echo `dirname "$a"`; done | sort -u >/tmp/scadDirectories.txt
 
 echo "Directories to create files for ..."
-cat /tmp/scadDirts.txt
+cat /tmp/scadDirectories.txt
 echo 
 
-cat /tmp/scadDirts.txt | while read dir; do
+cat /tmp/scadDirectories.txt | while read dir; do
     (
 	cd $dir
 	echo
