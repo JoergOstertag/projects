@@ -1,11 +1,8 @@
-use <../LibExternal/Triangles.scad>;
-use <MCAD/shapes/triangles.scad>;
-use <MCAD/triangles.scad>;
-
 debug=1; 
 
 debugFrames=1*debug;
 
+// Select part to render/print
 part=0; // [ 0:All, 1:Raspi A1 +LCD Housing, 2:Bottom Lid ,3:Bottom Lid with Mounting holes]
 
 // Border for walls 
@@ -20,7 +17,7 @@ addSpace2XYZ=addSpace*2*[1,1,1];
 
 // Dimensions Wemos D1 Mini
 raspberryPiA1=[62,53.2,14.8]+addSpace*[2,2,2];
-raspberryPiA1Lcd=[36.5,29.5,2.66]+addSpace*[2,2,2];
+raspberryPiA1Lcd=[36.7,30.2,2.66]+addSpace*[2,2,2];
 
 
 // -----------------------------------------------------------------
@@ -28,30 +25,31 @@ raspberryPiA1Lcd=[36.5,29.5,2.66]+addSpace*[2,2,2];
 // -----------------------------------------------------------------
 /* [Hidden] */
 
-$fn=125;
+// Number of segments in circle
+$fn=25;
 
 difference(){
     showPart(part=part);
  
-    //for Debugging 
+    // for Debugging 
     // to see inside Objects
     // cube to cut object apart 
     if ( 0 * debug ) 
         translate([59,-2,-11.1]) 
         // translate([-14,2,-31.1]) 
             cube([120,190,55]);
-    
 } 
 
+// Show the selected part
+// part=0 shows all parts in a grid
 module showPart(part=0){
     if ( part == 0) showAllParts();
     
 	if ( part == 1) RaspberryPiA1Housing(placeForPrint=1);
 	if ( part == 2) bottomLid(placeForPrint=1,numberOfBaseMountingClips=0);
     if ( part == 3) bottomLid(placeForPrint=1,numberOfBaseMountingClips=4);
-
-  
-    
+ 
+    // Part Ids for Debugging
 	if ( part == 11) RaspberryPiA1Housing(placeForPrint=0);
 	if ( part == 12) {
 		translate([0,0,0.1])	RaspberryPiA1Housing(placeForPrint=0);
@@ -68,21 +66,6 @@ module showPart(part=0){
     }
 }
 
-module showAllParts(){
-    distX=100;  maxX=5;
-    distY=100; maxY=5;
-
-    for ( i = [1:maxX] )
-            for ( j = [0:maxY] )
-                translate([ (i-1)*distX, j*distY, 0]){
-                    showPart(part= i + j*10);
-                	if ( debugFrames ) 
-                    	debugFrame(size=[distX-3,distY-3,1]);
-            		}
-        
-}
-        
-
 
 module RaspberryPiA1Housing(
     numberOfBaseMountingClips=0,
@@ -96,13 +79,11 @@ module RaspberryPiA1Housing(
     outerSize=[ 1*raspberryPiA1[0] + 2*border,
                 1*raspberryPiA1[1] + 2*border,
                 1*raspberryPiA1[2] + 2*border
-                    +raspberryPiA1Lcd[2]
+                 +raspberryPiA1Lcd[2]
                 ]
                +[2*borderX,0,0];
     
-     translate(
-     			 placeForPrint*[outerSize[0],0,outerSize[2]]
-     			)
+     translate( placeForPrint*[outerSize[0],0,outerSize[2]] )
 		rotate(placeForPrint*[0,180,0]) {
 		    difference(){
                 cube(outerSize);
@@ -119,23 +100,12 @@ module RaspberryPiA1Housing(
 		                    +border*[0,1,0]
 		                    +addSpace*[-1,-1,-1])
 		            bottomLid(cutOut=1);
-		
 	        }
-    }
-	
-	
+        }
 }
 
 
-module DEPRECATED_backLid(cutOut=0){
-    cube([  raspberryPiA1[0] + 2*border,
-            1,
-            raspberryPiA1[2]+ raspberryPiA1Lcd[2] ]
-        +cutOut*[1,1,2]
-    );
-    
-}
-
+// Cut out for Raspery Pi including LCD
 module raspberryPiCutOut(){
         hBase=raspberryPiA1[2];
         height=hBase
@@ -175,12 +145,12 @@ module raspberryPiCutOut(){
 
         // Buttons (y=[start:step:end])
         for (y=[7.4:3.5+2.4:19.3]){
-            translate([5.2,raspberryPiA1[1]-y+border,height]-addSpaceXYZ)
+            translate([5.2,raspberryPiA1[1]-y+border,hBase-.1]-addSpaceXYZ)
                 cube([6.0,3.6,7]+addSpace2XYZ); 
         }
 
         // JoyStick
-        translate([58,41,height-.1])
+        translate([58,41,hBase-.1])
             cylinder(h=12,d=5); 
     
 }
@@ -264,9 +234,7 @@ module BaseMountingClips(numberOfBaseMountingClips=4,outerSize=10){
         for( y=yRange){
             translate([x,y,0])
     	    rotate([0,0,(x > 0.01?-90:90)])
-    	        BaseMountingClip(
-                    diameterBaseClipHoles=diameterBaseClipHoles,
-                    x=x,y=y);
+    	        BaseMountingClip(diameterBaseClipHoles=diameterBaseClipHoles);
         }
     }
 }
@@ -291,22 +259,22 @@ module BaseMountingClip(diameterBaseClipHoles=3){
             //  hole for screw-head
             translate([sizeBaseMountX/2,sizeBaseMountY/2,2])
                 cylinder(d=diameterSkrewHead,h=sizeBaseMountZ+1);
-
-            *translate([2,2,1])
-                cube([sizeBaseMountX-3*2,sizeBaseMountY-3*2,sizeBaseMountZ]);
         }
-        
-        for(x=[0,sizeBaseMountX-reinforcementX])
-       		translate([x,0,sizeBaseMountZ])
-       			rotate([90,0,90]) 
-       				Right_Angled_Triangle(a=2, 
-                            b=sizeBaseMountY,height=reinforcementX);
-       
-
-        
-        
-
     }        
+}
+
+// place all Partes in a grid
+module showAllParts(){
+    distX=100;  maxX=5;
+    distY=100; maxY=5;
+
+    for ( i = [1:maxX] )
+        for ( j = [0:maxY] )
+            translate([ (i-1)*distX, j*distY, 0]){
+                showPart(part= i + j*10);
+                if ( debugFrames ) 
+                    debugFrame(size=[distX-3,distY-3,1]);
+            }
 }
 
 module debugFrame( size=[60,60,2], border=.3) {
