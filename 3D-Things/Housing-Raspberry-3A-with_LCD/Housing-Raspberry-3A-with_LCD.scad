@@ -3,7 +3,7 @@ debug=1;
 debugFrames=1*debug;
 
 // Select part to render/print
-part=0; // [ 0:All, 1:Raspi A1 +LCD Housing, 2:Bottom Lid ,3:Bottom Lid with Mounting holes]
+part=0; // [ 0:All, 1:Raspi A1 with LCD-Housing, 2:Bottom Lid ,3:Bottom Lid with Mounting holes]
 
 // Border for walls 
 border=1.3;
