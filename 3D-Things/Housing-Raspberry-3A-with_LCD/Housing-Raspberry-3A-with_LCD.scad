@@ -3,7 +3,7 @@ debug=1;
 debugFrames=1*debug;
 
 // Select part to render/print
-part=0; // [ 0:All, 1:Raspi A1 with LCD-Housing, 2:Bottom Lid ,3:Bottom Lid with Mounting holes]
+part=0; // [ 0:All, 1:Raspi 3A with LCD-Housing, 2:Bottom Lid ,3:Bottom Lid with Mounting holes]
 
 // Border for walls 
 border=1.3;
@@ -15,9 +15,9 @@ addSpace=.3;
 addSpaceXYZ=addSpace*[1,1,1];
 addSpace2XYZ=addSpace*2*[1,1,1];
 
-// Dimensions Wemos D1 Mini
-raspberryPiA1=[62,53.2,14.8]+addSpace*[2,2,2];
-raspberryPiA1Lcd=[36.7,30.2,2.66]+addSpace*[2,2,2];
+// Dimensions Raspberry Pi 3A
+raspberryPi3A=[62,53.2,14.8]+addSpace*[2,2,2];
+raspberryPi3ALcd=[36.7,30.2,2.66]+addSpace*[2,2,2];
 
 
 // -----------------------------------------------------------------
@@ -45,18 +45,18 @@ difference(){
 module showPart(part=0){
     if ( part == 0) showAllParts();
     
-	if ( part == 1) RaspberryPiA1Housing(placeForPrint=1);
+	if ( part == 1) RaspberryPi3AHousing(placeForPrint=1);
 	if ( part == 2) bottomLid(placeForPrint=1,numberOfBaseMountingClips=0);
     if ( part == 3) bottomLid(placeForPrint=1,numberOfBaseMountingClips=4);
  
     // Part Ids for Debugging
-	if ( part == 11) RaspberryPiA1Housing(placeForPrint=0);
+	if ( part == 11) RaspberryPi3AHousing(placeForPrint=0);
 	if ( part == 12) {
-		translate([0,0,0.1])	RaspberryPiA1Housing(placeForPrint=0);
+		translate([0,0,0.1])	RaspberryPi3AHousing(placeForPrint=0);
 		translate([1,3,0])	bottomLid(placeForPrint=0,numberOfBaseMountingClips=0,cutOut=0);
 	}
 	if ( part == 13) {
-		translate([0,0,0.2])	RaspberryPiA1Housing(placeForPrint=0);
+		translate([0,0,0.2])	RaspberryPi3AHousing(placeForPrint=0);
 		translate([border,border,0])	bottomLid(placeForPrint=0,numberOfBaseMountingClips=4,cutOut=0);
 	}			
     
@@ -67,7 +67,7 @@ module showPart(part=0){
 }
 
 
-module RaspberryPiA1Housing(
+module RaspberryPi3AHousing(
     numberOfBaseMountingClips=0,
     placeForPrint=0
     ){
@@ -76,10 +76,10 @@ module RaspberryPiA1Housing(
 	offsetX=0;
     borderX=4;
     
-    outerSize=[ 1*raspberryPiA1[0] + 2*border,
-                1*raspberryPiA1[1] + 2*border,
-                1*raspberryPiA1[2] + 2*border
-                 +raspberryPiA1Lcd[2]
+    outerSize=[ 1*raspberryPi3A[0] + 2*border,
+                1*raspberryPi3A[1] + 2*border,
+                1*raspberryPi3A[2] + 2*border
+                 +raspberryPi3ALcd[2]
                 ]
                +[2*borderX,0,0];
     
@@ -89,7 +89,7 @@ module RaspberryPiA1Housing(
                 cube(outerSize);
                 
                 
-		        // Rspberry Pi cutOut
+		        // Raspberry Pi cutOut
 		        translate( border * [1,1,2] 
 		                  + borderX*[1,0,0]) 
 		            raspberryPiCutOut();
@@ -107,18 +107,18 @@ module RaspberryPiA1Housing(
 
 // Cut out for Raspery Pi including LCD
 module raspberryPiCutOut(){
-        hBase=raspberryPiA1[2];
+        hBase=raspberryPi3A[2];
         height=hBase
-            +raspberryPiA1Lcd[2];
+            +raspberryPi3ALcd[2];
  
         // Base Raspi
-       cube(raspberryPiA1 + [.1,.1,.1]);
+       cube(raspberryPi3A + [.1,.1,.1]);
        
         // LCD
         deltyX=14.4;
-        deltaY=raspberryPiA1[1]-raspberryPiA1Lcd[1];
+        deltaY=raspberryPi3A[1]-raspberryPi3ALcd[1];
         translate([deltyX,deltaY,hBase]-addSpaceXYZ)
-            cube(raspberryPiA1Lcd
+            cube(raspberryPi3ALcd
                 +addSpace2XYZ
                 +[.1,.1,.1]);
         
@@ -136,7 +136,7 @@ module raspberryPiCutOut(){
                 cylinder(h=12,d=9); 
 
         // Usb-Out cutOut
-       translate([raspberryPiA1[0],23.3,4.5]-addSpaceXYZ)
+       translate([raspberryPi3A[0],23.3,4.5]-addSpaceXYZ)
             cube([10.4,15,6.6]+addSpace2XYZ); 
 
         // SD-Card
@@ -145,7 +145,7 @@ module raspberryPiCutOut(){
 
         // Buttons (y=[start:step:end])
         for (y=[7.4:3.5+2.4:19.3]){
-            translate([5.2,raspberryPiA1[1]-y+border,hBase-.1]-addSpaceXYZ)
+            translate([5.2,raspberryPi3A[1]-y+border,hBase-.1]-addSpaceXYZ)
                 cube([6.0,3.6,7]+addSpace2XYZ); 
         }
 
@@ -164,8 +164,8 @@ module bottomLid(cutOut=0,placeForPrint=0,numberOfBaseMountingClips=0){
     addYcutOut=.0*cutOut;
     
     
-    X= raspberryPiA1[0] + 2*border + cutOut*addSpace*2;
-    Y= raspberryPiA1[1] + 1*border + cutOut*addSpace*2 
+    X= raspberryPi3A[0] + 2*border + cutOut*addSpace*2;
+    Y= raspberryPi3A[1] + 1*border + cutOut*addSpace*2 
         + addY +addYcutOut;
                 
 //    color("green")
@@ -189,7 +189,7 @@ module bottomLid(cutOut=0,placeForPrint=0,numberOfBaseMountingClips=0){
 			            	outerSize=basePlate);
 	            	}
                 
-                // fit size of Rspberry Pi
+                // fit size of Raspberry Pi
                 cube(
                         [X,Y, 2*border  +cutOut*addSpace*2]);
 
