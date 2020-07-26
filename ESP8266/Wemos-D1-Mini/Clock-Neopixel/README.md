@@ -9,5 +9,6 @@ Mittels eines Neopixel Rings wird die aktuelle Uhrzeit angezeigt.
  - Zuerst werden alle Pixel auf die Hintergrundfarbe gesetzt.
   - Danach wird je ein Pixel in den passenden Farben für die Stunde,Minute und sekunde gesetzt.
   
+![Clock Demo with wired Neopixel](img/Clock-Neopixel-x8-1.mp4]
 
 ![Clock](img/clock-neopixel.gif)
