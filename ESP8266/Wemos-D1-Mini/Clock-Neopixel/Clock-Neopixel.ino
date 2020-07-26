@@ -44,6 +44,16 @@ int color_sec_b = 0;
 // The relaive intensity of all LEDs
 double intens = 1.0;
 
+#define NIGHT_DIM_FACTOR 0.2
+//#define NIGHT_DIM_FACTOR 0.99
+
+ 
+// -----------------------------------------------------------
+// Lib for Neopixel Ring
+#include <Adafruit_NeoPixel.h>
+
+Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB | NEO_KHZ800);
+
 // Define LED color for background
 uint32_t colorBackground = pixels.Color(0, 0, 0);
 
@@ -67,12 +77,6 @@ ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 #include <sys/time.h>                   // struct timeval
 #include <TZ.h>
 
-
-// -----------------------------------------------------------
-// Lib for Neopixel Ring
-#include <Adafruit_NeoPixel.h>
-
-Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIXEL_PIN, NEO_GRB | NEO_KHZ800);
 
 
 // Macro for debug output 
@@ -176,7 +180,7 @@ void showTime() {
   // Adapt intensity by time (hours)
   intens=1.0;
   if ( hour <7 || hour>22){
-    intens=.2;
+    intens=NIGHT_DIM_FACTOR;
   }
 
   double pixelPos;
