@@ -33,11 +33,12 @@ struct handColorRGB {
   int width; // Width in Pixel
 };
 
-
+int full=50;
 // RGB color for the different hand
-handColorRGB handHour    = {   0,   0, 200 , 3 };
-handColorRGB handMinute  = {   0, 200,   0 , 2 };
-handColorRGB handSecond  = { 200, 200,   0 , 1 };
+handColorRGB handHour    = {    0,    0, full , 3 };
+handColorRGB handMinute  = {    0, full,    0 , 2 };
+handColorRGB handSecond  = { full, full,    0 , 1 };
+handColorRGB markQuater  = {    2,    2,    2 , 1 };
 
 // The relaive intensity of all LEDs
 double intens = 1.0;
@@ -126,6 +127,7 @@ void setPixelLimited(int pixel, uint32_t color){
  * We also find out if the pixelposition is between two pixels. 
  * If we have a position inbetween two LEDs, we dim both pixels accordingly 
  * to show where inbetween the two pixels the real position is.
+ * In addition we take handColor.width to show multiple pixels with this width.
  * 
  */
 void setFloatingPixel(double pixelPos, handColorRGB handColor ){
@@ -160,6 +162,11 @@ int lastSec=0;
  */
 void showTime() {
   clearPixel();
+
+  setFloatingPixel(  0, markQuater);
+  setFloatingPixel(1.0/4, markQuater);
+  setFloatingPixel(2.0/4, markQuater);
+  setFloatingPixel(3.0/4, markQuater);
 
   // -----------------------------
   timeval tv;
