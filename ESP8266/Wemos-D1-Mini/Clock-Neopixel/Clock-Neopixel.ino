@@ -14,32 +14,30 @@
 
 // Uncomment for continuous Debug Output
 // #define DEBUG
-
+ 
 // Define my Time Zone to Germany
 #define MYTZ TZ_Europe_Berlin
 
 // Define Number of pixels in Neo Pixel Ring
-#define NUM_PIXELS    50
+#define NUM_PIXELS    24
 // Pixel Number of the first pixel (Showing Midnight)
-#define PIXEL_OFFSET  25
+#define PIXEL_OFFSET  12
 
 // Hardware Pin of Neopixel String
-#define NEOPIXEL_PIN  D2
+#define NEOPIXEL_PIN  D4
 
-// RGB color of the LED for the hour hand
-int color_hour_r = 0;
-int color_hour_g = 100;
-int color_hour_b = 0;
+struct handColorRGB {
+  int red;
+  int green;
+  int blue;
+  int width; // Width in Pixel
+};
 
-// RGB color of the LED for the minute hand
-int color_min_r = 0;
-int color_min_g = 0;
-int color_min_b = 100;
 
-// RGB color of the LED for the seconds hand
-int color_sec_r = 100;
-int color_sec_g = 100;
-int color_sec_b = 0;
+// RGB color for the different hand
+handColorRGB handHour    = {   0,   0, 200 , 3 };
+handColorRGB handMinute  = {   0, 200,   0 , 2 };
+handColorRGB handSecond  = { 200, 200,   0 , 1 };
 
 // The relaive intensity of all LEDs
 double intens = 1.0;
@@ -116,6 +114,10 @@ void setPixelLimited(int pixel, uint32_t color){
     pixels.setPixelColor(pixel, color);
 }
 
+ uint32_t toColor(double intens , handColorRGB handColor ){
+    return pixels.Color(handColor.red * intens, handColor.green * intens, handColor.blue * intens);
+}
+
 /**
  * Set pixel at pixelPos to specified RGB-color
  * The number of the pixelPos is a double which is normalized between 0.0 and 1.0
@@ -126,22 +128,29 @@ void setPixelLimited(int pixel, uint32_t color){
  * to show where inbetween the two pixels the real position is.
  * 
  */
-void setFloatingPixel(double pixelPos, int red, int green , int blue){
+void setFloatingPixel(double pixelPos, handColorRGB handColor ){
 
   double pixel = pixelPos * NUM_PIXELS;
   double fractionPixel=pixel-floor(pixel);
   DEBUG_PRINTF(" Pixel(Pos: %6.4f #:%3.0f) ", pixelPos,pixel);
 
+  int pixelMin= pixel- (handColor.width/2);
+  int pixelMax= pixelMin + handColor.width;
+  for ( int i = pixelMin+1; i < pixelMax; i++ ){
+    uint32_t color = toColor(intens,handColor);
+    setPixelLimited(i, color);
+  }
+
   // First Pixel
   double intens1 = intens*(1.0-fractionPixel);
-  uint32_t color = pixels.Color(red*intens1, green*intens1, blue*intens1);
-  setPixelLimited(pixel, color);
+  uint32_t color = toColor(intens1,handColor);
+  setPixelLimited(pixelMin, color);
   DEBUG_PRINTF("  Intens1: %5.2f",intens1);
 
   // Second Pixel
   intens1 = intens*fractionPixel;
-  color   = pixels.Color(red*intens1, green*intens1, blue*intens1);
-  setPixelLimited(pixel+1, color);
+  color   = toColor(intens1,handColor);
+  setPixelLimited(pixelMax, color);
   DEBUG_PRINTF("  Intens2: %5.2f",intens1);
 }
 
@@ -187,15 +196,15 @@ void showTime() {
 
   // Hour
   if ( hour >= 12 ) hour -= 12;
-  setFloatingPixel(hour / 12, color_hour_r, color_hour_g , color_hour_b);
+  setFloatingPixel(hour / 12, handHour);
   //  DEBUG_PRINTF("  Hour: %2.0f ", hour);
 
   // Minute
-  setFloatingPixel(min/60, color_min_r, color_min_g , color_min_b);
+  setFloatingPixel(min/60, handMinute);
   // DEBUG_PRINTF("  Min: %2.0f ", min);
 
   // Seconds
-  setFloatingPixel(sec/60, color_sec_r, color_sec_g , color_sec_b);
+  setFloatingPixel(sec/60, handSecond);
   // DEBUG_PRINTF("  Sec: %2.2f ", sec);
 
   DEBUG_PRINTF("\n");
