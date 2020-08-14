@@ -24,6 +24,12 @@
     https://www.aliexpress.com/item/32842745623.html
     Price: 3.15€
 
+Wiring:
+  VCC 3.3V
+  GND GND
+  SDA D2
+  SCÖ D1
+
 
 
   VL53L1X
