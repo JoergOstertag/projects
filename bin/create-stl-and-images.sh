@@ -72,7 +72,7 @@ function generateStl {
 }  
 
 function generateAllFiles {
-    DEBUG && echo "generateAllFiles ( $@ )"
+    $DEBUG && echo "generateAllFiles ( $@ )"
     
     scadFile="$1"
 	shift 1
