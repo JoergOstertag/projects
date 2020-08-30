@@ -1,38 +1,180 @@
-ledD=7.8;
-ledH=3.9;
-led2D=10.9;
-led2H=22.1;
+// Switch on Debugging Features (show Debug Object, Show frames, cutout part to see inside)
+debug=0; 
+
+// Switch on Debugging Feature cut-out part to see inside
+debugCutOutToLookInside=0;
+
+// Draw Frames around the raster-Squares
+debugFrames=1*debug;
+
+part=0; // [ 0:All, 1:Led in cylinder, 2: Cable channel]
+
+// Border for walls 
+border=1.3;
+
+// Border thinner walls 
+border1=1;
+
+// Add Space to fit
+addSpace=.3;
 
 
-//ledCutout();
-LedInCube();
+ledFrontD=7.8;
+ledFrontH=3.9;
+ledBackShellD=10.9;
+ledBackShellH=23.8;
+nibbleX=2.9;
+nibbleY=1.2;
+nibbleZ=ledBackShellH;
 
-module LedInCube(){
-    difference(){
-        X=20;
-        Y=20;
-        Z=20;
-        translate(-.5*[X,Y,0])
-            cube([20,20,20]);
-        ledCutout();
+ledCableZ=6;
+
+ledDistance=40;
+cableW=5.5;
+cableH=2.0;
+frontThickness=.4;
+
+
+
+
+
+difference(){
+    showPart(part=part);
+ 
+    //for Debugging 
+    // to see inside Objects
+    // cube to cut object apart 
+    if ( debugCutOutToLookInside * debug ) 
+        translate([59,2,-11.1]) 
+        // translate([-14,2,-31.1]) 
+            cube([120,190,55]);
+    
+} 
+
+module showPart(part=0){
+    if ( part == 0) showAllParts();
+    
+	if ( part == 1) LedInCylinder();
+	if ( part == 2) CableChannel();
+    
+    if ( debug ) {
+        if ( part == 11 ) LedCutout();
+        
+		if ( part == 12 ) LedInCube();
+        if ( part == 13 ) LedInCylinder();
+       	if ( part == 14 ) CableChannel();
     }
 }
 
-module ledCutout(){
+module CableChannel(){
+	difference(){
+		translate([-border,0,0])
+			cube([cableW,ledDistance,cableH]+border*[2,0,1]+[0,0,clipZ]);
+		translate([-addSpace,-addSpace,border-addSpace+.01])
+			cube([cableW,ledDistance,cableH]
+				+addSpace*[2,2,1]
+				+[0,0,clipZ]);
+	}
+	
+	// clips to hold cable
+	clipX=1.9;
+	clipY=3;
+	clipZ=0.9;
+	for ( x=[-addSpace,cableW+addSpace-clipX]){
+		dist=10;
+		offset=x>0?dist/2:0;
+		for (y=[offset:dist:ledDistance-1])
+			translate([x,y,border+cableH])
+				cube([clipX,clipY,clipZ]);
+		}
+}
+
+module LedInCube(){
+    difference(){
+        X=ledBackShellD+2*border+2*nibbleY;
+        Y=ledBackShellD+2*border+2*nibbleY;
+        Z=ledFrontD/2+ledBackShellH+ledFrontH+frontThickness+ledCableZ-.01;
+        translate(-.5*[X,Y,0])
+            cube([X,Y,Z]);
+        translate([0,0,frontThickness])
+        	LedCutout();
+    }
+}
+
+module LedInCylinder(){
+    difference(){
+        cylinderD=ledBackShellD+2*border+2*nibbleY;
+        Z=ledFrontD/2+ledBackShellH+ledFrontH+frontThickness;
+        cylinder(d=cylinderD,h=Z);
+        translate([0,0,frontThickness])
+        	LedCutout();
+    }
+}
+
+module LedCutout(cutOut=1){
     $fn=22;
     
-    translate([0,0,ledH+ledD/2]){
-        cylinder(d=led2D,led2H);
+    translate([0,0,ledFrontH+ledFrontD/2]){
+        // Gummi Hülle im hinteren Teil 
+		cylinder(d=ledBackShellD+cutOut*addSpace,ledBackShellH+.01+ledCableZ);
     
+    	// Nibble at Back with Rubber shell
+    	addInside=.2;
         for (winkel=[0:90:360]){
             rotate([0,0,winkel])
-                translate([led2D/2-.3,-0.6,0])
-                    cube([1.2,2.4,20.6]);
+                translate([-nibbleX/2-cutOut*addSpace/2, ledBackShellD/2 -addInside,  ,0])
+                    cube( [nibbleX, nibbleY +addInside , nibbleZ+ledCableZ]
+                    	+cutOut*addSpace*[1,1,1]);
         }
     }
     
-    translate([0,0,ledD/2]){
-        cylinder(d=ledD,ledH);
-        sphere(d=ledD);
+    // The LED itself
+    translate([0,0,ledFrontD/2]){
+        cylinder(d=ledFrontD,ledFrontH+.01);
+        sphere(d=ledFrontD);
     }
+    
+    // Cable Cut out
+    translate([-cableW/2,0,0]
+    	+[-border,-border-.01,0]
+    	+[0,-ledBackShellD/2-nibbleY-.01,ledBackShellH]
+    	+ [0,0,ledFrontD/2+ledFrontH]
+    	){
+    	cube([cableW+2*border,ledBackShellD+2*nibbleY+2*border+.2,ledCableZ+.01]);
+    }
+}
+
+
+// ==========================================================================
+// Debug Framework
+
+module debugFrame( size=[60,60,2], border=.3) {
+    translate(-frameHalfOffset)
+	    translate([0,0,-size[2]])
+		    color("white") 
+			    difference(){
+			        cube(size);
+			        translate( [0, 0, .01]
+			        		 + border*[1, 1, 0])
+			            cube(size - 2*border*[1,1,0]+[0,0,size[2]]);
+			    }
+}
+
+
+frameDistX=100; 
+frameDistY=100;
+frameHalfOffset=0.5*[frameDistX,frameDistY,0];
+module showAllParts(){
+    maxX=5;
+    maxY=5;
+
+	
+    for ( i = [1:maxX] )
+            for ( j = [0:maxY] )
+                translate([ (i-1)*frameDistX, j*frameDistY, 0]){
+                    showPart(part= i + j*10);
+                	if ( debugFrames ) 
+                    	debugFrame(size=[frameDistX-3,frameDistY-3,1]);
+            		}
+        
 }
