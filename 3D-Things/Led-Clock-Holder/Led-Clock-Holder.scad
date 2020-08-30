@@ -1,5 +1,5 @@
 // Switch on Debugging Features (show Debug Object, Show frames, cutout part to see inside)
-debug=0; 
+debug=1; 
 
 // Switch on Debugging Feature cut-out part to see inside
 debugCutOutToLookInside=0;
@@ -10,18 +10,15 @@ debugFrames=1*debug;
 part=0; // [ 0:All, 1:Led in cylinder, 2: Cable channel]
 
 // Border for walls 
-border=1.3;
-
-// Border thinner walls 
-border1=1;
+border=2.3;
 
 // Add Space to fit
-addSpace=.3;
+addSpace=.4;
 
 
 ledFrontD=7.8;
 ledFrontH=3.9;
-ledBackShellD=10.9;
+ledBackShellD=11.5;
 ledBackShellH=23.8;
 nibbleX=2.9;
 nibbleY=1.2;
@@ -29,7 +26,7 @@ nibbleZ=ledBackShellH;
 
 ledCableZ=6;
 
-ledDistance=40;
+ledDistance=60;
 cableW=5.5;
 cableH=2.0;
 frontThickness=.4;
@@ -81,8 +78,8 @@ module CableChannel(){
 	clipY=3;
 	clipZ=0.9;
 	for ( x=[-addSpace,cableW+addSpace-clipX]){
-		dist=10;
-		offset=x>0?dist/2:0;
+		dist=25;
+		offset=10+(x>0?dist/2:0);
 		for (y=[offset:dist:ledDistance-1])
 			translate([x,y,border+cableH])
 				cube([clipX,clipY,clipZ]);
@@ -104,7 +101,7 @@ module LedInCube(){
 module LedInCylinder(){
     difference(){
         cylinderD=ledBackShellD+2*border+2*nibbleY;
-        Z=ledFrontD/2+ledBackShellH+ledFrontH+frontThickness;
+        Z=ledFrontD/2+ledBackShellH+ledFrontH+frontThickness+ledCableZ-.01;
         cylinder(d=cylinderD,h=Z);
         translate([0,0,frontThickness])
         	LedCutout();
