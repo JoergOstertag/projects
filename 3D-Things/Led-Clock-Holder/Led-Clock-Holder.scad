@@ -7,7 +7,7 @@ debugCutOutToLookInside=0;
 // Draw Frames around the raster-Squares
 debugFrames=1*debug;
 
-part=44; // [ 0:All, 1:Led in Cylinder with cable channel 2:Led in cylinder, 3: Cable channel, 4: Led in Cube, 5: 3 Segments of Led in Cylinder with cable channel 6:Complete Ring with Led and cable]
+part=44; // [ 0:All, 1:Led in Cylinder with cable channel 2:Led in cylinder, 3: Cable channel, 4: Led in Cube, 5: 3 Segments of Led in Cylinder with cable channel 6:Complete Ring with Led and cable, 7: Ring of Led cubes with 5 Elements]
 
 // Border for walls 
 border=1.8;
@@ -66,13 +66,13 @@ module showPart(part=0){
     if ( part == 4) LedInCube();
 	if ( part == 5) rotate([0,0,40]) CompleteRingLedAndCableShaft(noCenter=1,numElements=3);
 	if ( part == 6) CompleteRingLedAndCableShaft();
+    if ( part == 7 ) RingLedCubes(numElements=5);
     
     if ( debug ) {
 		if ( part == 11 ) LedAndCableShaft(forPrint=0);
         if ( part == 12 ) LedCutout();
         if ( part == 13 ) CableChannel();
         if ( part == 14 ) CylinderHolder();
-        if ( part == 44 ) RingLedCubes(numElements=5);
     }
 }
 
@@ -276,7 +276,7 @@ frameDistX=150;
 frameDistY=150;
 frameHalfOffset=0.5*[frameDistX,frameDistY,0];
 module showAllParts(){
-    maxX=6;
+    maxX=7;
     maxY=5;
 
 	

@@ -13,3 +13,6 @@
 ### Led Clock Holder part 5 3 Segments of Led in Cylinder with cable channel 6 Complete Ring with Led and cable
 ![Led Clock Holder part 5 3 Segments of Led in Cylinder with cable channel 6 Complete Ring with Led and cable](stl/Led-Clock-Holder-part-5-3 Segments of Led in Cylinder with cable channel 6 Complete Ring with Led and cable.png)
 
+### Led Clock Holder part 7 Ring of Led cubes with 5 Elements
+![Led Clock Holder part 7 Ring of Led cubes with 5 Elements](stl/Led-Clock-Holder-part-7-Ring of Led cubes with 5 Elements.png)
+
