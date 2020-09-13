@@ -13,18 +13,25 @@
  *****************************************************************************************************************************/
 
 // Uncomment for continuous Debug Output
-// #define DEBUG
+//#define DEBUG
  
 // Define my Time Zone to Germany
 #define MYTZ TZ_Europe_Berlin
 
 // Define Number of pixels in Neo Pixel Ring
-#define NUM_PIXELS    24
+#define NUM_PIXELS    50
+// #define NUM_PIXELS    27
+
 // Pixel Number of the first pixel (Showing Midnight)
-#define PIXEL_OFFSET  12
+#define PIXEL_OFFSET  0
+
+// to get inverse direction of the pixels set to true
+// to get normal direction of the pixels set to false
+#define PIXEL_DIRECTION_INVERSE false
 
 // Hardware Pin of Neopixel String
-#define NEOPIXEL_PIN  D4
+//#define NEOPIXEL_PIN  D4
+#define NEOPIXEL_PIN  D2
 
 struct handColorRGB {
   int red;
@@ -112,6 +119,8 @@ void setPixelLimited(int pixel, uint32_t color){
       Serial.printf("ERROR Pixel Number (%f) too large",pixel);
       return;
     }
+    DEBUG_PRINTF(" Set Pixel %2d #%04X ",pixel,color);
+    
     pixels.setPixelColor(pixel, color);
 }
 
@@ -133,27 +142,33 @@ void setPixelLimited(int pixel, uint32_t color){
 void setFloatingPixel(double pixelPos, handColorRGB handColor ){
 
   double pixel = pixelPos * NUM_PIXELS;
+  if ( PIXEL_DIRECTION_INVERSE ) {
+    pixel = (1.0-pixelPos) * NUM_PIXELS;
+  }
+
   double fractionPixel=pixel-floor(pixel);
-  DEBUG_PRINTF(" Pixel(Pos: %6.4f #:%3.0f) ", pixelPos,pixel);
+  DEBUG_PRINTF(" Pixel(Pos:%4.2f #:%3.0f)", pixelPos,pixel);
 
   int pixelMin= pixel- (handColor.width/2);
   int pixelMax= pixelMin + handColor.width;
+
+  // First Pixel
+  double intens1 = intens*(1.0-fractionPixel);
+  uint32_t color = toColor(intens1,handColor);
+  DEBUG_PRINTF(" I1:%4.2f",intens1);
+  setPixelLimited(pixelMin, color);
+
   for ( int i = pixelMin+1; i < pixelMax; i++ ){
     uint32_t color = toColor(intens,handColor);
     setPixelLimited(i, color);
   }
 
-  // First Pixel
-  double intens1 = intens*(1.0-fractionPixel);
-  uint32_t color = toColor(intens1,handColor);
-  setPixelLimited(pixelMin, color);
-  DEBUG_PRINTF("  Intens1: %5.2f",intens1);
 
   // Second Pixel
   intens1 = intens*fractionPixel;
   color   = toColor(intens1,handColor);
+  DEBUG_PRINTF(" I2:%4.2f",intens1);
   setPixelLimited(pixelMax, color);
-  DEBUG_PRINTF("  Intens2: %5.2f",intens1);
 }
 
 int lastSec=0;
@@ -163,9 +178,13 @@ int lastSec=0;
 void showTime() {
   clearPixel();
 
-  setFloatingPixel(  0, markQuater);
+  DEBUG_PRINTF("\nMarker 1 ");
+  setFloatingPixel(0.0  , markQuater);
+  DEBUG_PRINTF("\nMarker 2 ");
   setFloatingPixel(1.0/4, markQuater);
+  DEBUG_PRINTF("\nMarker 3 ");
   setFloatingPixel(2.0/4, markQuater);
+  DEBUG_PRINTF("\nMarker 4 ");
   setFloatingPixel(3.0/4, markQuater);
 
   // -----------------------------
@@ -203,23 +222,27 @@ void showTime() {
 
   // Hour
   if ( hour >= 12 ) hour -= 12;
+  DEBUG_PRINTF("\n  Hour: %2.0f    ", hour);
   setFloatingPixel(hour / 12, handHour);
-  //  DEBUG_PRINTF("  Hour: %2.0f ", hour);
 
   // Minute
+  DEBUG_PRINTF("\n  Min:  %2.0f    ", min);
   setFloatingPixel(min/60, handMinute);
-  // DEBUG_PRINTF("  Min: %2.0f ", min);
 
   // Seconds
+  DEBUG_PRINTF("\n  Sec:  %5.2f ", sec);
   setFloatingPixel(sec/60, handSecond);
-  // DEBUG_PRINTF("  Sec: %2.2f ", sec);
 
+  DEBUG_PRINTF("\n");
   DEBUG_PRINTF("\n");
 
   // Send pixels to display
   pixels.show();
-  
+
   delay(10);
+  #ifdef DEBUG
+    delay(1000);
+  #endif
 }
 
 
