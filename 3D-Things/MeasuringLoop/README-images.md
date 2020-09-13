@@ -1,1 +1,3 @@
-![measuring-loop](stl/measuring-loop.png)
+### measuring loop
+![measuring loop](stl/measuring-loop.png)
+

@@ -1,1 +1,3 @@
-![Servo-Halter](stl/Servo-Halter.png)
+### Servo Halter
+![Servo Halter](stl/Servo-Halter.png)
+
