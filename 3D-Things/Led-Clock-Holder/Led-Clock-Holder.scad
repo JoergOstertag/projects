@@ -7,7 +7,7 @@ debugCutOutToLookInside=0;
 // Draw Frames around the raster-Squares
 debugFrames=1*debug;
 
-part=0; // [ 0:All, 1:Led in Cylinder with cable channel 2:Led in cylinder, 3: Cable channel, 4: Led in Cube, 5: 3 Segments of Led in Cylinder with cable channel 6:Complete Ring with Led and cable, 7: Ring of Led cubes with 5 Elements, 8: Ring of Led cubes with 15 Elements]
+part=0; // [ 0:All, 1:Led in Cylinder with cable channel 2:Led in cylinder, 3: Cable channel, 4: Led in Cube, 5: 3 Segments of Led in Cylinder with cable channel,  6: Ring of Led cubes with 5 Elements, 7: Ring of Led cubes with 15 Elements, 10:Complete Ring of LED cylinders]
 
 // Border for walls 
 border=1.8;
@@ -64,22 +64,22 @@ module showPart(part=0){
 	if ( part == 2 ) LedInCylinder();
 	if ( part == 3 ) CableChannel();
     if ( part == 4 ) LedInCube();
-	if ( part == 5 ) rotate([0,0,40]) CompleteRingLedAndCableShaft(noCenter=1,numElements=3);
+	if ( part == 5 ) rotate([0,0,40]) CompleteRingLedAndCableShaft(doCenter=0,numElements=3);
     if ( part == 6 ) RingLedCubes(numElements=5);
-    if ( part == 8 ) RingLedCubes(numElements=15);
+    if ( part == 7 ) RingLedCubes(numElements=15);
 	if ( part == 10 ) CompleteRingLedAndCableShaft();
     
     if ( debug ) {
 		if ( part == 11 ) LedAndCableShaft(forPrint=0);
         if ( part == 12 ) LedCutout();
-        if ( part == 13 ) CableChannel();
         if ( part == 14 ) CylinderHolder();
+	    if ( part == 27 ) RingLedCubes(numElements=50,doCenter=0);
     }
 }
 
 
 
-module RingLedCubes(noCenter=1,numElements=0){
+module RingLedCubes(doCenter=0,numElements=0){
 	X=ledBackShellD+2*border+2*nibbleY;
 	Z=ledBackShellD+2*border+2*nibbleY;
     Y=ledFrontD/2+ledBackShellH+ledFrontH+frontThickness+cableChannelZ-.01;
@@ -87,18 +87,20 @@ module RingLedCubes(noCenter=1,numElements=0){
     d=u/PI/2;
 	anglePerLed=360/numberOfLeds;
 	maxDegrees=( numElements>0)?anglePerLed*numElements-1:360;
-    translate([0,-noCenter*d,0])
-    for ( winkel=[0:anglePerLed:maxDegrees] )
-        rotate([0,0,winkel]){
-            translate([0,d,0]){
-            		LedInCube(forPrint=1);
-                }
-        	}
+    
+    translateY=-(doCenter?0:1)*d;
+    translate([0,translateY,0])
+	    for ( winkel=[0:anglePerLed:maxDegrees] )
+	        rotate([0,0,winkel]){
+	            translate([0,d,0]){
+	            		LedInCube(forPrint=1);
+	                }
+	        	}
 }
     
 
 
-module LedInCube(){
+module LedInCube(forPrint=1){
     difference(){
         X=ledBackShellD+2*border+2*nibbleY;
         Y=ledFrontD/2+ledBackShellH+ledFrontH+frontThickness+cableChannelZ-.01;
@@ -123,12 +125,13 @@ module LedInCube(){
 }
 
 
-module CompleteRingLedAndCableShaft(noCenter=1,numElements=0){
+module CompleteRingLedAndCableShaft(doCenter=0,numElements=0){
     u=(cableChannelY)*numberOfLeds;
     d=u/PI/2;
 	anglePerLed=360/numberOfLeds;
 	maxDegrees=( numElements>0)?anglePerLed*numElements-1:360;
-    translate([noCenter*d,0,0])
+    translateX=doCenter?0:d;
+    translate([translateX,0,0])
     for ( winkel=[0:anglePerLed:maxDegrees] )
         rotate([0,0,winkel]){
             translate([-d,0,0])
@@ -192,7 +195,7 @@ module CableChannel(){
 		Z=ledFrontD/2+ledBackShellH;
     	for ( y=[0,ledDistance])
        		translate([0,y,-Z])
-    			LedCutout();
+			LedCutout(cableCutout=0);
     }
     
 
@@ -200,7 +203,7 @@ module CableChannel(){
     for ( x=[-addSpace,cableW+addSpace-clipX]){
         dist=25;
         offset=10+(x>0?dist/2:0);
-        for (y=[offset:dist:ledDistance-1])
+        for (y=[offset:dist:ledDistance-11])
             translate([-cableW/2+x,y,border+cableH])
                 cube([clipX,clipY,clipZ]);
         }
@@ -215,7 +218,7 @@ module LedInCylinder(){
     }
 }
 
-module LedCutout(cutOut=1,cablesNonStreight=1){
+module LedCutout(cutOut=1,cablesNonStreight=1,cableCutout=1){
     $fn=22;
     
     translate([0,0,ledFrontH+ledFrontD/2]){
@@ -239,21 +242,22 @@ module LedCutout(cutOut=1,cablesNonStreight=1){
     }
 
 	// Cable attachments cutout
-    for ( winkel=[180,cablesNonStreight*-360/numberOfLeds])
-        rotate([0,0,winkel]){
-        // Cable Cut out
-        translate([-cableW/2,0,0]
-            +[-border,-border-.01,0]
-            +[0,-ledBackShellD/2-nibbleY-.01,ledBackShellH]
-            + [0,0,ledFrontD/2+ledFrontH]
-            +[0,4,0]
-            ){
-            cube([  cableW+2*border,
-                    ledBackShellD/2+nibbleY+border+.2,
-                    cableChannelZ+.01]
-                    +[0,12,32]);
-        }
-    }
+    if ( cableCutout)
+	    for ( winkel=[180,cablesNonStreight*-360/numberOfLeds])
+	        rotate([0,0,winkel]){
+	        // Cable Cut out
+	        translate([-cableW/2,0,0]
+	            +[-border,-border-.01,0]
+	            +[0,-ledBackShellD/2-nibbleY-.01,ledBackShellH]
+	            + [0,0,ledFrontD/2+ledFrontH]
+	            +[0,4,0]
+	            ){
+	            cube([  cableW+2*border,
+	                    ledBackShellD/2+nibbleY+border+.2,
+	                    cableChannelZ+.01]
+	                    +[0,12,32]);
+	        }
+	    }
 }
 
 
