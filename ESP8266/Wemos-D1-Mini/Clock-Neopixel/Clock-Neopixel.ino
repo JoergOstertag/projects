@@ -1,8 +1,10 @@
 /****************************************************************************************************************************
 
   Get the time with ntp and display the time on a neopixel Ring
-  Vou can Specify the number of pixels in the LED Ring with NUM_PIXELS
-  The variables color_hour_x,... specify the base RGB valueof the 
+  
+  You can specify the number of pixels in the LED Ring with NUM_PIXELS
+  
+  The variables handXxx... specifies the base RGB value and width of the pointers (hour,minute,second)
   
   Wifi Setup is derived from Example AutoConnect.ino using library https://github.com/khoih-prog/ESP_WiFiManager
 
@@ -13,16 +15,18 @@
  *****************************************************************************************************************************/
 
 // Uncomment for continuous Debug Output
-//#define DEBUG
+#define DEBUG
  
 // Define my Time Zone to Germany
 #define MYTZ TZ_Europe_Berlin
 
 // Define Number of pixels in Neo Pixel Ring
-#define NUM_PIXELS    50
+#define NUM_PIXELS    24
+//#define NUM_PIXELS    50
 // #define NUM_PIXELS    27
 
 // Pixel Number of the first pixel (Showing Midnight)
+// 0 means the first pixel is at the top of the ring
 #define PIXEL_OFFSET  0
 
 // to get inverse direction of the pixels set to true
@@ -30,9 +34,10 @@
 #define PIXEL_DIRECTION_INVERSE false
 
 // Hardware Pin of Neopixel String
-//#define NEOPIXEL_PIN  D4
-#define NEOPIXEL_PIN  D2
+#define NEOPIXEL_PIN  D4
+//#define NEOPIXEL_PIN  D2
 
+// Base definition for the pointers (Hour,Minute,Second)
 struct handColorRGB {
   int red;
   int green;
@@ -40,16 +45,21 @@ struct handColorRGB {
   int width; // Width in Pixel
 };
 
-int full=50;
+
+// maximum wanted intensity
+int iMax=50;
+
 // RGB color for the different hand
-handColorRGB handHour    = {    0,    0, full , 3 };
-handColorRGB handMinute  = {    0, full,    0 , 2 };
-handColorRGB handSecond  = { full, full,    0 , 1 };
+//                             red, geen,  blue, width
+handColorRGB handHour    = {    0,    0, iMax , 3 };  // Hour   ==> Blue
+handColorRGB handMinute  = {    0, iMax,    0 , 2 };  // Minute ==> Green
+handColorRGB handSecond  = { iMax, iMax,    0 , 1 };  // Second ==> Yellow
 handColorRGB markQuater  = {    2,    2,    2 , 1 };
 
-// The relaive intensity of all LEDs
+// The relative intensity of all LEDs
 double intens = 1.0;
 
+// This is the intensity factor to dim the LEDs at night
 #define NIGHT_DIM_FACTOR 0.2
 //#define NIGHT_DIM_FACTOR 0.99
 
