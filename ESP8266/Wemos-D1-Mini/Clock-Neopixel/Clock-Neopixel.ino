@@ -1,8 +1,10 @@
 /****************************************************************************************************************************
 
   Get the time with ntp and display the time on a neopixel Ring
-  Vou can Specify the number of pixels in the LED Ring with NUM_PIXELS
-  The variables color_hour_x,... specify the base RGB valueof the 
+  
+  You can specify the number of pixels in the LED Ring with NUM_PIXELS
+  
+  The variables handXxx... specifies the base RGB value and width of the pointers (hour,minute,second)
   
   Wifi Setup is derived from Example AutoConnect.ino using library https://github.com/khoih-prog/ESP_WiFiManager
 
@@ -13,16 +15,18 @@
  *****************************************************************************************************************************/
 
 // Uncomment for continuous Debug Output
-//#define DEBUG
+#define DEBUG
  
 // Define my Time Zone to Germany
 #define MYTZ TZ_Europe_Berlin
 
 // Define Number of pixels in Neo Pixel Ring
-#define NUM_PIXELS    50
+#define NUM_PIXELS    24
+//#define NUM_PIXELS    50
 // #define NUM_PIXELS    27
 
 // Pixel Number of the first pixel (Showing Midnight)
+// 0 means the first pixel is at the top of the ring
 #define PIXEL_OFFSET  0
 
 // to get inverse direction of the pixels set to true
@@ -30,9 +34,10 @@
 #define PIXEL_DIRECTION_INVERSE false
 
 // Hardware Pin of Neopixel String
-//#define NEOPIXEL_PIN  D4
-#define NEOPIXEL_PIN  D2
+#define NEOPIXEL_PIN  D4
+//#define NEOPIXEL_PIN  D2
 
+// Base definition for the pointers (Hour,Minute,Second)
 struct handColorRGB {
   int red;
   int green;
@@ -40,16 +45,21 @@ struct handColorRGB {
   int width; // Width in Pixel
 };
 
-int full=50;
+
+// maximum wanted intensity
+int iMax=50;
+
 // RGB color for the different hand
-handColorRGB handHour    = {    0,    0, full , 3 };
-handColorRGB handMinute  = {    0, full,    0 , 2 };
-handColorRGB handSecond  = { full, full,    0 , 1 };
+//                             red, geen,  blue, width
+handColorRGB handHour    = {    0,    0, iMax , 3 };  // Hour   ==> Blue
+handColorRGB handMinute  = {    0, iMax,    0 , 2 };  // Minute ==> Green
+handColorRGB handSecond  = { iMax, iMax,    0 , 1 };  // Second ==> Yellow
 handColorRGB markQuater  = {    2,    2,    2 , 1 };
 
-// The relaive intensity of all LEDs
+// The relative intensity of all LEDs
 double intens = 1.0;
 
+// This is the intensity factor to dim the LEDs at night
 #define NIGHT_DIM_FACTOR 0.2
 //#define NIGHT_DIM_FACTOR 0.99
 
@@ -66,12 +76,14 @@ uint32_t colorBackground = pixels.Color(0, 0, 0);
 
 // -----------------------------------------------------------
 // Libs for Wifi Connection
-#include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
+#include <ESP8266WiFi.h>          // https://github.com/esp8266/Arduino
 //needed for library
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 
-#include <ESP_WiFiManager.h>              //https://github.com/khoih-prog/ESP_WiFiManager
+
+// Wifimanager used to store WIFI Credentials in EEProm of Device
+#include <ESP_WiFiManager.h>      // https://github.com/khoih-prog/ESP_WiFiManager
 
 // Define Wifimanager
 ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
@@ -124,7 +136,10 @@ void setPixelLimited(int pixel, uint32_t color){
     pixels.setPixelColor(pixel, color);
 }
 
- uint32_t toColor(double intens , handColorRGB handColor ){
+/**
+ * Convert to a color struct which can be used directly to set a neopixel
+ */
+uint32_t toColor(double intens , handColorRGB handColor ){
     return pixels.Color(handColor.red * intens, handColor.green * intens, handColor.blue * intens);
 }
 
@@ -133,9 +148,13 @@ void setPixelLimited(int pixel, uint32_t color){
  * The number of the pixelPos is a double which is normalized between 0.0 and 1.0
  * where 0 is the first pixel. 1.0 is overflow and also the first pixel. 
  * where 1.0 -(1/NUM_PIXELS) is equivalent to the last pixel.
+ * 
+ * Dimming between pixels:
  * We also find out if the pixelposition is between two pixels. 
  * If we have a position inbetween two LEDs, we dim both pixels accordingly 
  * to show where inbetween the two pixels the real position is.
+ * This results in a smooth transition inbetween the pixels.
+ * 
  * In addition we take handColor.width to show multiple pixels with this width.
  * 
  */
@@ -158,19 +177,20 @@ void setFloatingPixel(double pixelPos, handColorRGB handColor ){
   DEBUG_PRINTF(" I1:%4.2f",intens1);
   setPixelLimited(pixelMin, color);
 
+  // Middle Pixels
   for ( int i = pixelMin+1; i < pixelMax; i++ ){
     uint32_t color = toColor(intens,handColor);
     setPixelLimited(i, color);
   }
 
-
-  // Second Pixel
+  // Last Pixel
   intens1 = intens*fractionPixel;
   color   = toColor(intens1,handColor);
   DEBUG_PRINTF(" I2:%4.2f",intens1);
   setPixelLimited(pixelMax, color);
 }
 
+// For debuggin. Each Second a seperate Line
 int lastSec=0;
 /**
  * Shows the time on the Neo Pixel Ring
@@ -178,6 +198,7 @@ int lastSec=0;
 void showTime() {
   clearPixel();
 
+  // Marker for each quater of the hour
   DEBUG_PRINTF("\nMarker 1 ");
   setFloatingPixel(0.0  , markQuater);
   DEBUG_PRINTF("\nMarker 2 ");
@@ -203,22 +224,21 @@ void showTime() {
 
   double fractionSec=tv.tv_usec/1000000.0;
   
-  double hour   = ti->tm_hour;
-  double min = ti->tm_min;
-  double sec = ti->tm_sec + fractionSec;
+  double hour = ti->tm_hour;
+  double min  = ti->tm_min;
+  double sec  = ti->tm_sec + fractionSec;
   // DEBUG_PRINTF("  Usec: %5.2f ",fractionSec);
 
-  // Add fractions to values
+  // Add fractions to values (this will cause the pointers for hour,minute to also move smoth)
   min  += (sec/60);
   hour += (min/60);
 
-  // Adapt intensity by time (hours)
+  // Adapt intensity by time of day (hours)
   intens=1.0;
-  if ( hour <7 || hour>22){
+  if ( hour < 7 || hour > 22){
     intens=NIGHT_DIM_FACTOR;
   }
 
-  double pixelPos;
 
   // Hour
   if ( hour >= 12 ) hour -= 12;
@@ -292,6 +312,7 @@ void setup() {
 }
 
 void loop() {
+  
   checkWifiStatus();
 
 
@@ -300,11 +321,10 @@ void loop() {
   String time = String(ctime(&now));
   //Serial.print( time);
 
-  // SHow time on Neopixel Ring
+  // Show time on Neopixel Ring
   showTime();
 
   // Wait a little bit, so we do not flood the console
-//  delay(1000.0 * 60.0/NUM_PIXELS/5.0);
   delay(10);
 
 }
