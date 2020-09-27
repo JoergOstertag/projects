@@ -24,7 +24,7 @@
   TODO:
   - adapt fov=20 to real value of sensor
   - put fov automatically into the resulting scad fi
-  - Add sin() to calculation of distance and 2D-SVG
+  - Add sin() to calculation of in 2D-distances-SVG
   - use separate iframes so the refreash not always reinjects the html Values (even after recompile)
   - use seperate Sourcode Files
   - Check Memory usage for larger Scans (Maybe use seperate I2C RAM or SD-Card
@@ -47,11 +47,6 @@ ResultStorageHandler resultStorageHandler;
 
 ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 
-// Correction for Servo Direction and Position
-int servoDirectionAZ = -1;
-int servoDirectionEL = -1;
-int servoOffsetAZ = -90;
-int servoOffsetEL = -90;
 
 int preMeasureDelay = 20;
 
@@ -91,7 +86,7 @@ boolean handleParameters() {
 
   parseParameter(server, "servoStepActive", servoStepActive);
   parseParameter(server, "preMeasureDelay", preMeasureDelay);
-  parseParameter(server, "distanceMaxRetry",distanceMaxRetry);
+  parseParameter(server, "distanceMaxRetry", distanceMaxRetry);
 
   return changes;
 }
@@ -125,31 +120,28 @@ void drawRoomLayout() {
     PolarCoordinate position = resultStorageHandler.getPosition(i);
     int el = position.el;
     int az = position .az;
-    if ( el <= resultStorageHandler.servoPosAzMin) {
-      y = -1;
-      x = -1;
-    }
 
-    int elCorrected = (el + servoOffsetEL) * servoDirectionEL;
-    int azCorrected = (az + servoOffsetAZ) * servoDirectionAZ;
     int dist = resultStorageHandler.getResult(i);
     if (  dist > 0 ) {
       countValidPoints++;
-      float rad = grad2Rad * azCorrected;
-      float distFloor = dist * cos(grad2Rad * elCorrected);
+      float rad = grad2Rad * az;
+      float distFloor = dist * cos(grad2Rad * el);
       float distPixel = distFloor * max(height, width) / maxVal / 2;
-      int y2 = (width / 2)  + sin(rad) * distPixel;
-      int x2 = (height / 2) + cos(rad) * distPixel;
+      int y2 = (width / 2)  - cos(rad) * distPixel;
+      int x2 = (height / 2) + sin(rad) * distPixel;
 
       // Draw circle at endpoints
       sprintf(temp, "  <circle cx=\"%d\" cy=\"%d\" r=\"2\" fill=\"red\" />\n", x2, y2);
       out += temp;
 
       // Draw lines between points
-      if ( az > 0 && x >= 0 && y >= 0 && x2 >= 0 && y2 >= 0) {
-        sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, y, x2, y2);
-        out += temp;
+      if ( el > resultStorageHandler.servoPosAzMin) {
+        if ( az > 0 && x >= 0 && y >= 0 && x2 >= 0 && y2 >= 0) {
+          sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, y, x2, y2);
+          out += temp;
+        }
       }
+      
       y = y2;
       x = x2;
       server.sendContent(out);
@@ -168,7 +160,7 @@ void drawRoomLayout() {
     out += maxVal;
     out += "</text>\n";
 
-    out += "<text x=\"0\" y=\"30\" fill=\"blue\">ValidPoints: ";
+    out += "<text x=\"0\" y=\"35\" fill=\"blue\">ValidPoints: ";
     out += countValidPoints;
     out += "</text>\n";
 
@@ -265,17 +257,19 @@ String inputForms() {
   output += formString("servoPosAzMin",       resultStorageHandler.servoPosAzMin);
   output += formString("servoPosAzMax",       resultStorageHandler.servoPosAzMax);
   output += formString("servoStepAz",         resultStorageHandler.servoStepAz);
-  output += formString("servoOffsetAZ", servoOffsetAZ);
+  output += formString("servoOffsetAZ",       servoOffsetAZ);
 
   output += "       <tr><td><br></td></tr>\n";
   //  output += formString("servoPosEl",       servoPosEl);
   output += formString("servoPosElMin",       resultStorageHandler.servoPosElMin);
   output += formString("servoPosElMax",       resultStorageHandler.servoPosElMax);
   output += formString("servoStepEl",         resultStorageHandler.servoStepEl);
-  output += "       <tr><td><br></td></tr>\n";
-  output += formString("servoOffsetEL", servoOffsetEL);
+  output += formString("servoOffsetEL",       servoOffsetEL);
+
+
   output += "       <tr><td><br></td></tr>\n";
   output += formString("servoStepActive",         servoStepActive);
+
   output += "       <tr><td><br></td></tr>\n";
   output += formString("preMeasureDelay",         preMeasureDelay);
   output += formString("distanceMaxRetry", distanceMaxRetry);
@@ -403,28 +397,24 @@ void handleScad() {
   output.reserve(200);
 
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);   //Enable Chunked Transfer
-  server.send(200, "image/svg+xml", F(
+  server.send(200, "text/plain", F(
                 "\n"
                 "\n"
                 "\n"
                 "// ===========================================================\n"
-                "// Distance Sensor\n"
+                "// 3D-Scan with Distance Sensor\n"
                 "// ===========================================================\n"));
 
   for ( int i = 0; i < resultStorageHandler.maxIndex(); i++) {
     PolarCoordinate position = resultStorageHandler.getPosition(i);
-    int el = position.el;
-    int az = position .az;
-    int elCorrected = (el + servoOffsetEL) * servoDirectionEL;
-    int azCorrected = (az + servoOffsetAZ) * servoDirectionAZ;
-
+    
     output = "segment(";
     output += "az=";
-    output += azCorrected;
+    output += position.az;
     output += ",\t";
 
     output += "el=";
-    output += elCorrected  ;
+    output += position.el;
     output += ",\t";
 
     output += "dist=";
@@ -452,8 +442,8 @@ void handleScad() {
                         "    dist1= dist-deltaDist;\n"
                         "\n"
                         "      rotate( [0,el,az] )\n"
-                        "        rotate( [0,-90,0] )\n"
-                        "          translate([0,0,dist1])\n"
+                        "        rotate( [-90,0,0] )\n"
+                        "          translate([dist1,0,0])\n"
                         "            cylinder( d1= tanFactor*dist1,\n"
                         "                      d2= tanFactor*dist,\n"
                         "                       h= deltaDist );\n"

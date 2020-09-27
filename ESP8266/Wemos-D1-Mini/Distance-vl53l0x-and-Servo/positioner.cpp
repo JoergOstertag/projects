@@ -6,6 +6,12 @@
 int servoStepActive = 1;
 boolean debugPosition = true;
 
+// Correction for Servo Direction and Position
+boolean servoCounterClockwiseAZ = true;
+boolean servoCounterClockwiseEL = true;
+int servoOffsetAZ = -90;
+int servoOffsetEL = -90;
+
 Servo servo_az;
 Servo servo_el;
 
@@ -27,7 +33,27 @@ void servo_move(PolarCoordinate position) {
     Serial.printf( " AZ: %4d", (int)position.az );
     Serial.printf( " EL: %4d", (int)position.el );
   }
-  servo_el.write(position.el );
-  servo_az.write(position.az );
-  delay(30);
+
+  int maxDifference = 0;
+
+  int elValue = (servoCounterClockwiseEL ? 180 - position.el : position.el) + servoOffsetEL;
+  maxDifference = max(maxDifference , abs(servo_el.read() - elValue));
+  servo_el.write(elValue);
+
+
+  int azValue = (servoCounterClockwiseAZ ? 180 - position.az : position.az) + servoOffsetAZ;
+  maxDifference = max(maxDifference , abs(servo_az.read() - azValue));
+  servo_az.write(azValue );
+
+  if ( debugPosition) {
+    Serial.printf( " AzValue: %4d", (int)azValue );
+    Serial.printf( " ElValue: %4d", (int)elValue );
+  }
+
+
+  if ( false ) {
+    Serial.print(  " maxDifference: " );
+    Serial.print(  maxDifference );
+  }
+  delay(1000 * maxDifference / 180);
 }

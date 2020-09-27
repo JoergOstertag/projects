@@ -23,13 +23,13 @@ class ResultStorageHandler {
     ResultStorageHandler();
 
 
-    int servoPosAzMin =  00;
-    int servoPosAzMax = 180;
-    int servoStepAz   =  2;
+    float servoPosAzMin = -90;
+    float servoPosAzMax =  90;
+    float servoStepAz   =   1;
 
-    int servoPosElMin =  60;
-    int servoPosElMax = 110;
-    int servoStepEl   =  2;
+    float servoPosElMin = -10;
+    float servoPosElMax =  60;
+    float servoStepEl   =   4;
 
     PolarCoordinate getPosition(unsigned int resultArrayIndex);
     int getResult(unsigned int resultArrayIndex);

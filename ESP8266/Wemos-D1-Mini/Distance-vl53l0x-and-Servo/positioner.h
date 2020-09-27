@@ -6,6 +6,8 @@
 
 extern int servoStepActive;
 extern boolean debugPosition;
+extern int servoOffsetAZ;
+extern int servoOffsetEL;
 
 void initPositioner();
 void servo_move(PolarCoordinate position);

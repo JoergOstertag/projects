@@ -32,8 +32,13 @@ PolarCoordinate ResultStorageHandler::getPosition(unsigned int resultArrayIndex)
 
   PolarCoordinate resultCoordinate;
   unsigned int elIndex = resultArrayIndex / servoNumPointsAz();
+  // Serial.print(" elIndex: ");  Serial.print(elIndex );
+
   resultCoordinate.el = servoPosElMin + elIndex * servoStepEl;
+
   unsigned int azIndex = resultArrayIndex - (elIndex * servoNumPointsAz());
+  // Serial.print(" azIndex: ");  Serial.print(azIndex );
+
   resultCoordinate.az = servoPosAzMin + (azIndex * servoStepAz);
 
   return resultCoordinate;

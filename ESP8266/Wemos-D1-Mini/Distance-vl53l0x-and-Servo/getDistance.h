@@ -6,6 +6,7 @@
 extern int distanceMaxRetry;
 extern int distanceRetryDelay;
 extern boolean debugDistance;
+extern int distanceFov;
 
 void initDistance();
 int getDistance(boolean debugDistance);

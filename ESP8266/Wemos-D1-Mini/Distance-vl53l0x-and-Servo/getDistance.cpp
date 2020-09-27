@@ -2,10 +2,29 @@
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
+/**
+ * If the measured DISTANCE is more than this we return a nagive Error Result
+ */
 #define MAX_DISTANCE 3000
-int distanceMaxRetry = 4;
+
+/**
+ * The Maximum Number of retries
+ */
+int distanceMaxRetry = 2;
+
+/**
+ * If we need a retry we wait for this long
+ */
 int distanceRetryDelay = 20;
 
+/**
+ * Field of View of the Distance Sensor
+ */
+int distanceFov = 20;
+
+/**
+ * Print Debugging output for Distance on Serial Console
+ */
 boolean debugDistance = true;
 
 void initDistance() {
@@ -31,7 +50,6 @@ int getDistance(boolean debugDistance) {
     if ( dist_mm > 1 && dist_mm < MAX_DISTANCE && measure.RangeStatus != 4) {
       doRetry = false;
     } else if ( retryCount++ < distanceMaxRetry ) {
-      // Serial.println("EL: " + String(servoPosEl) + " AZ: " + String(servoPosAz) + ": Retry " + String(retryCount));
       delay(distanceRetryDelay);
     } else {
       doRetry = false;
