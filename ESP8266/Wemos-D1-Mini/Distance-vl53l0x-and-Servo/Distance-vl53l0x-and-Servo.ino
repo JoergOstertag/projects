@@ -23,19 +23,27 @@
 
   TODO:
   - adapt fov=20 to real value of sensor
+  - put fov automatically into the resulting scad fi
   - Add sin() to calculation of distance and 2D-SVG
-  - use separate iframes so the refreash not always reinjects the new Values
-
+  - use separate iframes so the refreash not always reinjects the html Values (even after recompile)
+  - use seperate Sourcode Files
+  - Check Memory usage for larger Scans (Maybe use seperate I2C RAM or SD-Card
+  - refactor az/el calculation to have a loop over arrayindex (prevent rounding errors in index calculation)
 **/
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
-#include "Adafruit_VL53L0X.h"
 #include <Servo.h>
 #include <ESP_WiFiManager.h>              //https://github.com/khoih-prog/ESP_WiFiManager
 #include "htmlFormHandler.h"
+#include "getDistance.h"
+#include "webServer.h"
+
+#include "resultStorageHandler.h"
+
+ResultStorageHandler resultStorageHandler;
 
 ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 
@@ -48,34 +56,20 @@ int servoOffsetEL = -90;
 
 #define PIN_SERVO_AZ D8
 #define PIN_SERVO_EL D7
-#define SERVO_MAX_VALUES 5000
-
-int servoPosAzMin = 80;
-int servoPosAzMax = 190;
-int servoStepAz = 10;
-int servoDirAz = 1;
-int servoPosAz = servoPosAzMin;
-
-int servoPosElMin = 80;
-int servoPosElMax = 110;
-int servoStepEl = 10;
-int servoDirEl = 1;
-int servoPosEl = servoPosElMin;
 
 int servoStepActive = 1;
 
+int preMeasureDelay = 20;
 
-int preMeasureDelay = 100;
-
+unsigned int resultArrayIndex = 0;
 
 #define DIST_MIN 1
 #define DIST_MAX 500*10
 
-boolean debugDistance = false;
+boolean debugDistance = true;
 
 #define SIZE_2D_GRAPH 600
 
-Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
 Servo servo_az;
 Servo servo_el;
@@ -84,71 +78,27 @@ Servo servo_el;
 
 ESP8266WebServer server(80);
 
-/**
-   Result Values in mm
-   nagative values are invalid/out of range
-*/
-
-int _result[SERVO_MAX_VALUES];
-
-int getResultPos(int az, int el) {
-  int index = 0;
-  //   servoPosAzMin servoPosAzMax servoStepAz;
-  az = min(servoPosAzMax, az);
-  az = max(servoPosAzMin, az);
-  int azPos = az - servoPosAzMin / servoStepAz;
-
-  el = min(servoPosElMax, el);
-  el = max(servoPosElMin, el);
-  int elPos = el - servoPosElMin / servoStepEl;
-  int elCount = (servoPosElMax - servoPosElMin ) / servoStepEl;
-
-  index = (elPos * elCount) + azPos;
-  if ( index > SERVO_MAX_VALUES) {
-    Serial.print(index);
-    Serial.print(" is over MAX index ");
-    Serial.print(SERVO_MAX_VALUES);
-    Serial.println();
-  }
-  index = max(0, index);
-  index = min(SERVO_MAX_VALUES - 1, index);
-  return index;
-}
-
-
-int getResult(int az, int el) {
-  return _result[getResultPos(az, el)];
-}
-
-void putResult(int az, int el, int value) {
-  _result[getResultPos(az, el)] = value;
-}
-void resetResults() {
-  for ( int i = 0; i < SERVO_MAX_VALUES; i++) {
-    _result[i] = -1;
-  }
-}
 
 boolean handleParameters() {
   boolean changes = false;
   if ( servoStepActive == 0) {
-    changes |= parseParameter(server, "servoPosEl",    servoPosEl );
+    //    changes |= parseParameter(server, "servoPosEl",    servoPosEl );
   }
-  changes |= parseParameter(server, "servoPosAzMin",    servoPosAzMin);
-  changes |= parseParameter(server, "servoPosAzMax",    servoPosAzMax);
-  changes |= parseParameter(server, "servoStepAz",      servoStepAz);
+  changes |= parseParameter(server, "servoPosAzMin",    resultStorageHandler.servoPosAzMin);
+  changes |= parseParameter(server, "servoPosAzMax",    resultStorageHandler.servoPosAzMax);
+  changes |= parseParameter(server, "servoStepAz",      resultStorageHandler.servoStepAz);
   parseParameter(server, "servoOffsetAZ", servoOffsetAZ);
 
   if ( servoStepActive == 0) {
-    changes |= parseParameter(server, "servoPosAz",    servoPosAz );
+    //  changes |= parseParameter(server, "servoPosAz",    servoPosAz );
   }
-  changes |= parseParameter(server, "servoPosElMin",    servoPosElMin);
-  changes |= parseParameter(server, "servoPosElMax",    servoPosElMax);
-  changes |= parseParameter(server, "servoStepEl",      servoStepEl);
+  changes |= parseParameter(server, "servoPosElMin",    resultStorageHandler.servoPosElMin);
+  changes |= parseParameter(server, "servoPosElMax",    resultStorageHandler.servoPosElMax);
+  changes |= parseParameter(server, "servoStepEl",      resultStorageHandler.servoStepEl);
   parseParameter(server, "servoOffsetEL", servoOffsetEL);
 
 
-  changes |= parseParameter(server, "servoStepActive", servoStepActive);
+  parseParameter(server, "servoStepActive", servoStepActive);
   parseParameter(server, "preMeasureDelay", preMeasureDelay);
 
   return changes;
@@ -165,57 +115,60 @@ void drawRoomLayout() {
   out += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"" + String(width) + "\" height=\"" + String(height) + "\">\n";
   out += "<rect width=\"" + String(width) + "\" height=\"" + String(height) + "\" fill=\"rgb(50, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
   out += "<g stroke=\"black\">\n";
-  int maxVal = resultMax();
+  int maxVal = resultStorageHandler.resultMax();
 
   out += "<text x=\"0\" y=\"15\" fill=\"blue\">maxVal: ";
   out += maxVal;
   out += "</text>\n";
 
   float grad2Rad = 71.0 / 4068.0;
-  for ( int el = servoPosElMin ; el <= servoPosElMax; el += servoStepEl) {
+  for ( int i = 0; i < resultStorageHandler.maxIndex(); i++) {
+    polarCoordinate position = resultStorageHandler.getPosition(i);
+    int el = position.el;
+    int az = position .az;
+
     int y = -1;
     int x = -1;
     int elCorrected = (el + servoOffsetEL) * servoDirectionEL;
 
-    for ( int az = servoPosAzMin ; az <= servoPosAzMax; az += servoStepAz) {
-      int azCorrected = (az + servoOffsetAZ) * servoDirectionAZ;
-      int dist = getResult(az, el);
-      if ( ( dist >= DIST_MIN) && ( dist < DIST_MAX) ) {
-        float rad = grad2Rad * azCorrected;
-        float distFloor = dist * cos(grad2Rad * elCorrected);
-        float distPixel = distFloor * max(height, width) / maxVal / 2;
-        int y2 = (width / 2)  + sin(rad) * distPixel;
-        int x2 = (height / 2) + cos(rad) * distPixel;
+    int azCorrected = (az + servoOffsetAZ) * servoDirectionAZ;
+    int dist = resultStorageHandler.getResult(i);
+    if ( ( dist >= DIST_MIN) && ( dist < DIST_MAX) ) {
+      float rad = grad2Rad * azCorrected;
+      float distFloor = dist * cos(grad2Rad * elCorrected);
+      float distPixel = distFloor * max(height, width) / maxVal / 2;
+      int y2 = (width / 2)  + sin(rad) * distPixel;
+      int x2 = (height / 2) + cos(rad) * distPixel;
 
-        /*
-              Serial.print(i);
-              Serial.print("\tdeg: ");
-              Serial.print(degree);
-              Serial.print("\trad: ");
-              Serial.print(rad);
-              Serial.print("\tdist: ");
-              Serial.print(dist);
-              Serial.print("\tdistPixel: ");
-              Serial.print(distPixel);
-              Serial.print(x2);
-              Serial.print("\t");
-              Serial.print(y2);
-              Serial.println();
-        */
+      /*
+            Serial.print(i);
+            Serial.print("\tdeg: ");
+            Serial.print(degree);
+            Serial.print("\trad: ");
+            Serial.print(rad);
+            Serial.print("\tdist: ");
+            Serial.print(dist);
+            Serial.print("\tdistPixel: ");
+            Serial.print(distPixel);
+            Serial.print(x2);
+            Serial.print("\t");
+            Serial.print(y2);
+            Serial.println();
+      */
 
-        // Draw circle at endpoints
-        sprintf(temp, "  <circle cx=\"%d\" cy=\"%d\" r=\"2\" fill=\"red\" />\n", x2, y2);
+      // Draw circle at endpoints
+      sprintf(temp, "  <circle cx=\"%d\" cy=\"%d\" r=\"2\" fill=\"red\" />\n", x2, y2);
+      out += temp;
+
+      // Draw lines between points
+      if ( az > 0 && x >= 0 && y >= 0 && x2 >= 0 && y2 >= 0) {
+        sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, y, x2, y2);
         out += temp;
-
-        // Draw lines between points
-        if ( az > 0 && x >= 0 && y >= 0 && x2 >= 0 && y2 >= 0) {
-          sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, y, x2, y2);
-          out += temp;
-        }
-        y = y2;
-        x = x2;
       }
+      y = y2;
+      x = x2;
     }
+
   }
   out += "<line x1=\"" + String(width / 2) + "\" y1=\"0\" x2=\"" + String(width / 2) + "\" y2=\"" + String(height) + "\" stroke=\"white\" stroke-width=\"1\" />\n";
   out += "<line x1=\"0\" y1=\"" + String(height / 2) + "\" x2=\"" + String(width) + "\" y2=\"" + String(height / 2) + "\" stroke=\"white\" stroke-width=\"1\" />\n";
@@ -225,16 +178,7 @@ void drawRoomLayout() {
 }
 
 
-void printStatus(int i , float dist_cm) {
-  Serial.print("# az=");
-  Serial.print(servoPosAz );
-  // Serial.print("Distance (cm): ");
-  Serial.print("\t");
-  Serial.print(" d=");
 
-  Serial.print(dist_cm );
-  Serial.println();
-}
 
 
 String upTimeString() {
@@ -257,17 +201,17 @@ String inputForms() {
   output += "<form action=\"/\">\n";
 
   output += "       <table>\n";
-  output += formString("servoPosAz",       servoPosAz);
-  output += formString("servoPosAzMin",       servoPosAzMin);
-  output += formString("servoPosAzMax",       servoPosAzMax);
-  output += formString("servoStepAz",         servoStepAz);
+  // output += formString("servoPosAz",       servoPosAz);
+  output += formString("servoPosAzMin",       resultStorageHandler.servoPosAzMin);
+  output += formString("servoPosAzMax",       resultStorageHandler.servoPosAzMax);
+  output += formString("servoStepAz",         resultStorageHandler.servoStepAz);
   output += formString("servoOffsetAZ", servoOffsetAZ);
 
   output += "       <tr><td><br></td></tr>\n";
-  output += formString("servoPosEl",       servoPosEl);
-  output += formString("servoPosElMin",       servoPosElMin);
-  output += formString("servoPosElMax",       servoPosElMax);
-  output += formString("servoStepEl",         servoStepEl);
+  //  output += formString("servoPosEl",       servoPosEl);
+  output += formString("servoPosElMin",       resultStorageHandler.servoPosElMin);
+  output += formString("servoPosElMax",       resultStorageHandler.servoPosElMax);
+  output += formString("servoStepEl",         resultStorageHandler.servoStepEl);
   output += "       <tr><td><br></td></tr>\n";
   output += formString("servoOffsetEL", servoOffsetEL);
   output += "       <tr><td><br></td></tr>\n";
@@ -294,7 +238,7 @@ String inputForms() {
 void handleRoot() {
 
   if (   handleParameters()) {
-    resetResults();
+    resultStorageHandler.resetResults();
   }
 
   String output = "<html>\n\
@@ -402,38 +346,40 @@ void handleScad() {
   output += "// Distance Sensor\n";
   output += "// ===========================================================\n";
 
-  for ( int el = servoPosElMin ; el <= servoPosElMax; el += servoStepEl) {
-    for ( int az = servoPosAzMin ; az <= servoPosAzMax; az += servoStepAz) {
-      int elCorrected = (el + servoOffsetEL) * servoDirectionEL;
-      int azCorrected = (az + servoOffsetAZ) * servoDirectionAZ;
+  for ( int i = 0; i < resultStorageHandler.maxIndex(); i++) {
+    polarCoordinate position = resultStorageHandler.getPosition(i);
+    int el = position.el;
+    int az = position .az;
+    int elCorrected = (el + servoOffsetEL) * servoDirectionEL;
+    int azCorrected = (az + servoOffsetAZ) * servoDirectionAZ;
 
-      output += "segment(";
-      output += "az=";
-      output += azCorrected;
-      output += ",\t";
+    output += "segment(";
+    output += "az=";
+    output += azCorrected;
+    output += ",\t";
 
-      output += "el=";
-      output += elCorrected  ;
-      output += ",\t";
+    output += "el=";
+    output += elCorrected  ;
+    output += ",\t";
 
-      output += "dist=";
-      output += getResult(az, el);
-      output += ");";
+    output += "dist=";
+    output += resultStorageHandler.getResult(i);
+    output += ");";
 
 
-      // output += "// el=";
-      // output += el;
-      // output += ", az= ";
-      // output += az;
-      output += "\n";
-    }
+    // output += "// el=";
+    // output += el;
+    // output += ", az= ";
+    // output += az;
+    output += "\n";
+
   }
 
   output += "\n";
   output += "\n";
   output += "\n";
   output += "module segment(az=0,el=0,dist=20){\n";
-  output += "  if ( dist > 0 && dist < 800 ) {\n";
+  output += "  if ( dist > 0 ) {\n";
   output += "    fov=20;\n";
   output += "    tanFactor=tan(fov);\n";
   output += "    deltaDist= .1;\n";
@@ -473,19 +419,6 @@ void handleNotFound() {
 }
 
 
-int resultMax() {
-  int max = 0;
-  for ( int el = servoPosElMin ; el <= servoPosElMax; el += servoStepEl) {
-    for ( int az = servoPosAzMin ; az <= servoPosAzMax; az += servoStepAz) {
-      int dist = getResult(az, el);
-      if ( dist < DIST_MAX && dist > max) {
-        max = dist;
-      }
-    }
-  }
-  return max;
-}
-
 void distanceGraph() {
   String out;
   out.reserve(2600);
@@ -501,22 +434,23 @@ void distanceGraph() {
   int y = 0;
   int x = 0;
 
-  int maxVal = 10 + resultMax();
+  int maxVal = 10 + resultStorageHandler.resultMax();
 
-  for ( int el = servoPosElMin ; el <= servoPosElMax; el += servoStepEl) {
-    for ( int az = servoPosAzMin ; az <= servoPosAzMax; az += servoStepAz) {
-      int y2 = getResult(az, el) * height / maxVal;
-      if ( y2 < DIST_MAX && y2 > 0 ) {
-        int x2 = (az - servoPosAzMin ) * width / (servoPosAzMax - servoPosAzMin);
-        if ( y > 0) {
-          if ( az > servoPosAzMin ) {
-            sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, height - y, x2, height - y2);
-          }
-          out += temp;
+  for ( int i = 0; i < resultStorageHandler.maxIndex(); i++) {
+    polarCoordinate position = resultStorageHandler.getPosition(i);
+    int el = position.el;
+    int az = position .az;
+    int y2 = resultStorageHandler.getResult(i) * height / maxVal;
+    if ( y2 < DIST_MAX && y2 > 0 ) {
+      int x2 = (az - resultStorageHandler.servoPosAzMin ) * width / (resultStorageHandler.servoPosAzMax - resultStorageHandler.servoPosAzMin);
+      if ( y > 0) {
+        if ( az > resultStorageHandler.servoPosAzMin ) {
+          sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, height - y, x2, height - y2);
         }
-        y = y2;
-        x = x2;
+        out += temp;
       }
+      y = y2;
+      x = x2;
     }
   }
   out += "</g>\n";
@@ -525,87 +459,29 @@ void distanceGraph() {
   server.send(200, "image/svg+xml", out);
 }
 
-int measure_dist() {
+void measure() {
+
   delay(preMeasureDelay);
 
-  VL53L0X_RangingMeasurementData_t measure;
-
-  int retryCount = 0;
-  int dist_mm = -1;
-  boolean doRetry = true;
-  do {
-    // Serial.print("Reading a measurement... ");
-    lox.rangingTest(&measure, false); // pass in 'true' to get debug data printout!
-    dist_mm = measure.RangeMilliMeter;
-    if ( dist_mm > 1 && dist_mm < 800 && measure.RangeStatus != 4) {
-      doRetry = false;
-      if ( retryCount > 0 ) {
-        Serial.println("Retry succeded");
-      }
-    } else if ( retryCount++ < 2 ) {
-      // Serial.println("EL: " + String(servoPosEl) + " AZ: " + String(servoPosAz) + ": Retry " + String(retryCount));
-      delay(100);
-    } else {
-      doRetry = false;
-    }
-  } while ( doRetry );
-
-  if (measure.RangeStatus != 4) {  // phase failures have incorrect data
-    boolean debugDistance = false;
-    if ( debugDistance) {
-      Serial.print( "EL: " + String(servoPosEl) );
-      Serial.print( " AZ: " + String(servoPosAz) );
-      Serial.print( " ArrayPos: " + String(getResultPos(servoPosAz, servoPosEl)));
-      Serial.print( " : Retry " + String(retryCount) );
-      Serial.print( " Distance: " + String(dist_mm));
-      Serial.println();
-    }
-    // printStatus(servoPosAz, dist_mm);
-    if ( dist_mm > 800) {
-      return -1;
-    } else {
-      return dist_mm;
-    }
-  } else {
-    return -1;
-  }
+  int dist_mm = getDistance(debugDistance);
+  resultStorageHandler.putResult(resultArrayIndex, dist_mm);
 }
 
-void measure() {
-  putResult(servoPosAz, servoPosEl, measure_dist());
-
-}
 
 void servo_move() {
-  // Move Servo
-  if ( servoStepActive > 0) {
-    servoPosAz += servoDirAz * servoStepAz;
+  if (servoStepActive > 0) {
+    resultArrayIndex = resultStorageHandler.nextPositionServo(resultArrayIndex);
+    polarCoordinate position = resultStorageHandler.getPosition(resultArrayIndex);
 
-    if ( ( servoPosAz > servoPosAzMax) || (servoPosAz < servoPosAzMin ) ) {
-      servoDirAz *= -1;
-      servoPosEl += servoDirEl * servoStepEl;
-      if ( servoPosEl > servoPosElMax ) {
-        servoPosEl = servoPosElMax;
-        servoDirEl = -1;
-      }
-      if ( servoPosEl < servoPosElMin ) {
-        servoPosEl = servoPosElMin;
-        servoDirEl = 1;
-      }
-      Serial.println("New El: " + String(servoPosEl));
+    if ( debugDistance) {
+      Serial.printf( " ArrayPos: %5u", resultArrayIndex);
+      Serial.printf( " AZ: %4d", (int)position.az );
+      Serial.printf( " EL: %4d", (int)position.el );
     }
-
-    if ( servoPosAz > servoPosAzMax ) {
-      servoPosAz = servoPosAzMax;
-    }
-    if ( servoPosAz < servoPosAzMin ) {
-      servoPosAz = servoPosAzMin;
-    }
-
+    servo_el.write(position.el );
+    servo_az.write(position.az );
+    delay(30);
   }
-  servo_el.write(servoPosEl );
-  servo_az.write(servoPosAz );
-  delay(30);
 }
 
 void setup() {
@@ -616,7 +492,7 @@ void setup() {
 
 
   Serial.println("Reset Results ...");
-  resetResults();
+  resultStorageHandler.resetResults();
 
   Serial.println("Wifi Manager ...");
   ESP_wifiManager.setDebugOutput(true);
@@ -634,25 +510,14 @@ void setup() {
   Serial.println("Attaching Servo ...");
   servo_az.attach(PIN_SERVO_AZ);  // attaches the servo
   servo_el.attach(PIN_SERVO_EL);  // attaches the servo
-  servo_az.write(servoPosAz );
-  servo_el.write(servoPosEl );
 
-  // VL53L0X
-  Serial.println("Conneting Adafruit VL53L0X ...");
-  if (!lox.begin()) {
-    Serial.println(F("Failed to boot VL53L0X"));
-    delay(5 * 1000);
-    while (1);
-  }
-  // power
-  Serial.println(F("VL53L0X API Simple Ranging example\n\n"));
+  initDistance();
 
-
-
-
-  if (MDNS.begin("2d-SCANNER")) {
-    Serial.println("MDNS responder started");
-    Serial.println("http://2d-scanner.fritz.box/");
+  // Make ourselfs visible with M-DNS
+  if (MDNS.begin(F("3D-SCANNER"))) {
+    Serial.println(F("MDNS responder started"));
+    Serial.println(F("You can connect to the device with"));
+    Serial.println(F("http://3d-scanner.fritz.box/"));
   }
 
   // Register URLs to answer
@@ -673,8 +538,18 @@ void setup() {
   Serial.println(" KB");
 }
 
-
 void loop() {
+  if ( resultArrayIndex == 0 ) {
+
+    Serial.println();
+    Serial.print(" servoNumPointsAz= " );
+    Serial.print( resultStorageHandler.servoNumPointsAz() );
+    Serial.print(" servoNumPointsEl= " );
+    Serial.print( resultStorageHandler.servoNumPointsEl() );
+    Serial.println();
+    delay(1000);
+
+  }
 
   measure();
   servo_move();
@@ -684,4 +559,7 @@ void loop() {
     server.handleClient();
     MDNS.update();
   }
+
+  Serial.println();
+
 }
