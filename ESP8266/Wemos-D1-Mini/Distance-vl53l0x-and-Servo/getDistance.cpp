@@ -2,13 +2,13 @@
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
-#define MAX_DISTANCE 1990
+#define MAX_DISTANCE 3000
+int distanceMaxRetry = 4;
+int distanceRetryDelay = 20;
 
 boolean debugDistance = true;
 
-void initDistance(){
-  // VL53L0X
-
+void initDistance() {
   Serial.println("Conneting Adafruit VL53L0X ...");
   if (!lox.begin()) {
     Serial.println(F("Failed to boot VL53L0X"));
@@ -18,7 +18,7 @@ void initDistance(){
 }
 
 int getDistance(boolean debugDistance) {
- 
+
   VL53L0X_RangingMeasurementData_t measure;
 
   int retryCount = 0;
@@ -30,29 +30,25 @@ int getDistance(boolean debugDistance) {
     dist_mm = measure.RangeMilliMeter;
     if ( dist_mm > 1 && dist_mm < MAX_DISTANCE && measure.RangeStatus != 4) {
       doRetry = false;
-      if ( retryCount > 0 ) {
-        Serial.println("Retry succeded");
-      }
-    } else if ( retryCount++ < 2 ) {
+    } else if ( retryCount++ < distanceMaxRetry ) {
       // Serial.println("EL: " + String(servoPosEl) + " AZ: " + String(servoPosAz) + ": Retry " + String(retryCount));
-      delay(100);
+      delay(distanceRetryDelay);
     } else {
       doRetry = false;
     }
   } while ( doRetry );
 
   if (measure.RangeStatus != 4) {  // phase failures have incorrect data
-    boolean debugDistance = false;
     if ( dist_mm > MAX_DISTANCE) {
-      dist_mm = -1;
-    } else {
+      dist_mm = -3;
     }
   } else {
-    dist_mm = -1;
+    dist_mm = -2;
   }
+  
   if ( debugDistance) {
     Serial.print( " Distance: " + String(dist_mm));
-    if ( retryCount > 0) {
+    if ( dist_mm > 0 && retryCount > 0) {
       Serial.print( " : Retry " + String(retryCount) + " " );
     }
   }

@@ -91,61 +91,55 @@ boolean handleParameters() {
 
   parseParameter(server, "servoStepActive", servoStepActive);
   parseParameter(server, "preMeasureDelay", preMeasureDelay);
+  parseParameter(server, "distanceMaxRetry",distanceMaxRetry);
 
   return changes;
 }
 
 void drawRoomLayout() {
   String out;
-  out.reserve(2600);
+  out.reserve(200);
   char temp[70];
 
   int height = SIZE_2D_GRAPH;
   int width  = SIZE_2D_GRAPH;
 
+  server.setContentLength(CONTENT_LENGTH_UNKNOWN);   //Enable Chunked Transfer
+  server.send(200, "image/svg+xml", "");
+
   out += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"" + String(width) + "\" height=\"" + String(height) + "\">\n";
   out += "<rect width=\"" + String(width) + "\" height=\"" + String(height) + "\" fill=\"rgb(50, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
   out += "<g stroke=\"black\">\n";
+
+
+  server.sendContent(out);
+
   int maxVal = resultStorageHandler.resultMax();
 
-  out += "<text x=\"0\" y=\"15\" fill=\"blue\">maxVal: ";
-  out += maxVal;
-  out += "</text>\n";
-
   float grad2Rad = 71.0 / 4068.0;
+  int y = -1;
+  int x = -1;
+  int countValidPoints = 0;
   for ( int i = 0; i < resultStorageHandler.maxIndex(); i++) {
+    out = "";
     PolarCoordinate position = resultStorageHandler.getPosition(i);
     int el = position.el;
     int az = position .az;
+    if ( el <= resultStorageHandler.servoPosAzMin) {
+      y = -1;
+      x = -1;
+    }
 
-    int y = -1;
-    int x = -1;
     int elCorrected = (el + servoOffsetEL) * servoDirectionEL;
-
     int azCorrected = (az + servoOffsetAZ) * servoDirectionAZ;
     int dist = resultStorageHandler.getResult(i);
-    if ( ( dist >= DIST_MIN) && ( dist < DIST_MAX) ) {
+    if (  dist > 0 ) {
+      countValidPoints++;
       float rad = grad2Rad * azCorrected;
       float distFloor = dist * cos(grad2Rad * elCorrected);
       float distPixel = distFloor * max(height, width) / maxVal / 2;
       int y2 = (width / 2)  + sin(rad) * distPixel;
       int x2 = (height / 2) + cos(rad) * distPixel;
-
-      /*
-            Serial.print(i);
-            Serial.print("\tdeg: ");
-            Serial.print(degree);
-            Serial.print("\trad: ");
-            Serial.print(rad);
-            Serial.print("\tdist: ");
-            Serial.print(dist);
-            Serial.print("\tdistPixel: ");
-            Serial.print(distPixel);
-            Serial.print(x2);
-            Serial.print("\t");
-            Serial.print(y2);
-            Serial.println();
-      */
 
       // Draw circle at endpoints
       sprintf(temp, "  <circle cx=\"%d\" cy=\"%d\" r=\"2\" fill=\"red\" />\n", x2, y2);
@@ -158,16 +152,91 @@ void drawRoomLayout() {
       }
       y = y2;
       x = x2;
+      server.sendContent(out);
     }
 
   }
-  out += "<line x1=\"" + String(width / 2) + "\" y1=\"0\" x2=\"" + String(width / 2) + "\" y2=\"" + String(height) + "\" stroke=\"white\" stroke-width=\"1\" />\n";
-  out += "<line x1=\"0\" y1=\"" + String(height / 2) + "\" x2=\"" + String(width) + "\" y2=\"" + String(height / 2) + "\" stroke=\"white\" stroke-width=\"1\" />\n";
-  out += "</g>\n</svg>\n";
 
-  server.send(200, "image/svg+xml", out);
+  { // white centered Coordinate Lines (x and y)
+    out = "<line x1=\"" + String(width / 2) + "\" y1=\"0\" x2=\"" + String(width / 2) + "\" y2=\"" + String(height) + "\" stroke=\"white\" stroke-width=\"1\" />\n";
+    out += "<line x1=\"0\" y1=\"" + String(height / 2) + "\" x2=\"" + String(width) + "\" y2=\"" + String(height / 2) + "\" stroke=\"white\" stroke-width=\"1\" />\n";
+    server.sendContent(out);
+  }
+
+  {
+    out = "<text x=\"0\" y=\"15\" fill=\"blue\">maxVal: ";
+    out += maxVal;
+    out += "</text>\n";
+
+    out += "<text x=\"0\" y=\"30\" fill=\"blue\">ValidPoints: ";
+    out += countValidPoints;
+    out += "</text>\n";
+
+
+    server.sendContent(out);
+  }
+
+  {
+    out = "</g>\n</svg>\n";
+    server.sendContent(out);
+  }
+
+  server.sendContent("");
+  server.chunkedResponseFinalize();
 }
 
+
+
+void distanceGraph() {
+
+  server.setContentLength(CONTENT_LENGTH_UNKNOWN);   //Enable Chunked Transfer
+  server.send(200, "image/svg+xml", "");
+
+
+  String out;
+  out.reserve(2600);
+  char temp[70];
+  int width = 900;
+  int height = 300;
+
+  out += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"";
+  out += String(width) + "\" height=\"" + String( height) + "\">\n";
+
+  out += "<rect width=\"" + String(width) + "\" height=\"" + String(height) + "\" fill=\"rgb(250, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
+  out += "<g stroke=\"black\">\n";
+
+  server.sendContent(out);
+
+
+  int y = 0;
+  int x = 0;
+  int maxVal = 10 + resultStorageHandler.resultMax();
+
+  for ( int i = 0; i < resultStorageHandler.maxIndex(); i++) {
+    PolarCoordinate position = resultStorageHandler.getPosition(i);
+    int el = position.el;
+    int az = position .az;
+    int y2 = resultStorageHandler.getResult(i) * height / maxVal;
+    if ( y2 < DIST_MAX && y2 > 0 ) {
+      int x2 = (az - resultStorageHandler.servoPosAzMin ) * width / (resultStorageHandler.servoPosAzMax - resultStorageHandler.servoPosAzMin);
+      if ( y > 0) {
+        if ( az > resultStorageHandler.servoPosAzMin ) {
+          sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, height - y, x2, height - y2);
+        }
+        out = temp;
+        server.sendContent(out);
+
+      }
+      y = y2;
+      x = x2;
+    }
+  }
+  server.sendContent(F("</g>\n"
+                       "</svg>\n"));
+
+  server.sendContent("");
+  server.chunkedResponseFinalize();
+}
 
 
 
@@ -209,6 +278,7 @@ String inputForms() {
   output += formString("servoStepActive",         servoStepActive);
   output += "       <tr><td><br></td></tr>\n";
   output += formString("preMeasureDelay",         preMeasureDelay);
+  output += formString("distanceMaxRetry", distanceMaxRetry);
 
   if ( false) {
     output += "    <div class=\"slidecontainer\"> \n\n";
@@ -247,20 +317,9 @@ void handleRoot() {
 
   output += "  <body>\n";
   output += "\n";
-  output += "  <h1>ESP8266 2D-Scanner</h1>\n\n";
+  output += "  <h2>ESP8266 3D-Scanner</h2>\n\n";
 
-  {
-    output += "  <div style=\"text-align:left; margin:8px;\">\n";
 
-    // Uptime
-    output += "      <p>" + upTimeString() + "</p>\n";
-
-    // Open Scad Reference
-    output += "      <p>\n";
-    output += "         <a href=\"/scan-2D.scad\">scan-2D.scad</a>\n";
-    output += "      </p>\n\n";
-    output += "   </div>\n\n";
-  }
 
   {
     output += "   <div style=\"float:left; width:100%; margin:8px;\">\n";
@@ -271,6 +330,19 @@ void handleRoot() {
       output += "          <p>Room Layout:</p>\n";
       output += "          <img src=\"/roomLayout.svg\" />\n";
       output += "      </div>\n";
+    }
+
+    {
+      output += "  <div style=\"text-align:left; margin:8px;\">\n";
+
+      // Uptime
+      output += "      <p>" + upTimeString() + "</p>\n";
+
+      // Open Scad Reference
+      output += "      <p>\n";
+      output += "         <a href=\"/scan-3D.scad\">scan-3D.scad</a>\n";
+      output += "      </p>\n\n";
+      output += "   </div>\n\n";
     }
 
     {
@@ -289,7 +361,7 @@ void handleRoot() {
   output += "\n";
   output += "       <div style=\"float:left; margin:8px;\">\n";
   output += "          <p>Distances:<p/>\n";
-  output += "          <img src=\"/distGraph.svg\" />\n";
+  output += "          <img src=\"/distanceGraph.svg\" />\n";
   output += "       </div>\n";
   output += "\n";
 
@@ -297,7 +369,7 @@ void handleRoot() {
   output += "\n\n";
   output += "  </body>\n";
   output += "</html > \n";
-  server.send(200, "text / html", output);
+  server.send(200, "text/html", output);
 
 }
 
@@ -328,14 +400,16 @@ void handleInputForm() {
 
 void handleScad() {
   String output;
-  output.reserve(64);
+  output.reserve(200);
 
-  output = "\n";
-  output += "\n";
-  output += "\n";
-  output += "// ===========================================================\n";
-  output += "// Distance Sensor\n";
-  output += "// ===========================================================\n";
+  server.setContentLength(CONTENT_LENGTH_UNKNOWN);   //Enable Chunked Transfer
+  server.send(200, "image/svg+xml", F(
+                "\n"
+                "\n"
+                "\n"
+                "// ===========================================================\n"
+                "// Distance Sensor\n"
+                "// ===========================================================\n"));
 
   for ( int i = 0; i < resultStorageHandler.maxIndex(); i++) {
     PolarCoordinate position = resultStorageHandler.getPosition(i);
@@ -344,7 +418,7 @@ void handleScad() {
     int elCorrected = (el + servoOffsetEL) * servoDirectionEL;
     int azCorrected = (az + servoOffsetAZ) * servoDirectionAZ;
 
-    output += "segment(";
+    output = "segment(";
     output += "az=";
     output += azCorrected;
     output += ",\t";
@@ -364,29 +438,29 @@ void handleScad() {
     // output += az;
     output += "\n";
 
+    server.sendContent(output);
   }
 
-  output += "\n";
-  output += "\n";
-  output += "\n";
-  output += "module segment(az=0,el=0,dist=20){\n";
-  output += "  if ( dist > 0 ) {\n";
-  output += "    fov=20;\n";
-  output += "    tanFactor=tan(fov);\n";
-  output += "    deltaDist= .1;\n";
-  output += "    dist1= dist-deltaDist;\n";
-  output += "\n";
-  output += "      rotate( [0,el,az] )\n";
-  output += "        rotate( [0,-90,0] )\n";
-  output += "          translate([0,0,dist1])\n";
-  output += "            cylinder( d1= tanFactor*dist1,\n";
-  output += "                      d2= tanFactor*dist,\n";
-  output += "                       h= deltaDist );\n";
-  output += "    }\n";
-  output += "}\n";
-  output += "\n";
-  output += "\n";
-  server.sendContent(output);
+  server.sendContent( F("\n"
+                        "\n"
+                        "\n"
+                        "module segment(az=0,el=0,dist=20){\n"
+                        "if ( dist > 0 ) {\n"
+                        "    fov=20;\n"
+                        "    tanFactor=tan(fov);\n"
+                        "    deltaDist= .1;\n"
+                        "    dist1= dist-deltaDist;\n"
+                        "\n"
+                        "      rotate( [0,el,az] )\n"
+                        "        rotate( [0,-90,0] )\n"
+                        "          translate([0,0,dist1])\n"
+                        "            cylinder( d1= tanFactor*dist1,\n"
+                        "                      d2= tanFactor*dist,\n"
+                        "                       h= deltaDist );\n"
+                        "    }\n"
+                        "}\n"
+                        "\n"
+                        "\n"));
   server.chunkedResponseFinalize();
 }
 
@@ -409,46 +483,6 @@ void handleNotFound() {
   Serial.println("Sent 2D Scad File");
 }
 
-
-void distanceGraph() {
-  String out;
-  out.reserve(2600);
-  char temp[70];
-  int width = 900;
-  int height = 300;
-
-  out += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"";
-  out += String(width) + "\" height=\"" + String( height) + "\">\n";
-
-  out += "<rect width=\"" + String(width) + "\" height=\"" + String(height) + "\" fill=\"rgb(250, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
-  out += "<g stroke=\"black\">\n";
-  int y = 0;
-  int x = 0;
-
-  int maxVal = 10 + resultStorageHandler.resultMax();
-
-  for ( int i = 0; i < resultStorageHandler.maxIndex(); i++) {
-    PolarCoordinate position = resultStorageHandler.getPosition(i);
-    int el = position.el;
-    int az = position .az;
-    int y2 = resultStorageHandler.getResult(i) * height / maxVal;
-    if ( y2 < DIST_MAX && y2 > 0 ) {
-      int x2 = (az - resultStorageHandler.servoPosAzMin ) * width / (resultStorageHandler.servoPosAzMax - resultStorageHandler.servoPosAzMin);
-      if ( y > 0) {
-        if ( az > resultStorageHandler.servoPosAzMin ) {
-          sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, height - y, x2, height - y2);
-        }
-        out += temp;
-      }
-      y = y2;
-      x = x2;
-    }
-  }
-  out += "</g>\n";
-  out += "</svg>\n";
-
-  server.send(200, "image/svg+xml", out);
-}
 
 void measure() {
 
@@ -499,8 +533,8 @@ void setup() {
   // Register URLs to answer
   if ( ACTIVATE_WEBSERVER ) {
     server.on("/", handleRoot);
-    server.on("/distGraph.svg", distanceGraph);
-    server.on("/scan-2D.scad", handleScad);
+    server.on("/distanceGraph.svg", distanceGraph);
+    server.on("/scan-3D.scad", handleScad);
     server.on("/roomLayout.svg", drawRoomLayout);
     server.on("/inputForm.html", handleInputForm);
 

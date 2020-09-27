@@ -24,9 +24,6 @@ boolean parseParameter(ESP8266WebServer &server, String name, float &value ) {
   return false;
 }
 
-
-
-
 String formString(String name, int value) {
   String output = "\n";
   output += "      <tr><td>" + name + ": </td><td><input type=\"text\" name=\"" + name + "\" value=\"";
