@@ -35,29 +35,23 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
-#include <Servo.h>
 #include <ESP_WiFiManager.h>              //https://github.com/khoih-prog/ESP_WiFiManager
+
 #include "htmlFormHandler.h"
 #include "getDistance.h"
 #include "webServer.h"
-
 #include "resultStorageHandler.h"
+#include "positioner.h"
 
 ResultStorageHandler resultStorageHandler;
 
 ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 
+// Correction for Servo Direction and Position
 int servoDirectionAZ = -1;
 int servoDirectionEL = -1;
-
 int servoOffsetAZ = -90;
 int servoOffsetEL = -90;
-
-
-#define PIN_SERVO_AZ D8
-#define PIN_SERVO_EL D7
-
-int servoStepActive = 1;
 
 int preMeasureDelay = 20;
 
@@ -66,13 +60,10 @@ unsigned int resultArrayIndex = 0;
 #define DIST_MIN 1
 #define DIST_MAX 500*10
 
-boolean debugDistance = true;
 
 #define SIZE_2D_GRAPH 600
 
 
-Servo servo_az;
-Servo servo_el;
 
 #define ACTIVATE_WEBSERVER true
 
@@ -123,7 +114,7 @@ void drawRoomLayout() {
 
   float grad2Rad = 71.0 / 4068.0;
   for ( int i = 0; i < resultStorageHandler.maxIndex(); i++) {
-    polarCoordinate position = resultStorageHandler.getPosition(i);
+    PolarCoordinate position = resultStorageHandler.getPosition(i);
     int el = position.el;
     int az = position .az;
 
@@ -347,7 +338,7 @@ void handleScad() {
   output += "// ===========================================================\n";
 
   for ( int i = 0; i < resultStorageHandler.maxIndex(); i++) {
-    polarCoordinate position = resultStorageHandler.getPosition(i);
+    PolarCoordinate position = resultStorageHandler.getPosition(i);
     int el = position.el;
     int az = position .az;
     int elCorrected = (el + servoOffsetEL) * servoDirectionEL;
@@ -437,7 +428,7 @@ void distanceGraph() {
   int maxVal = 10 + resultStorageHandler.resultMax();
 
   for ( int i = 0; i < resultStorageHandler.maxIndex(); i++) {
-    polarCoordinate position = resultStorageHandler.getPosition(i);
+    PolarCoordinate position = resultStorageHandler.getPosition(i);
     int el = position.el;
     int az = position .az;
     int y2 = resultStorageHandler.getResult(i) * height / maxVal;
@@ -468,27 +459,14 @@ void measure() {
 }
 
 
-void servo_move() {
-  if (servoStepActive > 0) {
-    resultArrayIndex = resultStorageHandler.nextPositionServo(resultArrayIndex);
-    polarCoordinate position = resultStorageHandler.getPosition(resultArrayIndex);
-
-    if ( debugDistance) {
-      Serial.printf( " ArrayPos: %5u", resultArrayIndex);
-      Serial.printf( " AZ: %4d", (int)position.az );
-      Serial.printf( " EL: %4d", (int)position.el );
-    }
-    servo_el.write(position.el );
-    servo_az.write(position.az );
-    delay(30);
-  }
-}
-
 void setup() {
+  debugDistance = true;
+  debugPosition = true;
+
   Serial.begin(115200);
 
   Serial.println();
-  Serial.println("2D/3D-Scanner .... ");
+  Serial.println("3D-Scanner .... ");
 
 
   Serial.println("Reset Results ...");
@@ -507,9 +485,7 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  Serial.println("Attaching Servo ...");
-  servo_az.attach(PIN_SERVO_AZ);  // attaches the servo
-  servo_el.attach(PIN_SERVO_EL);  // attaches the servo
+  initPositioner();
 
   initDistance();
 
@@ -539,6 +515,17 @@ void setup() {
 }
 
 void loop() {
+
+  if (servoStepActive > 0) {
+    resultArrayIndex = resultStorageHandler.nextPositionServo(resultArrayIndex);
+    PolarCoordinate position = resultStorageHandler.getPosition(resultArrayIndex);
+
+    if ( debugDistance) {
+      Serial.printf( " ArrayPos: %5u", resultArrayIndex);
+    }
+    servo_move(position);
+  }
+
   if ( resultArrayIndex == 0 ) {
 
     Serial.println();
@@ -552,7 +539,6 @@ void loop() {
   }
 
   measure();
-  servo_move();
 
 
   if (ACTIVATE_WEBSERVER) {

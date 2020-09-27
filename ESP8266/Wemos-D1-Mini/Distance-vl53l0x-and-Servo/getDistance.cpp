@@ -4,6 +4,8 @@ Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
 #define MAX_DISTANCE 1990
 
+boolean debugDistance = true;
+
 void initDistance(){
   // VL53L0X
 

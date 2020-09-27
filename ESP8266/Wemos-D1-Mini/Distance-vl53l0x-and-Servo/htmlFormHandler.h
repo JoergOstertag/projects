@@ -5,6 +5,9 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
+// Interrims import
+#include "resultStorageHandler.h"
+
 boolean parseParameter(ESP8266WebServer &server, String name, int &value );
 boolean parseParameter(ESP8266WebServer &server, String name, float &value );
 

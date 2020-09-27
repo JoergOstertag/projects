@@ -12,7 +12,7 @@
 /**
    polar Coordinate
 */
-struct polarCoordinate {
+struct PolarCoordinate {
   float az;
   float el;
 };
@@ -25,16 +25,16 @@ class ResultStorageHandler {
 
     int servoPosAzMin =  00;
     int servoPosAzMax = 180;
-    int servoStepAz   =  10;
+    int servoStepAz   =  2;
 
-    int servoPosElMin =  80;
+    int servoPosElMin =  60;
     int servoPosElMax = 110;
-    int servoStepEl   =  10;
+    int servoStepEl   =  2;
 
-    polarCoordinate getPosition(unsigned int resultArrayIndex);
+    PolarCoordinate getPosition(unsigned int resultArrayIndex);
     int getResult(unsigned int resultArrayIndex);
     void putResult(unsigned int resultArrayIndex, int value);
-    unsigned int indexOfPosition( polarCoordinate  currentPosition );
+    unsigned int indexOfPosition( PolarCoordinate  currentPosition );
     unsigned int nextPositionLinear( unsigned int resultArrayIndex );
     unsigned int nextPositionServo( unsigned int resultArrayIndex );
     unsigned int maxIndex();

@@ -26,11 +26,11 @@ boolean ResultStorageHandler::checkPosition(unsigned int resultArrayIndex) {
   return true;
 }
 
-polarCoordinate ResultStorageHandler::getPosition(unsigned int resultArrayIndex) {
+PolarCoordinate ResultStorageHandler::getPosition(unsigned int resultArrayIndex) {
 
   checkPosition(resultArrayIndex);
 
-  polarCoordinate resultCoordinate;
+  PolarCoordinate resultCoordinate;
   unsigned int elIndex = resultArrayIndex / servoNumPointsAz();
   resultCoordinate.el = servoPosElMin + elIndex * servoStepEl;
   unsigned int azIndex = resultArrayIndex - (elIndex * servoNumPointsAz());
@@ -54,7 +54,7 @@ void ResultStorageHandler::putResult(unsigned int resultArrayIndex, int value) {
   _result[resultArrayIndex] = value;
 };
 
-unsigned int ResultStorageHandler::indexOfPosition( polarCoordinate  currentPosition ) {
+unsigned int ResultStorageHandler::indexOfPosition( PolarCoordinate  currentPosition ) {
 
 }
 
