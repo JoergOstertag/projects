@@ -1,7 +1,7 @@
 #include "resultStorageHandler.h"
 
 ResultStorageHandler::ResultStorageHandler() {
-
+  _result = (short*) malloc( sizeof(short) * (MAX_RESULT_INDEX + 1));
 }
 
 boolean ResultStorageHandler::checkPosition(unsigned int resultArrayIndex) {
@@ -24,6 +24,15 @@ boolean ResultStorageHandler::checkPosition(unsigned int resultArrayIndex) {
   }
 
   return true;
+}
+
+void ResultStorageHandler::debugPosition( unsigned int resultArrayIndex) {
+  PolarCoordinate position = ResultStorageHandler::getPosition(resultArrayIndex);
+  if ( debugResultPosition) {
+    Serial.printf( " ArrayPos: %5u", resultArrayIndex);
+    Serial.printf( " AZ: %4d", (int)position.az );
+    Serial.printf( " EL: %4d", (int)position.el );
+  }
 }
 
 PolarCoordinate ResultStorageHandler::getPosition(unsigned int resultArrayIndex) {
@@ -96,6 +105,7 @@ unsigned int ResultStorageHandler::nextPositionServo( unsigned int resultArrayIn
   }
   return resultArrayIndex;
 }
+
 
 /**
    Get next position array wise

@@ -7,8 +7,7 @@
    Result storage Handler
 */
 
-#define MAX_RESULT_INDEX 5000
-
+#define MAX_RESULT_INDEX (14*1024)
 /**
    polar Coordinate
 */
@@ -23,12 +22,15 @@ class ResultStorageHandler {
     ResultStorageHandler();
 
 
+
+    boolean debugResultPosition = true;
+
     float servoPosAzMin = -90;
     float servoPosAzMax =  90;
     float servoStepAz   =   1;
 
     float servoPosElMin = -10;
-    float servoPosElMax =  60;
+    float servoPosElMax =  90;
     float servoStepEl   =   4;
 
     PolarCoordinate getPosition(unsigned int resultArrayIndex);
@@ -41,6 +43,7 @@ class ResultStorageHandler {
     unsigned int servoNumPointsAz();
     unsigned int servoNumPointsEl();
     boolean checkPosition(unsigned int resultArrayIndex);
+    void debugPosition( unsigned int resultArrayIndex);
 
     int resultMax();
 
@@ -54,7 +57,8 @@ class ResultStorageHandler {
        Result Values in mm
        nagative values are invalid/out of range
     */
-    int _result[MAX_RESULT_INDEX];
+    // int _result[MAX_RESULT_INDEX];
+    short *_result;
 
 
 };

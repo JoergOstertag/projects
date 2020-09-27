@@ -27,6 +27,12 @@ int distanceFov = 20;
  */
 boolean debugDistance = true;
 
+
+/**
+ * delay before measuring
+ */
+int preMeasureDelay=0;
+ 
 void initDistance() {
   Serial.println("Conneting Adafruit VL53L0X ...");
   if (!lox.begin()) {
@@ -37,6 +43,8 @@ void initDistance() {
 }
 
 int getDistance(boolean debugDistance) {
+
+  delay(preMeasureDelay);
 
   VL53L0X_RangingMeasurementData_t measure;
 

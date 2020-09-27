@@ -29,10 +29,6 @@ void servo_move(PolarCoordinate position) {
     return;
   }
 
-  if ( debugPosition) {
-    Serial.printf( " AZ: %4d", (int)position.az );
-    Serial.printf( " EL: %4d", (int)position.el );
-  }
 
   int maxDifference = 0;
 

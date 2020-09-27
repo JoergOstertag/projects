@@ -48,8 +48,6 @@ ResultStorageHandler resultStorageHandler;
 ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 
 
-int preMeasureDelay = 20;
-
 unsigned int resultArrayIndex = 0;
 
 #define DIST_MIN 1
@@ -141,7 +139,7 @@ void drawRoomLayout() {
           out += temp;
         }
       }
-      
+
       y = y2;
       x = x2;
       server.sendContent(out);
@@ -156,7 +154,7 @@ void drawRoomLayout() {
   }
 
   {
-    out = "<text x=\"0\" y=\"15\" fill=\"blue\">maxVal: ";
+    out = "<text x=\"0\" y=\"15\" fill=\"blue\">max Dist: ";
     out += maxVal;
     out += "</text>\n";
 
@@ -185,20 +183,21 @@ void distanceGraph() {
   server.send(200, "image/svg+xml", "");
 
 
-  String out;
-  out.reserve(2600);
-  char temp[70];
+  char temp[100];
   int width = 900;
   int height = 300;
 
-  out += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"";
-  out += String(width) + "\" height=\"" + String( height) + "\">\n";
+  {
+    String out;
+    out.reserve(1000);
+    out = "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"";
+    out += String(width) + "\" height=\"" + String( height) + "\">\n";
 
-  out += "<rect width=\"" + String(width) + "\" height=\"" + String(height) + "\" fill=\"rgb(250, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
-  out += "<g stroke=\"black\">\n";
+    out += "<rect width=\"" + String(width) + "\" height=\"" + String(height) + "\" fill=\"rgb(250, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
+    out += "<g stroke=\"black\">\n";
 
-  server.sendContent(out);
-
+    server.sendContent(out);
+  }
 
   int y = 0;
   int x = 0;
@@ -215,8 +214,7 @@ void distanceGraph() {
         if ( az > resultStorageHandler.servoPosAzMin ) {
           sprintf(temp, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%d\" stroke-width=\"1\" />\n", x, height - y, x2, height - y2);
         }
-        out = temp;
-        server.sendContent(out);
+        server.sendContent(temp);
 
       }
       y = y2;
@@ -226,7 +224,6 @@ void distanceGraph() {
   server.sendContent(F("</g>\n"
                        "</svg>\n"));
 
-  server.sendContent("");
   server.chunkedResponseFinalize();
 }
 
@@ -245,7 +242,9 @@ String upTimeString() {
 }
 
 String inputForms() {
-  String output = "\n";
+  String output ;
+  output.reserve(2000);
+  output= "\n";
 
   // border: 1px solid green;
   output += "<div style=\"text-align:left; margin:8px; \">\n";
@@ -296,26 +295,31 @@ void handleRoot() {
     resultStorageHandler.resetResults();
   }
 
-  String output = "<html>\n\
-  <head>\n\
-    <meta http-equiv='refresh' content='5'/>\n\
-    <title>ESP8266 Distance</title>\n\
-    <style>\n\
-      body {\n\
-       background-color: #cccccc;\n\
-       font-family: Arial, Helvetica, Sans-Serif;\n\
-       Color: #000088;\n\
-       }\n\
-    </style>\n\
-  </head>\n\n";
+  server.setContentLength(CONTENT_LENGTH_UNKNOWN);   //Enable Chunked Transfer
 
-  output += "  <body>\n";
-  output += "\n";
-  output += "  <h2>ESP8266 3D-Scanner</h2>\n\n";
+  server.send(200, "text/html", F("<html>\n"
+                                  "<head>\n"
+                                  "  <meta http-equiv='refresh' content='20'/>\n"
+                                  "  <title>ESP8266 Distance</title>\n"
+                                  "  <style>\n"
+                                  "    body {\n"
+                                  "     background-color: #cccccc;\n"
+                                  "     font-family: Arial, Helvetica, Sans-Serif;\n"
+                                  "     Color: #000088;\n"
+                                  "     }\n"
+                                  "  </style>\n"
+                                  "</head>\n"
+                                  "\n"
+                                  "<body>\n"
+                                  "\n"
+                                  "  <h3>ESP8266 3D-Scanner</h3>\n"
+                                  "\n"));
 
 
 
   {
+    String output ;
+    output.reserve(2000);
     output += "   <div style=\"float:left; width:100%; margin:8px;\">\n";
     {
       // Room Layout img Reference
@@ -332,12 +336,16 @@ void handleRoot() {
       // Uptime
       output += "      <p>" + upTimeString() + "</p>\n";
 
+      // Show Scan percentage
+      output += "      <p>Scan: " + String(resultArrayIndex * 100 / resultStorageHandler.maxIndex() ) + " %</p>\n";
+
       // Open Scad Reference
-      output += "      <p>\n";
-      output += "         <a href=\"/scan-3D.scad\">scan-3D.scad</a>\n";
-      output += "      </p>\n\n";
+      output += "      <p><a href=\"/scan-3D.scad\">scan-3D.scad</a></p>\n\n";
+      // CSV Reference
+      output += "      <p><a href=\"/scan.csv\">scan.csv</a></p>\n\n";
       output += "   </div>\n\n";
     }
+    server.sendContent(output); output = "";
 
     {
       // HTML Forms
@@ -349,24 +357,31 @@ void handleRoot() {
 
     output += "    </div>\n";
     output += "\n";
+    server.sendContent(output);
   }
 
-  // Distances Graf img reference
-  output += "\n";
-  output += "       <div style=\"float:left; margin:8px;\">\n";
-  output += "          <p>Distances:<p/>\n";
-  output += "          <img src=\"/distanceGraph.svg\" />\n";
-  output += "       </div>\n";
-  output += "\n";
 
-  // html End
-  output += "\n\n";
-  output += "  </body>\n";
-  output += "</html > \n";
-  server.send(200, "text/html", output);
+
+  // Distances Graf img reference
+
+  server.sendContent(F( "\n"
+                        "       <div style=\"float:left; margin:8px;\">\n"
+                        "          <p>Distances:<p/>\n"
+                        "          <img src=\"/distanceGraph.svg\" />\n"
+                        "       </div>\n"
+                        "\n"
+                        // html End
+                        "\n\n"
+                        "  </body>\n"
+                        "</html > \n"));
+
+  server.chunkedResponseFinalize();
 
 }
 
+/**
+   Separate Frame for input FOrm
+*/
 void handleInputForm() {
 
   String output = "<html>\n\
@@ -392,22 +407,54 @@ void handleInputForm() {
   server.send(200, "text / html", output);
 }
 
-void handleScad() {
-  String output;
-  output.reserve(200);
+
+/**
+   Send Data as CSV
+*/
+void handleCSV() {
 
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);   //Enable Chunked Transfer
-  server.send(200, "text/plain", F(
-                "\n"
-                "\n"
-                "\n"
-                "// ===========================================================\n"
-                "// 3D-Scan with Distance Sensor\n"
-                "// ===========================================================\n"));
+  server.send(200, "text/csv", F("az;el;distance\n"));
+
+  String output;
+  output.reserve(2000);
 
   for ( int i = 0; i < resultStorageHandler.maxIndex(); i++) {
     PolarCoordinate position = resultStorageHandler.getPosition(i);
-    
+
+    output = position.az;
+    output += ";";
+    output += position.el;
+    output += ";";
+    output += resultStorageHandler.getResult(i);
+    output += "\n";
+
+    server.sendContent(output);
+  }
+  server.chunkedResponseFinalize();
+}
+
+/**
+   Send Open Scad File to Server connection
+*/
+void handleScad() {
+
+  server.setContentLength(CONTENT_LENGTH_UNKNOWN);   //Enable Chunked Transfer
+  server.send(200, "text/plain", F(
+                "// ===========================================================\n"
+                "// 3D-Scan with Distance Sensor\n"
+                "// ===========================================================\n"
+                "fov=20;\n"
+                "\n"
+                "\n"
+                "\n"
+                "\n"
+              ));
+
+  for ( int i = 0; i < resultStorageHandler.maxIndex(); i++) {
+    PolarCoordinate position = resultStorageHandler.getPosition(i);
+
+    String output;
     output = "segment(";
     output += "az=";
     output += position.az;
@@ -419,14 +466,7 @@ void handleScad() {
 
     output += "dist=";
     output += resultStorageHandler.getResult(i);
-    output += ");";
-
-
-    // output += "// el=";
-    // output += el;
-    // output += ", az= ";
-    // output += az;
-    output += "\n";
+    output += ");\n";
 
     server.sendContent(output);
   }
@@ -436,14 +476,13 @@ void handleScad() {
                         "\n"
                         "module segment(az=0,el=0,dist=20){\n"
                         "if ( dist > 0 ) {\n"
-                        "    fov=20;\n"
                         "    tanFactor=tan(fov);\n"
                         "    deltaDist= .1;\n"
                         "    dist1= dist-deltaDist;\n"
                         "\n"
-                        "      rotate( [0,el,az] )\n"
+                        "      rotate( [el,0,-az] )\n"
                         "        rotate( [-90,0,0] )\n"
-                        "          translate([dist1,0,0])\n"
+                        "          translate([0,0,dist1])\n"
                         "            cylinder( d1= tanFactor*dist1,\n"
                         "                      d2= tanFactor*dist,\n"
                         "                       h= deltaDist );\n"
@@ -470,18 +509,75 @@ void handleNotFound() {
   }
 
   server.send(404, "text/plain", message);
-  Serial.println("Sent 2D Scad File");
 }
 
 
 void measure() {
 
-  delay(preMeasureDelay);
-
   int dist_mm = getDistance(debugDistance);
   resultStorageHandler.putResult(resultArrayIndex, dist_mm);
 }
 
+
+void showMemory() {
+  uint16_t maxBlock = ESP.getMaxFreeBlockSize();
+  uint32_t freeHeap = ESP.getFreeHeap();
+  Serial.print("Free-Heap: "); Serial.print(freeHeap / 1024); Serial.println("KB");
+  Serial.print("MaxFreeBlockSize: "); Serial.print( maxBlock / 1024); Serial.println("KB");
+}
+
+void loop() {
+
+  if (servoStepActive > 0) {
+    if ( resultArrayIndex == 0 ) {
+      Serial.println();
+
+      showMemory();
+
+      Serial.println();
+
+      Serial.print("servoNumPointsAz= " );       Serial.println( resultStorageHandler.servoNumPointsAz() );
+      Serial.print("servoNumPointsEl= " );       Serial.println( resultStorageHandler.servoNumPointsEl() );
+      Serial.print("maxIndex: ");                Serial.println(resultStorageHandler.maxIndex() );
+      Serial.print("MAX_RESULT_INDEX: ");        Serial.println(MAX_RESULT_INDEX);
+
+      if ( resultStorageHandler.maxIndex() >= MAX_RESULT_INDEX) {
+        Serial.println("!!!!!! Warning maxIndex() >= MAX_RESULT_INDEX !!!!!!!!");
+        delay(5 * 1000);
+      }
+
+      Serial.println();
+      delay(1000);
+
+    }
+
+    resultStorageHandler.debugPosition( resultArrayIndex);
+
+  }
+
+  measure();
+
+
+  if (servoStepActive > 0) {
+    resultArrayIndex = resultStorageHandler.nextPositionServo(resultArrayIndex);
+    PolarCoordinate position = resultStorageHandler.getPosition(resultArrayIndex);
+
+    if ( debugDistance) {
+      Serial.printf( "       New ArrayPos: %5u", resultArrayIndex);
+    }
+
+    servo_move(position);
+  }
+
+
+  if (ACTIVATE_WEBSERVER) {
+    server.handleClient();
+    MDNS.update();
+  }
+
+  Serial.println();
+
+}
 
 void setup() {
   debugDistance = true;
@@ -513,6 +609,7 @@ void setup() {
 
   initDistance();
 
+
   // Make ourselfs visible with M-DNS
   if (MDNS.begin(F("3D-SCANNER"))) {
     Serial.println(F("MDNS responder started"));
@@ -525,6 +622,7 @@ void setup() {
     server.on("/", handleRoot);
     server.on("/distanceGraph.svg", distanceGraph);
     server.on("/scan-3D.scad", handleScad);
+    server.on("/scan.csv", handleCSV);
     server.on("/roomLayout.svg", drawRoomLayout);
     server.on("/inputForm.html", handleInputForm);
 
@@ -532,44 +630,5 @@ void setup() {
     server.begin();
   }
   Serial.println("HTTP server started");
-
-  Serial.print("Free Mem on Heap: ");
-  Serial.print(ESP.getFreeHeap() / 1024.0, DEC);
-  Serial.println(" KB");
-}
-
-void loop() {
-
-  if (servoStepActive > 0) {
-    resultArrayIndex = resultStorageHandler.nextPositionServo(resultArrayIndex);
-    PolarCoordinate position = resultStorageHandler.getPosition(resultArrayIndex);
-
-    if ( debugDistance) {
-      Serial.printf( " ArrayPos: %5u", resultArrayIndex);
-    }
-    servo_move(position);
-  }
-
-  if ( resultArrayIndex == 0 ) {
-
-    Serial.println();
-    Serial.print(" servoNumPointsAz= " );
-    Serial.print( resultStorageHandler.servoNumPointsAz() );
-    Serial.print(" servoNumPointsEl= " );
-    Serial.print( resultStorageHandler.servoNumPointsEl() );
-    Serial.println();
-    delay(1000);
-
-  }
-
-  measure();
-
-
-  if (ACTIVATE_WEBSERVER) {
-    server.handleClient();
-    MDNS.update();
-  }
-
-  Serial.println();
 
 }
