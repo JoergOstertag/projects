@@ -1,6 +1,5 @@
-
-#ifndef _HTML_FORM_HANDLER_H    
-#define _HTML_FORM_HANDLER_H    
+#ifndef _HTML_FORM_HANDLER_H
+#define _HTML_FORM_HANDLER_H
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
@@ -12,4 +11,4 @@ boolean parseParameter(ESP8266WebServer &server, String name, float &value );
 String formString(String name, int value);
 String formString(String name, float value);
 
-#endif // _HTML_FORM_HANDLER_H    // Put this line at the end of your file.
+#endif // _HTML_FORM_HANDLER_H
