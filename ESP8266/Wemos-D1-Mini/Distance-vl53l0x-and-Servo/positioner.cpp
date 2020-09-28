@@ -1,7 +1,7 @@
 #include "positioner.h"
 
-#define PIN_SERVO_AZ D8
-#define PIN_SERVO_EL D7
+#define PIN_SERVO_AZ D3
+#define PIN_SERVO_EL D4
 
 int servoStepActive = 1;
 boolean debugPosition = true;

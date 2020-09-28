@@ -2,6 +2,18 @@
 
 ResultStorageHandler::ResultStorageHandler() {
   _result = (short*) malloc( sizeof(short) * (MAX_RESULT_INDEX + 1));
+
+  if ( false ) {
+    servoPosAzMin = -10;
+    servoPosAzMax =  10;
+    servoStepAz   =   2;
+
+    servoPosElMin =  1;
+    servoPosElMax =  2;
+    servoStepEl   =   3;
+
+    debugResultPosition=true;
+  }
 }
 
 boolean ResultStorageHandler::checkPosition(unsigned int resultArrayIndex) {
@@ -80,12 +92,12 @@ unsigned int ResultStorageHandler::maxIndex() {
 
 
 unsigned int ResultStorageHandler::servoNumPointsAz() {
-  unsigned int result = (servoPosAzMax - servoPosAzMin) / servoStepAz;
+  unsigned int result = (servoPosAzMax - servoPosAzMin) / servoStepAz+1;
   return result ;
 }
 
 unsigned int ResultStorageHandler::servoNumPointsEl() {
-  unsigned int result = (servoPosElMax - servoPosElMin) / servoStepEl;
+  unsigned int result = (servoPosElMax - servoPosElMin) / servoStepEl+1;
   return result;
 }
 

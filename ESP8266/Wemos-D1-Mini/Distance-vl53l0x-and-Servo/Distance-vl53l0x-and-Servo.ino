@@ -42,6 +42,9 @@
 #include "webServer.h"
 #include "resultStorageHandler.h"
 #include "positioner.h"
+#include "timeHelper.h"
+
+#include "sdCardWrite.h"
 
 ResultStorageHandler resultStorageHandler;
 
@@ -62,6 +65,9 @@ unsigned int resultArrayIndex = 0;
 
 ESP8266WebServer server(80);
 
+void writeToSdCard(){
+  sdCardWrite(resultStorageHandler);
+}
 
 boolean handleParameters() {
   boolean changes = false;
@@ -229,22 +235,10 @@ void distanceGraph() {
 
 
 
-
-String upTimeString() {
-  char temp[100];
-  int sec = millis() / 1000;
-  int min = sec / 60;
-  int hr = min / 60;
-
-  snprintf(temp, 100, "Uptime: %02d:%02d:%02d ", hr, min % 60, sec % 60 );
-  String result = String(temp);
-  return result;
-}
-
 String inputForms() {
   String output ;
   output.reserve(2000);
-  output= "\n";
+  output = "\n";
 
   // border: 1px solid green;
   output += "<div style=\"text-align:left; margin:8px; \">\n";
@@ -526,6 +520,7 @@ void showMemory() {
   Serial.print("MaxFreeBlockSize: "); Serial.print( maxBlock / 1024); Serial.println("KB");
 }
 
+
 void loop() {
 
   if (servoStepActive > 0) {
@@ -557,6 +552,10 @@ void loop() {
 
   measure();
 
+
+  if ( resultArrayIndex >= (resultStorageHandler.maxIndex() - 1)) {
+    writeToSdCard();
+  }
 
   if (servoStepActive > 0) {
     resultArrayIndex = resultStorageHandler.nextPositionServo(resultArrayIndex);
@@ -609,6 +608,8 @@ void setup() {
 
   initDistance();
 
+  initTimeHelper();
+
 
   // Make ourselfs visible with M-DNS
   if (MDNS.begin(F("3D-SCANNER"))) {
@@ -625,6 +626,7 @@ void setup() {
     server.on("/scan.csv", handleCSV);
     server.on("/roomLayout.svg", drawRoomLayout);
     server.on("/inputForm.html", handleInputForm);
+    server.on("/writeToSdCard.cgi", writeToSdCard);
 
     server.onNotFound(handleNotFound);
     server.begin();
