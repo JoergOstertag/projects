@@ -38,7 +38,7 @@
 #include <ESP_WiFiManager.h>              //https://github.com/khoih-prog/ESP_WiFiManager
 
 #include "htmlFormHandler.h"
-#include "getDistance.h"
+#include "getDistanceVl53L0X.h"
 #include "webServer.h"
 #include "resultStorageHandler.h"
 #include "positioner.h"
