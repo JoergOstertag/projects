@@ -1,8 +1,8 @@
 
 /**
    Naming of Pin D0 ==> 16 // Wake
-   Naming of Pin D1 ==> 5  // Wemos Relay Shield
-   Naming of Pin D2 ==> 4
+   Naming of Pin D1 ==> 5  // (I2C SCL) Wemos Relay Shield
+   Naming of Pin D2 ==> 4  // (I2C SDA)
    Naming of Pin D3 ==> 0  // Button Shield
    Naming of Pin D4 ==> 2  // Default SDA if Wire.h
    Naming of Pin D5 ==> 14 // Default SCL of Wire.h; Default SCLK of SPI
