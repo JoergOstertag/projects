@@ -1,16 +1,9 @@
-#ifndef _GET_DISTANCE
-#define _GET_DISTANCE
+#ifndef _GET_DISTANCE_VL53L0X
+#define _GET_DISTANCE_VL53L0X
 
-#include "Adafruit_VL53L0X.h"
+#include <Arduino.h>
 
-extern int distanceMaxRetry;
-extern int distanceRetryDelay;
-extern boolean debugDistance;
-extern int distanceFov;
-extern int preMeasureDelay;
-
-void initDistance();
-int getDistance(boolean debugDistance);
-
+void initDistanceVl53L0X();
+int getDistanceVl53L0X(boolean debugDistance);
 
 #endif

@@ -1,25 +1,4 @@
 /**
-  Example taken from
-    http://www.esp8266learning.com/vl53l0x-time-of-flight-sensor-and-esp8266.php
-
-  Datasheet:
-    https://www.st.com/resource/en/datasheet/vl53l0x.pdf
-
-  Features of sensor:
-    Measuring Field of view covered (FOV = 25 degrees)
-    Measuring Range: (normal 1.2m) (long distance 2m)
-    Measuring Time:
-      Total time including processing: 33ms(typical)
-      Measuring only: 20ms(default Accurycy +/-5%) 300ms(High Accuracy +/-3%)
-    Operating voltage 2.6 to 3.5 V
-    940 nm laser
-    I2C Up to 400 kHz (FAST mode) serial bus
-    I2C Address: 0x52
-
-  Buy:
-    https://www.aliexpress.com/item/32842745623.html
-    Price: 3.15€
-
 
   TODO:
   - adapt fov=20 to real value of sensor
@@ -31,6 +10,10 @@
   - refactor az/el calculation to have a loop over arrayindex (prevent rounding errors in index calculation)
 **/
 
+
+#include "getDistance.h"
+
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
@@ -38,7 +21,6 @@
 #include <ESP_WiFiManager.h>              //https://github.com/khoih-prog/ESP_WiFiManager
 
 #include "htmlFormHandler.h"
-#include "getDistanceVl53L0X.h"
 #include "webServer.h"
 #include "resultStorageHandler.h"
 #include "positioner.h"
@@ -65,7 +47,7 @@ unsigned int resultArrayIndex = 0;
 
 ESP8266WebServer server(80);
 
-void writeToSdCard(){
+void writeToSdCard() {
   sdCardWrite(resultStorageHandler);
 }
 

@@ -1,39 +1,40 @@
+#include "config.h"
+
+#include "getDistance.h"
 #include "getDistanceVl53L0X.h"
+#include "Adafruit_VL53L0X.h"
+
+/*
+  Example taken from
+    http://www.esp8266learning.com/vl53l0x-time-of-flight-sensor-and-esp8266.php
+
+  Datasheet:
+    https://www.st.com/resource/en/datasheet/vl53l0x.pdf
+
+  Features of sensor:
+    Measuring Field of view covered (FOV = 25 degrees)
+    Measuring Range: (normal 1.2m) (long distance 2m)
+    Measuring Time:
+      Total time including processing: 33ms(typical)
+      Measuring only: 20ms(default Accurycy +/-5%) 300ms(High Accuracy +/-3%)
+    Operating voltage 2.6 to 3.5 V
+    940 nm laser
+    I2C Up to 400 kHz (FAST mode) serial bus
+    I2C Address: 0x52
+
+  Buy:
+    https://www.aliexpress.com/item/32842745623.html
+    Price: 3.15€
+
+*/
+/**
+   If the measured DISTANCE is more than this we return a nagive Error Result
+*/
+#define MAX_DISTANCE 3000
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
-/**
- * If the measured DISTANCE is more than this we return a nagive Error Result
- */
-#define MAX_DISTANCE 3000
-
-/**
- * The Maximum Number of retries
- */
-int distanceMaxRetry = 2;
-
-/**
- * If we need a retry we wait for this long
- */
-int distanceRetryDelay = 20;
-
-/**
- * Field of View of the Distance Sensor
- */
-int distanceFov = 20;
-
-/**
- * Print Debugging output for Distance on Serial Console
- */
-boolean debugDistance = true;
-
-
-/**
- * delay before measuring
- */
-int preMeasureDelay=0;
- 
-void initDistance() {
+void initDistanceVl53L0X() {
   Serial.println("Conneting Adafruit VL53L0X ...");
   if (!lox.begin()) {
     Serial.println(F("Failed to boot VL53L0X"));
@@ -42,7 +43,7 @@ void initDistance() {
   }
 }
 
-int getDistance(boolean debugDistance) {
+int getDistanceVl53L0X(boolean debugDistance) {
 
   delay(preMeasureDelay);
 
@@ -71,7 +72,7 @@ int getDistance(boolean debugDistance) {
   } else {
     dist_mm = -2;
   }
-  
+
   if ( debugDistance) {
     Serial.print( " Distance: " + String(dist_mm));
     if ( dist_mm > 0 && retryCount > 0) {

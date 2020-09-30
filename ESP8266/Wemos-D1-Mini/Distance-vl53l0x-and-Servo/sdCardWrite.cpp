@@ -18,6 +18,9 @@
 */
 #include "sdCardWrite.h"
 
+#ifdef USE_SD_CARD
+
+
 #include "timeHelper.h"
 #include "resultStorageHandler.h"
 
@@ -52,7 +55,31 @@ void readSdCardFile(String fileName) {
   }
 }
 
-void sdCardWrite(ResultStorageHandler &resultStorageHandler) {
+
+void sdCardFileCountLines(String fileName) {
+  // re-open the file for reading:
+  myFile = SD.open(fileName);
+  if (myFile) {
+    Serial.println("test.txt:");
+
+    // read from the file until there's nothing else in it:
+    int lineCount = 0;
+    while (myFile.available()) {
+      myFile.read();
+      lineCount++;
+      ESP.wdtFeed();
+      delay(1);
+    }
+    // close the file:
+    myFile.close();
+    Serial.printf("Seen %d Lines\n", lineCount);
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
+  }
+}
+
+void sdCardWriteInternal(ResultStorageHandler &resultStorageHandler) {
 
   Serial.print(F("\nInitializing SD card..."));
 
@@ -98,5 +125,15 @@ void sdCardWrite(ResultStorageHandler &resultStorageHandler) {
     Serial.println("error opening test.txt");
   }
 
-  readSdCardFile(fileName);
+  sdCardFileCountLines(fileName);
+}
+#endif
+
+void sdCardWrite(ResultStorageHandler &resultStorageHandler) {
+#ifdef USE_SD_CARD
+  sdCardWriteInternal(ResultStorageHandler & resultStorageHandler);
+#else
+  Serial.println("Writing to SD DISABLED");
+
+#endif
 }
