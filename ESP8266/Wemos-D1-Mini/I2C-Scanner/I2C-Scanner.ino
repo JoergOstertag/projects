@@ -42,6 +42,8 @@ void loop()
   byte error, address;
   int nDevices;
 
+  Serial.println("");
+  Serial.println("------------------------------------------------------------");
   Serial.println("Scanning...");
 
   nDevices = 0;
@@ -58,21 +60,20 @@ void loop()
       if (address < 16)
         Serial.print("0");
       Serial.print(address, HEX);
-      Serial.println("  !");
+      Serial.print(" :");
 
       switch (address) {
-        case 0x29: Serial.println("\t\tLidar Sensor VL53L0X"); break;
-        case 0x3C: Serial.println("\t\tOLED Display"); break;
-        case 0x1E: Serial.println("\t\tHMC5883L"); break;
-        case 0x77: Serial.println("\t\tBMP Sensor"); break;
-        case 0x50: Serial.println("\t\tRTC DS1307"); break;
-        case 0x68: Serial.println("\t\tRTC DS1307|GY-521"); break;
-        case 0x48: Serial.println("\t\tPCF-8591 AD-Converter"); break;
-        case 0x03: Serial.println("\t\tGrove LCD RGB"); break;
-        case 0x62: Serial.println("\t\tGrove LCD RGB"); break;
-        case 0x70: Serial.println("\t\tGrove LCD RGB"); break;
-        default:
-          break;
+        case 0x29: Serial.println("\tLidar Sensor VL53L0X"); break;
+        case 0x3C: Serial.println("\tOLED Display"); break;
+        case 0x1E: Serial.println("\tHMC5883L"); break;
+        case 0x77: Serial.println("\tBMP Sensor"); break;
+        case 0x50: Serial.println("\tRTC DS1307"); break;
+        case 0x68: Serial.println("\tRTC DS1307|GY-521"); break;
+        case 0x48: Serial.println("\tPCF-8591 AD-Converter"); break;
+        case 0x03: Serial.println("\tGrove LCD RGB"); break;
+        case 0x62: Serial.println("\tGrove LCD RGB|Garmin Lidar Lite-V3"); break;
+        case 0x70: Serial.println("\tGrove LCD RGB"); break;
+        default:   Serial.println("");           break;
       };
 
       nDevices++;
