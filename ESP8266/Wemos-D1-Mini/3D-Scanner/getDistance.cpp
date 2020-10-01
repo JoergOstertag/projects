@@ -4,7 +4,8 @@
 
 #ifdef USE_DISTANCE_VL53L0X
 #include "getDistanceVl53L0X.h"
-#else
+#endif
+#ifdef _DISTANCE_LIDAR_LITE
 #include "getDistanceLidarLite.h"
 #endif
 
@@ -49,12 +50,13 @@ void initDistance() {
 int getDistance(boolean debugDistance) {
 
   delay(preMeasureDelay);
+  int dist_mm = -1;
 
 #ifdef _GET_DISTANCE_VL53L0X
-  int dist_mm = getDistanceVl53L0X(debugDistance);
+  dist_mm = getDistanceVl53L0X(debugDistance);
 #endif
 #ifdef _DISTANCE_LIDAR_LITE
-  int dist_mm = getDistanceLidarLite(debugDistance);
+  dist_mm = getDistanceLidarLite(debugDistance);
 #endif
 
   return dist_mm;
