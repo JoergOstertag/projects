@@ -24,3 +24,7 @@
 //#define MAX_RESULT_INDEX (14*1024)
 
 #define MAX_RESULT_INDEX (14*1024)
+
+// ----------------------------------
+// Web Server
+#define ACTIVATE_WEBSERVER true
