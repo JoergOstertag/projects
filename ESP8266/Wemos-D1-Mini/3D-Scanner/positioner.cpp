@@ -63,13 +63,20 @@ Servo servo_az;
 Servo servo_el;
 
 void pwmServoSet(int azValue, int elValue) {
+
+
+  servo_el.write(elValue);
+  servo_az.write(azValue );
+
+  delayServo( azValue, elValue);
+}
+
+void delayServo(int azValue, int elValue) {
+
   int maxDifference = 0;
 
   maxDifference = max(maxDifference , abs(servo_el.read() - elValue));
   maxDifference = max(maxDifference , abs(servo_az.read() - azValue));
-
-  servo_el.write(elValue);
-  servo_az.write(azValue );
 
   if ( false ) {
     Serial.print(  " maxDifference: " );
