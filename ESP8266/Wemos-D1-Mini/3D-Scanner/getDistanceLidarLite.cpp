@@ -75,6 +75,7 @@ void initDistanceLidarLite() {
 
 int getDistanceLidarLite(boolean debugDistance) {
 
+  // Serial.printf(" preMeasureDelay: %d", preMeasureDelay);
   delay(preMeasureDelay);
 
 
@@ -94,9 +95,16 @@ int getDistanceLidarLite(boolean debugDistance) {
   */
 
   // Take a measurement with receiver bias correction and print to serial terminal
-//  Serial.println(myLidarLite.distance());
+  //  Serial.println(myLidarLite.distance());
 
   // Take measurement without receiver bias correction
 
-  return myLidarLite.distance(false);
+  int dist_mm = -1;
+  //   dist_mm = myLidarLite.distance(false);
+  dist_mm = myLidarLite.distance();
+  if ( debugDistance) {
+    Serial.print( " Distance: " + String(dist_mm));
+  }
+
+  return dist_mm;
 }

@@ -14,6 +14,8 @@ int servoOffsetAZ = -90;
 int servoOffsetEL = -90;
 
 
+void delayServo(int azValue, int elValue);
+
 
 #ifdef SERVO_PCA
 
@@ -24,8 +26,8 @@ const size_t loop_delay = 100;
 const uint8_t channelAz = 0;
 const uint8_t channelEl = 1;
 
-const uint16_t servo_pulse_duration_min = 900;
-const uint16_t servo_pulse_duration_max = 2100;
+const uint16_t servo_pulse_duration_min = 200;
+const uint16_t servo_pulse_duration_max = 3400;
 const uint16_t servo_pulse_duration_increment = 100;
 
 
@@ -44,10 +46,11 @@ void initPositioner() {
 }
 
 
-void pwmServoSet(int azValue, int elValue) {
-  //  pulselength = map(degrees, 0, 180, SERVOMIN, SERVOMAX);
-  pca9685.setChannelServoPulseDuration(channelAz, servo_pulse_duration);
-  pca9685.setChannelServoPulseDuration(channelEl, servo_pulse_duration);
+void pcaServoSet(int azValue, int elValue) {
+  int servo_pulse_durationAz = map(azValue, 0, 180, servo_pulse_duration_min, servo_pulse_duration_max);
+  int servo_pulse_durationEl = map(elValue, 0, 180, servo_pulse_duration_min, servo_pulse_duration_max);
+  pca9685.setChannelServoPulseDuration(channelAz, servo_pulse_durationAz);
+  pca9685.setChannelServoPulseDuration(channelEl, servo_pulse_durationEl);
 }
 
 #endif
@@ -109,11 +112,11 @@ void servo_move(PolarCoordinate position) {
   int azValue = (servoCounterClockwiseAZ ? 180 - position.az : position.az) + servoOffsetAZ;
 
 #ifdef SERVO_PCA
-
   pcaServoSet(azValue, elValue);
 #else
   pwmServoSet(azValue, elValue);
 #endif
+
   if ( debugPosition) {
     Serial.printf( " AzValue: %4d", (int)azValue );
     Serial.printf( " ElValue: %4d", (int)elValue );

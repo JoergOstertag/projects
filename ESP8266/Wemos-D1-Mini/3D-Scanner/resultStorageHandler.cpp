@@ -6,7 +6,7 @@ ResultStorageHandler::ResultStorageHandler() {
   if ( false ) {
     servoPosAzMin = -10;
     servoPosAzMax =  10;
-    servoStepAz   =   2;
+    servoStepAz   =   1;
 
     servoPosElMin =  1;
     servoPosElMax =  2;

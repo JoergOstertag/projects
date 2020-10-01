@@ -5,7 +5,7 @@
 // ----------------------------------
 // Servos
 
-// #define SERVO_PCA
+#define SERVO_PCA
 //#define PIN_SERVO_AZ D7
 //#define PIN_SERVO_EL D8
 
@@ -15,7 +15,7 @@
 // ----------------------------------
 // Distance Sensor
 // #define USE_DISTANCE_VL53L0X
-// #define _DISTANCE_LIDAR_LITE
+#define USE_DISTANCE_LIDAR_LITE
 
 /**
    Result storage Handler
