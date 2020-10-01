@@ -18,8 +18,10 @@
 */
 #include "sdCardWrite.h"
 
+
 #ifdef USE_SD_CARD
 
+char *FOLDER_NAME = "3D-Scans";
 
 #include "timeHelper.h"
 #include "resultStorageHandler.h"
@@ -60,7 +62,7 @@ void sdCardFileCountLines(String fileName) {
   // re-open the file for reading:
   myFile = SD.open(fileName);
   if (myFile) {
-    Serial.println("test.txt:");
+    Serial.print("Check " + fileName + "\n");
 
     // read from the file until there's nothing else in it:
     int lineCount = 0;
@@ -76,6 +78,15 @@ void sdCardFileCountLines(String fileName) {
   } else {
     // if the file didn't open, print an error:
     Serial.println("error opening test.txt");
+  }
+}
+
+// Create a new folder.
+void createFolder() {
+  if (!SD.mkdir(FOLDER_NAME)) {
+    Serial.printf(F("Create %s failed"), FOLDER_NAME );
+  } else {
+    Serial.printf(F("Createed %s"), FOLDER_NAME );
   }
 }
 
@@ -119,10 +130,10 @@ void sdCardWriteInternal(ResultStorageHandler &resultStorageHandler) {
 
     // close the file:
     myFile.close();
-    Serial.println("done.");
+    Serial.println("Writing " + fileName + "done.");
   } else {
     // if the file didn't open, print an error:
-    Serial.println("error opening test.txt");
+    Serial.print("!!!! ERROR opening " + fileName + "\n");
   }
 
   sdCardFileCountLines(fileName);
@@ -131,9 +142,17 @@ void sdCardWriteInternal(ResultStorageHandler &resultStorageHandler) {
 
 void sdCardWrite(ResultStorageHandler &resultStorageHandler) {
 #ifdef USE_SD_CARD
-  sdCardWriteInternal(ResultStorageHandler & resultStorageHandler);
+  sdCardWriteInternal(resultStorageHandler);
 #else
   Serial.println("Writing to SD DISABLED");
+#endif
+}
 
+
+void initSdCard() {
+#ifdef USE_SD_CARD
+  createFolder();
+#else
+  Serial.println("Writing to SD DISABLED");
 #endif
 }

@@ -5,5 +5,6 @@
 #include "resultStorageHandler.h"
 
 void sdCardWrite(ResultStorageHandler &resultStorageHandler);
+void initSdCard();
 
 #endif

@@ -544,7 +544,7 @@ void loop() {
     PolarCoordinate position = resultStorageHandler.getPosition(resultArrayIndex);
 
     if ( debugDistance) {
-      Serial.printf( "       New ArrayPos: %5u", resultArrayIndex);
+      //Serial.printf( "       New ArrayPos: %5u", resultArrayIndex);
     }
 
     servo_move(position);
@@ -591,6 +591,8 @@ void setup() {
   initDistance();
 
   initTimeHelper();
+  initSdCard();
+  
 
 
   // Make ourselfs visible with M-DNS

@@ -13,12 +13,12 @@ boolean servoCounterClockwiseEL = true;
 int servoOffsetAZ = -90;
 int servoOffsetEL = -90;
 
+PolarCoordinate servoLastPosition = {0, 0};
 
-void delayServo(int azValue, int elValue);
+void delayServo(PolarCoordinate position);
 
 
 #ifdef SERVO_PCA
-
 const uint8_t device_address = 0x40;
 
 const size_t loop_delay = 100;
@@ -26,9 +26,10 @@ const size_t loop_delay = 100;
 const uint8_t channelAz = 0;
 const uint8_t channelEl = 1;
 
-const uint16_t servo_pulse_duration_min = 200;
-const uint16_t servo_pulse_duration_max = 3400;
-const uint16_t servo_pulse_duration_increment = 100;
+const uint16_t servoAzPulse_0 = 2360;
+const uint16_t servoAzPulse_180 = 610;
+const uint16_t servoElPulse_0 = 610;
+const uint16_t servoElPulse_180 = 2360;
 
 
 #include <PCA9685.h>
@@ -39,20 +40,22 @@ uint16_t servo_pulse_duration;
 
 void initPositioner() {
   pca9685.setupSingleDevice(Wire, device_address);
-
   pca9685.setToServoFrequency();
 
-  servo_pulse_duration = servo_pulse_duration_min;
 }
 
 
-void pcaServoSet(int azValue, int elValue) {
-  int servo_pulse_durationAz = map(azValue, 0, 180, servo_pulse_duration_min, servo_pulse_duration_max);
-  int servo_pulse_durationEl = map(elValue, 0, 180, servo_pulse_duration_min, servo_pulse_duration_max);
+void pcaServoSet(PolarCoordinate position) {
+  int servo_pulse_durationAz = map(position.az, 0, 180, servoAzPulse_0, servoAzPulse_180);
+  int servo_pulse_durationEl = map(position.el, 0, 180, servoElPulse_0, servoElPulse_180);
+  if ( debugPosition) {
+    Serial.printf( " AzPulse: %4d", (int)servo_pulse_durationAz );
+    Serial.printf( " ElPulse: %4d", (int)servo_pulse_durationAz );
+  }
   pca9685.setChannelServoPulseDuration(channelAz, servo_pulse_durationAz);
   pca9685.setChannelServoPulseDuration(channelEl, servo_pulse_durationEl);
+  delay(loop_delay );
 }
-
 #endif
 
 
@@ -60,26 +63,28 @@ void pcaServoSet(int azValue, int elValue) {
 // PWM
 // ------------------------------------------------------
 #ifndef SERVO_PCA
-
-
 Servo servo_az;
 Servo servo_el;
 
-void pwmServoSet(int azValue, int elValue) {
-
-
-  servo_el.write(elValue);
-  servo_az.write(azValue );
-
-  delayServo( azValue, elValue);
+void pwmServoSet(PolarCoordinate position) {
+  servo_el.write(position.el);
+  servo_az.write(position.az );
 }
 
-void delayServo(int azValue, int elValue) {
+void initPositioner() {
+  Serial.println("Attaching Servo ...");
+  servo_az.attach(PIN_SERVO_AZ);  // attaches the servo
+  servo_el.attach(PIN_SERVO_EL);  // attaches the servo
+}
+#endif
+
+
+void delayServo(PolarCoordinate position) {
 
   int maxDifference = 0;
 
-  maxDifference = max(maxDifference , abs(servo_el.read() - elValue));
-  maxDifference = max(maxDifference , abs(servo_az.read() - azValue));
+  maxDifference = max(maxDifference , abs(servoLastPosition.el - position.el));
+  maxDifference = max(maxDifference , abs(servoLastPosition.az - position.az));
 
   if ( false ) {
     Serial.print(  " maxDifference: " );
@@ -87,17 +92,6 @@ void delayServo(int azValue, int elValue) {
   }
   delay(1000 * maxDifference / 180);
 }
-
-
-void initPositioner() {
-  Serial.println("Attaching Servo ...");
-  servo_az.attach(PIN_SERVO_AZ);  // attaches the servo
-  servo_el.attach(PIN_SERVO_EL);  // attaches the servo
-}
-
-#endif
-
-
 /**
     -----------------------------------------------------------------
   TODO: remove parameter ResultStorageHandler resultStorageHandler
@@ -107,20 +101,18 @@ void servo_move(PolarCoordinate position) {
     return;
   }
 
-
-  int elValue = (servoCounterClockwiseEL ? 180 - position.el : position.el) + servoOffsetEL;
-  int azValue = (servoCounterClockwiseAZ ? 180 - position.az : position.az) + servoOffsetAZ;
-
 #ifdef SERVO_PCA
-  pcaServoSet(azValue, elValue);
+  pcaServoSet(position);
 #else
-  pwmServoSet(azValue, elValue);
+  pwmServoSet(position);
 #endif
 
   if ( debugPosition) {
-    Serial.printf( " AzValue: %4d", (int)azValue );
-    Serial.printf( " ElValue: %4d", (int)elValue );
+    Serial.printf( " AzValue: %4d", (int)position.az );
+    Serial.printf( " ElValue: %4d", (int)position.el );
   }
 
+  delayServo(position);
 
+  servoLastPosition = position;
 }

@@ -3,17 +3,6 @@
 ResultStorageHandler::ResultStorageHandler() {
   _result = (short*) malloc( sizeof(short) * (MAX_RESULT_INDEX + 1));
 
-  if ( false ) {
-    servoPosAzMin = -10;
-    servoPosAzMax =  10;
-    servoStepAz   =   1;
-
-    servoPosElMin =  1;
-    servoPosElMax =  2;
-    servoStepEl   =   3;
-
-    debugResultPosition=true;
-  }
 }
 
 boolean ResultStorageHandler::checkPosition(unsigned int resultArrayIndex) {
