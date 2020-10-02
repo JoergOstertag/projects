@@ -4,7 +4,8 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-
+#include "sdCardWrite.h"
+#include "SdFat.h"
 
 #include "htmlFormHandler.h"
 #include "webServer.h"
@@ -17,11 +18,46 @@
 
 #define SIZE_2D_GRAPH 600
 
+//SdFat SD;
+//File myFile;
+
+
 ESP8266WebServer server(80);
 
 extern unsigned int resultArrayIndex;
 
 extern ResultStorageHandler resultStorageHandler;
+
+/**
+  void deliverSdCardFile(String fileName) {
+
+  myFile = SD.open(fileName);
+  if (myFile) {
+    Serial.print("Check " + fileName + "\n");
+    server.streamFile(myFile, "text/plain");
+    // close the file:
+    myFile.close();
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
+  }
+
+
+  server.chunkedResponseFinalize();
+  }
+*/
+
+void handleFile() {
+  for (int i = 0; i < server.args(); i++) {
+
+    Serial.print("Arg nº" + (String)i + " – > ");
+    Serial.print(server.argName(i) + ": ");
+    Serial.print( server.arg(i) + "\n");
+  }
+  //deliverSdCardFile("test.txt");
+
+}
+
 boolean handleParameters() {
   boolean changes = false;
   if ( servoStepActive == 0) {
@@ -47,6 +83,7 @@ boolean handleParameters() {
 
   return changes;
 }
+
 
 void distanceGraph() {
 
@@ -480,7 +517,7 @@ void initWebserver(ResultStorageHandler &newResultStorageHandler) {  // Register
     server.on("/roomLayout.svg", drawRoomLayout);
     server.on("/inputForm.html", handleInputForm);
     server.on("/writeToSdCard.cgi", writeToSdCard);
-
+    server.on("/file", handleFile);
     server.onNotFound(handleNotFound);
     server.begin();
   }

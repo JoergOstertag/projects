@@ -17,22 +17,26 @@
 
 */
 #include "sdCardWrite.h"
+#include "timeHelper.h"
+#include "resultStorageHandler.h"
+#include <SPI.h>
 
 
 #ifdef USE_SD_CARD
 
-char *FOLDER_NAME = "3D-Scans";
-
-#include "timeHelper.h"
-#include "resultStorageHandler.h"
-
-#include <SPI.h>
-#include "SdFat.h"
-SdFat SD;
-
 #define SD_CS_PIN SS
+
+char *resultFolderName = "3D-Scans";
+
+SdFat SD;
 File myFile;
 
+
+// open the file for reading:
+File sdOpen(String fileName) {
+  myFile = SD.open(fileName);
+  return myFile;
+}
 
 void readSdCardFile(String fileName) {
   // re-open the file for reading:
@@ -83,10 +87,10 @@ void sdCardFileCountLines(String fileName) {
 
 // Create a new folder.
 void createFolder() {
-  if (!SD.mkdir(FOLDER_NAME)) {
-    Serial.printf(F("Create %s failed"), FOLDER_NAME );
+  if (!SD.mkdir(resultFolderName)) {
+    Serial.printf(F("Create %s failed"), resultFolderName );
   } else {
-    Serial.printf(F("Createed %s"), FOLDER_NAME );
+    Serial.printf(F("Createed %s"), resultFolderName );
   }
 }
 
