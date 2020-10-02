@@ -16,11 +16,11 @@ bool parseParameter(ESP8266WebServer &server, String name, float &value ) {
   String parameterString = server.arg(name);
   if (parameterString != "") {
     int newValue = parameterString.toFloat();
-    if ( newValue != value ) {
+    if ( newValue != value )
       value = newValue;
-      return true;
-    }
+    return true;
   }
+
   return false;
 }
 
@@ -29,9 +29,29 @@ String formString(String name, int value) {
   output += "          <tr><td>" + name + ": </td><td><input type=\"text\" name=\"" + name + "\" value=\"";
   output += value;
   output += "\"></td></tr>\n";
-  
+
   return output;
 }
+
+
+
+String formString(String name, bool value) {
+  String output = "          "
+                  "<tr><td>"
+                  + name
+                  + ": </td><td>"
+                  + " <input "
+                  + " type=\"checkbox\""
+                  + " id=\"" + name + "\""
+                  + " name=\"" + name + "\""
+                  + ( value ? " checked" : " " )
+                  + " > \n"
+                  + "<label for = \"" + name + "\">" + name + "</label>"
+                  + "</td></tr>\n";
+  return output;
+}
+
+
 
 String formString(String name, float value) {
   String output = "";

@@ -208,13 +208,13 @@ void handleRoot() {
 
       // Open Scad Reference
       output += "      <p><a href=\"/scan-3D.scad\" target=\"_blank\">scan-3D.scad</a></p>\n\n";
-      
+
       // CSV Reference
       output += "      <p><a href=\"/scan.csv\"  target=\"_blank\">scan.csv</a></p>\n\n";
 
       // /distanceGraph.svg
       output += "      <p><a href=\"/distanceGraph.svg\"  target=\"_blank\">distanceGraph.svg</a></p>\n\n";
-      
+
       output += "   </div>\n\n";
     }
     server.sendContent(output); output = "";
@@ -335,6 +335,10 @@ void handleInputForm() {
 void deliverCSV() {
   Serial.print("deliverCSV ... ");
 
+  String filename = "scan-3D.csv";
+
+  server.sendHeader("Content-Disposition", "attachment; filename=" + filename);
+
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);   //Enable Chunked Transfer
   server.send(200, "text/csv", F("az;el;distance\n"));
 
@@ -364,8 +368,11 @@ void deliverCSV() {
 void deliverScad() {
   Serial.print("deliverScad ... ");
 
+  String filename = "scan-3D.scad";
+  server.sendHeader("Content-Disposition", "attachment; filename=" + filename);
+
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);   //Enable Chunked Transfer
-  server.send(200, "text/plain", F(
+  server.send(200, "application/x-openscad", F(
                 "// ===========================================================\n"
                 "// 3D-Scan with Distance Sensor\n"
                 "// ===========================================================\n"

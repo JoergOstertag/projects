@@ -11,6 +11,12 @@
 #endif
 
 
+#ifdef USE_DISTANCE_HCSR04
+#include <HCSR04.h>
+
+UltraSonicDistanceSensor distanceSensor(D3, D4);
+#endif
+
 /**
    The Maximum Number of retries
 */
@@ -47,6 +53,7 @@ void initDistance() {
   initDistanceLidarLite();
 #endif
 
+
 }
 
 int getDistance(bool debugDistance) {
@@ -59,6 +66,10 @@ int getDistance(bool debugDistance) {
 #endif
 #ifdef USE_DISTANCE_LIDAR_LITE
   dist_mm = getDistanceLidarLite(debugDistance);
+#endif
+
+#ifdef USE_DISTANCE_HCSR04
+  dist_mm = 10.0 * distanceSensor.measureDistanceCm();
 #endif
 
   return dist_mm;
