@@ -19,6 +19,8 @@
 #include "sdCardWrite.h"
 #include "timeHelper.h"
 #include "resultStorageHandler.h"
+
+#include "SdFat.h"
 #include <SPI.h>
 
 

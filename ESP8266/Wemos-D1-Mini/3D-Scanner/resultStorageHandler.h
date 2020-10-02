@@ -3,7 +3,7 @@
 
 #include "config.h"
 
-#include "Arduino.h"
+//#include "Arduino.h"
 
 /**
    polar Coordinate
@@ -20,7 +20,7 @@ class ResultStorageHandler {
 
 
 
-    boolean debugResultPosition = true;
+    bool debugResultPosition = true;
 
     float servoPosAzMin =   0;
     float servoPosAzMax = 180;
@@ -39,7 +39,7 @@ class ResultStorageHandler {
     unsigned int maxIndex();
     unsigned int servoNumPointsAz();
     unsigned int servoNumPointsEl();
-    boolean checkPosition(unsigned int resultArrayIndex);
+    bool checkPosition(unsigned int resultArrayIndex);
     void debugPosition( unsigned int resultArrayIndex);
 
     int resultMax();

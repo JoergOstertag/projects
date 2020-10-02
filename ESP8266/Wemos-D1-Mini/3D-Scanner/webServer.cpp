@@ -1,15 +1,13 @@
-#include "config.h"
 #include "webServer.h"
+#include "config.h"
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-#include "sdCardWrite.h"
-#include "SdFat.h"
 
 #include "htmlFormHandler.h"
-#include "webServer.h"
 #include "resultStorageHandler.h"
+
 #include "positioner.h"
 #include "timeHelper.h"
 #include "getDistance.h"
@@ -17,10 +15,6 @@
 #include "sdCardWrite.h"
 
 #define SIZE_2D_GRAPH 600
-
-//SdFat SD;
-//File myFile;
-
 
 ESP8266WebServer server(80);
 

@@ -1,11 +1,13 @@
 #include "resultStorageHandler.h"
+#include <stdlib.h>
+#include <Arduino.h>
 
 ResultStorageHandler::ResultStorageHandler() {
   _result = (short*) malloc( sizeof(short) * (MAX_RESULT_INDEX + 1));
 
 }
 
-boolean ResultStorageHandler::checkPosition(unsigned int resultArrayIndex) {
+bool ResultStorageHandler::checkPosition(unsigned int resultArrayIndex) {
   if (resultArrayIndex >= MAX_RESULT_INDEX) {
     Serial.print("Result Array Index ( ");
     Serial.print(resultArrayIndex);
