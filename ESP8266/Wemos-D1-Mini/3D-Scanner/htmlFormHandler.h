@@ -8,8 +8,8 @@
 // Interrims import
 #include "resultStorageHandler.h"
 
-boolean parseParameter(ESP8266WebServer &server, String name, int &value );
-boolean parseParameter(ESP8266WebServer &server, String name, float &value );
+bool parseParameter(ESP8266WebServer &server, String name, int &value );
+bool parseParameter(ESP8266WebServer &server, String name, float &value );
 
 String formString(String name, int value);
 String formString(String name, float value);

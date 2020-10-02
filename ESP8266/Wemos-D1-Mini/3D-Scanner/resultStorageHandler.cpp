@@ -4,18 +4,14 @@
 
 
 ResultStorageHandler::ResultStorageHandler() {
-  uint32_t freeHeap = ESP.getFreeHeap();
-  MAX_RESULT_INDEX = (freeHeap - 5000) / sizeof(short);
-  _result = (short*) malloc( sizeof(short) * (MAX_RESULT_INDEX + 1));
-
 }
 
 bool ResultStorageHandler::checkPosition(unsigned int resultArrayIndex) {
-  if (resultArrayIndex >= MAX_RESULT_INDEX) {
+  if (resultArrayIndex >= maxAvailableArrayIndex) {
     Serial.print("Result Array Index ( ");
     Serial.print(resultArrayIndex);
-    Serial.print(" ) out of bound. MAX_RESULT_INDEX=");
-    Serial.print(MAX_RESULT_INDEX);
+    Serial.print(" ) out of bound. maxAvailableArrayIndex=");
+    Serial.print(maxAvailableArrayIndex);
     Serial.println();
     return false;
   }
@@ -84,6 +80,12 @@ unsigned int ResultStorageHandler::maxIndex() {
 
 }
 
+unsigned int ResultStorageHandler::maxValidIndex() {
+  int result = servoNumPointsEl() * servoNumPointsAz();
+  result = min(maxAvailableArrayIndex, result);
+  return result;
+}
+
 
 unsigned int ResultStorageHandler::servoNumPointsAz() {
   unsigned int result = (servoPosAzMax - servoPosAzMin) / servoStepAz + 1;
@@ -103,7 +105,7 @@ unsigned int ResultStorageHandler::servoNumPointsEl() {
 */
 unsigned int ResultStorageHandler::nextPositionServo( unsigned int resultArrayIndex) {
   resultArrayIndex  += 1;
-  if (resultArrayIndex >= MAX_RESULT_INDEX) {
+  if (resultArrayIndex >= maxAvailableArrayIndex) {
     return 0;
   }
   if (resultArrayIndex >= maxIndex() ) {
@@ -118,7 +120,7 @@ unsigned int ResultStorageHandler::nextPositionServo( unsigned int resultArrayIn
 */
 unsigned int ResultStorageHandler::nextPositionLinear( unsigned int resultArrayIndex ) {
   resultArrayIndex += 1;
-  if (resultArrayIndex >= MAX_RESULT_INDEX) {
+  if (resultArrayIndex >= maxAvailableArrayIndex) {
     return 0;
   }
   if (resultArrayIndex >= maxIndex() ) {
@@ -128,15 +130,10 @@ unsigned int ResultStorageHandler::nextPositionLinear( unsigned int resultArrayI
 }
 
 
-void ResultStorageHandler::resetResults() {
-  for ( int i = 0; i < MAX_RESULT_INDEX; i++) {
-    _result[i] = -1;
-  }
-}
 
 int ResultStorageHandler::resultMax() {
   int max = 0;
-  for ( unsigned int i = 0; i < maxIndex(); i++ ) {
+  for ( unsigned int i = 0; i < maxValidIndex(); i++ ) {
     int dist = _result[i];
     if ( dist > max) {
       max = dist;
@@ -145,4 +142,19 @@ int ResultStorageHandler::resultMax() {
 
   return max;
 
+}
+
+void ResultStorageHandler::resetResults() {
+
+  Serial.println("Reset Results ...");
+  for ( int i = 0; i < maxAvailableArrayIndex; i++) {
+    _result[i] = -1;
+  }
+}
+
+void ResultStorageHandler::initResults() {
+  Serial.println("Init Results Array ...");
+  uint32_t freeHeap = ESP.getFreeHeap();
+  maxAvailableArrayIndex = (freeHeap - 8 * 1024) / sizeof(short);
+  _result = (short*) malloc( sizeof(short) * (maxAvailableArrayIndex + 1));
 }

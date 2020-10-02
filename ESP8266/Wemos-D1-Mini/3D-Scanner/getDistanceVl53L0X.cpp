@@ -43,7 +43,7 @@ void initDistanceVl53L0X() {
   }
 }
 
-int getDistanceVl53L0X(boolean debugDistance) {
+int getDistanceVl53L0X(bool debugDistance) {
 
   delay(preMeasureDelay);
 
@@ -51,7 +51,7 @@ int getDistanceVl53L0X(boolean debugDistance) {
 
   int retryCount = 0;
   int dist_mm = -1;
-  boolean doRetry = true;
+  bool doRetry = true;
   do {
     // Serial.print("Reading a measurement... ");
     lox.rangingTest(&measure, false); // pass in 'true' to get debug data printout!

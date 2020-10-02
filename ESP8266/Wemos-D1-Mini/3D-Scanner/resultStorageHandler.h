@@ -20,17 +20,17 @@ class ResultStorageHandler {
 
 
 
-    bool debugResultPosition = true;
+    bool debugResultPosition = false;
 
-int MAX_RESULT_INDEX=1;
+    int maxAvailableArrayIndex = 1;
 
     float servoPosAzMin =   0;
     float servoPosAzMax = 180;
     float servoStepAz   =   0.5;
 
     float servoPosElMin =   0;
-    float servoPosElMax =  90;
-    float servoStepEl   =   1;
+    float servoPosElMax =  60;
+    float servoStepEl   =   1.5;
 
     PolarCoordinate getPosition(unsigned int resultArrayIndex);
     int getResult(unsigned int resultArrayIndex);
@@ -39,26 +39,25 @@ int MAX_RESULT_INDEX=1;
     unsigned int nextPositionLinear( unsigned int resultArrayIndex );
     unsigned int nextPositionServo( unsigned int resultArrayIndex );
     unsigned int maxIndex();
+    unsigned int maxValidIndex();
     unsigned int servoNumPointsAz();
     unsigned int servoNumPointsEl();
     bool checkPosition(unsigned int resultArrayIndex);
     void debugPosition( unsigned int resultArrayIndex);
 
     int resultMax();
+    void initResults();
 
     void resetResults();
 
 
 
   private:
-
     /**
        Result Values in mm
        nagative values are invalid/out of range
     */
-    // int _result[MAX_RESULT_INDEX];
     short *_result;
-
 
 };
 

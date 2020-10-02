@@ -4,6 +4,6 @@
 #include <Arduino.h>
 
 void initDistanceVl53L0X();
-int getDistanceVl53L0X(boolean debugDistance);
+int getDistanceVl53L0X(bool debugDistance);
 
 #endif

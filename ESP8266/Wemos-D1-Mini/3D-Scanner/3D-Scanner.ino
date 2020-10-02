@@ -8,6 +8,7 @@
   - use seperate Sourcode Files
   - Check Memory usage for larger Scans (Maybe use seperate I2C RAM or SD-Card
   - refactor az/el calculation to have a loop over arrayindex (prevent rounding errors in index calculation)
+  - inputForm fields only take integer (not float) displayint float is working
 **/
 
 
@@ -68,10 +69,11 @@ void loop() {
       Serial.print("servoNumPointsAz= " );       Serial.println( resultStorageHandler.servoNumPointsAz() );
       Serial.print("servoNumPointsEl= " );       Serial.println( resultStorageHandler.servoNumPointsEl() );
       Serial.print("maxIndex: ");                Serial.println( resultStorageHandler.maxIndex() );
-      Serial.print("MAX_RESULT_INDEX: ");        Serial.println(resultStorageHandler.MAX_RESULT_INDEX);
+      Serial.print("maxValidIndex: ");           Serial.println( resultStorageHandler.maxValidIndex() );
+      Serial.print("maxAvailableArrayIndex: ");  Serial.println(resultStorageHandler.maxAvailableArrayIndex);
 
-      if ( resultStorageHandler.maxIndex() >= resultStorageHandler.MAX_RESULT_INDEX) {
-        Serial.println("!!!!!! Warning maxIndex() >= MAX_RESULT_INDEX !!!!!!!!");
+      if ( resultStorageHandler.maxIndex() >= resultStorageHandler.maxAvailableArrayIndex) {
+        Serial.println("!!!!!! Warning maxIndex() >= maxAvailableArrayIndex !!!!!!!!");
         delay(5 * 1000);
       }
 
@@ -87,7 +89,7 @@ void loop() {
   measure();
 
 
-  if ( resultArrayIndex >= (resultStorageHandler.maxIndex() - 1)) {
+  if ( resultArrayIndex >= (resultStorageHandler.maxValidIndex() - 1)) {
     sdCardWrite(resultStorageHandler);
   }
 
@@ -108,15 +110,15 @@ void loop() {
     MDNS.update();
   }
 
-  Serial.println();
+  //  Serial.println();
 
 }
 
 
 
 void setup() {
-  debugDistance = true;
-  debugPosition = true;
+  debugDistance = false;
+  debugPosition = false;
 
   Serial.begin(115200);
 
@@ -124,8 +126,6 @@ void setup() {
   Serial.println("3D-Scanner .... ");
 
 
-  Serial.println("Reset Results ...");
-  resultStorageHandler.resetResults();
 
   Serial.println("Wifi Manager ...");
   ESP_wifiManager.setDebugOutput(true);
@@ -148,7 +148,8 @@ void setup() {
 
   initSdCard();
 
-
+  resultStorageHandler.initResults();
+  resultStorageHandler.resetResults();
 
   // Make ourselfs visible with M-DNS
   if (MDNS.begin(F("3D-SCANNER"))) {

@@ -1,6 +1,6 @@
 #include "htmlFormHandler.h"
 
-boolean parseParameter(ESP8266WebServer &server, String name, int &value ) {
+bool parseParameter(ESP8266WebServer &server, String name, int &value ) {
   String parameterString = server.arg(name);
   if (parameterString != "") {
     int newValue = parameterString.toInt();
@@ -12,7 +12,7 @@ boolean parseParameter(ESP8266WebServer &server, String name, int &value ) {
   return false;
 }
 
-boolean parseParameter(ESP8266WebServer &server, String name, float &value ) {
+bool parseParameter(ESP8266WebServer &server, String name, float &value ) {
   String parameterString = server.arg(name);
   if (parameterString != "") {
     int newValue = parameterString.toFloat();
@@ -25,8 +25,8 @@ boolean parseParameter(ESP8266WebServer &server, String name, float &value ) {
 }
 
 String formString(String name, int value) {
-  String output = "\n";
-  output += "      <tr><td>" + name + ": </td><td><input type=\"text\" name=\"" + name + "\" value=\"";
+  String output = "";
+  output += "          <tr><td>" + name + ": </td><td><input type=\"text\" name=\"" + name + "\" value=\"";
   output += value;
   output += "\"></td></tr>\n";
   
@@ -34,8 +34,8 @@ String formString(String name, int value) {
 }
 
 String formString(String name, float value) {
-  String output = "\n";
-  output += "      <tr><td>" + name + ": </td><td><input type=\"text\" name=\"" + name + "\" value=\"";
+  String output = "";
+  output += "          <tr><td>" + name + ": </td><td><input type=\"text\" name=\"" + name + "\" value=\"";
   output += value;
   output += "\"></td></tr>\n";
 

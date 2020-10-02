@@ -4,6 +4,6 @@
 #include <Arduino.h>
 
 void initDistanceLidarLite();
-int getDistanceLidarLite(boolean debugDistance);
+int getDistanceLidarLite(bool debugDistance);
 
 #endif

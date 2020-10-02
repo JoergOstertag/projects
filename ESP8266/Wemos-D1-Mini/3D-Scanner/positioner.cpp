@@ -5,11 +5,11 @@
 
 
 int servoStepActive = 1;
-boolean debugPosition = true;
+bool debugPosition = true;
 
 // Correction for Servo Direction and Position
-boolean servoCounterClockwiseAZ = true;
-boolean servoCounterClockwiseEL = true;
+bool servoCounterClockwiseAZ = true;
+bool servoCounterClockwiseEL = true;
 int servoOffsetAZ = -90;
 int servoOffsetEL = -90;
 

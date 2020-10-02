@@ -73,7 +73,7 @@ void initDistanceLidarLite() {
 
 
 
-int getDistanceLidarLite(boolean debugDistance) {
+int getDistanceLidarLite(bool debugDistance) {
 
   // Serial.printf(" preMeasureDelay: %d", preMeasureDelay);
   delay(preMeasureDelay);

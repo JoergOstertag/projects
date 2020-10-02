@@ -29,7 +29,7 @@ int distanceFov = 20;
 /**
    Print Debugging output for Distance on Serial Console
 */
-boolean debugDistance = true;
+bool debugDistance = false;
 
 
 /**
@@ -49,7 +49,7 @@ void initDistance() {
 
 }
 
-int getDistance(boolean debugDistance) {
+int getDistance(bool debugDistance) {
 
   delay(preMeasureDelay);
   int dist_mm = -1;
