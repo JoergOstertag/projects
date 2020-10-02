@@ -26,8 +26,8 @@ const size_t loop_delay = 100;
 const uint8_t channelAz = 0;
 const uint8_t channelEl = 1;
 
-const uint16_t servoAzPulse_0 = 2360;
-const uint16_t servoAzPulse_180 = 610;
+const uint16_t servoAzPulse_0 = 2500;
+const uint16_t servoAzPulse_180 = 550;
 const uint16_t servoElPulse_0 = 610;
 const uint16_t servoElPulse_180 = 2360;
 

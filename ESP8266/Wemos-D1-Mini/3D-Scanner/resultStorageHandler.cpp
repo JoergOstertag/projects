@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <Arduino.h>
 
+
 ResultStorageHandler::ResultStorageHandler() {
+  uint32_t freeHeap = ESP.getFreeHeap();
+  MAX_RESULT_INDEX = (freeHeap - 5000) / sizeof(short);
   _result = (short*) malloc( sizeof(short) * (MAX_RESULT_INDEX + 1));
 
 }
@@ -83,12 +86,12 @@ unsigned int ResultStorageHandler::maxIndex() {
 
 
 unsigned int ResultStorageHandler::servoNumPointsAz() {
-  unsigned int result = (servoPosAzMax - servoPosAzMin) / servoStepAz+1;
+  unsigned int result = (servoPosAzMax - servoPosAzMin) / servoStepAz + 1;
   return result ;
 }
 
 unsigned int ResultStorageHandler::servoNumPointsEl() {
-  unsigned int result = (servoPosElMax - servoPosElMin) / servoStepEl+1;
+  unsigned int result = (servoPosElMax - servoPosElMin) / servoStepEl + 1;
   return result;
 }
 

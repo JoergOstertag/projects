@@ -22,9 +22,11 @@ class ResultStorageHandler {
 
     bool debugResultPosition = true;
 
+int MAX_RESULT_INDEX=1;
+
     float servoPosAzMin =   0;
     float servoPosAzMax = 180;
-    float servoStepAz   =   2;
+    float servoStepAz   =   0.5;
 
     float servoPosElMin =   0;
     float servoPosElMax =  90;

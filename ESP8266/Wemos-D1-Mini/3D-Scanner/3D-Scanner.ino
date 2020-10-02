@@ -67,10 +67,10 @@ void loop() {
 
       Serial.print("servoNumPointsAz= " );       Serial.println( resultStorageHandler.servoNumPointsAz() );
       Serial.print("servoNumPointsEl= " );       Serial.println( resultStorageHandler.servoNumPointsEl() );
-      Serial.print("maxIndex: ");                Serial.println(resultStorageHandler.maxIndex() );
-      Serial.print("MAX_RESULT_INDEX: ");        Serial.println(MAX_RESULT_INDEX);
+      Serial.print("maxIndex: ");                Serial.println( resultStorageHandler.maxIndex() );
+      Serial.print("MAX_RESULT_INDEX: ");        Serial.println(resultStorageHandler.MAX_RESULT_INDEX);
 
-      if ( resultStorageHandler.maxIndex() >= MAX_RESULT_INDEX) {
+      if ( resultStorageHandler.maxIndex() >= resultStorageHandler.MAX_RESULT_INDEX) {
         Serial.println("!!!!!! Warning maxIndex() >= MAX_RESULT_INDEX !!!!!!!!");
         delay(5 * 1000);
       }
