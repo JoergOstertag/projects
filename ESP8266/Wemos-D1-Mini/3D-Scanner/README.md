@@ -29,12 +29,12 @@ Somit bleiben nur noch der PIN D0,D3 und D4 übrig um einen Servo an zu steuern.
 Das ist ein weiterer Grund warum es sich rentiert den I2C converter zu verwenden.
 Denn dadurch sind nach außen wirklich nur 4 Kabel an die Sensoreinheit notwendig.
 
-![distanceGraph.svg](img/distanceGraph.svg)
-![roomLayout.svg](img/roomLayout.svg)
-![scan-3D.scad](img/scan-3D.scad
 ![scanner-V2.jpg](img/scanner-V2.jpg)
 ![Screenshot.png](img/Screenshot.png)
 ![video.mp4](img/video.mp4)
+![distanceGraph.svg](img/distanceGraph.svg)
+![roomLayout.svg](img/roomLayout.svg)
+![scan-3D.scad](img/scan-3D.scad
 
 Andere ähnliche Projekte:
 -------------------------
