@@ -146,11 +146,21 @@ void deliverRoomLayoutHtml() {
                                   "<head>\n"
                                   "  <meta http-equiv='refresh' content='20'/>\n"
                                   "</head>\n"
-                                  "<body>\n"
-                                  "    <img src=\"/roomLayout.svg\" />\n"
-                                  "</body>\n"
-                                  "</html>\n"
-                                  "\n"));
+                                  "<body>\n"));
+
+  server.sendContent(
+    // Uptime
+    upTimeString() + "<br/>\n"
+
+    // Show Scan percentage
+    + "Scan: " + String(resultArrayIndex * 100 / resultStorageHandler.maxIndex() ) + " %<br/>\n"
+
+    "<a href=\"roomLayout.html\">Room Layout:</a><br/>\n"
+
+    "    <img src=\"/roomLayout.svg\" />\n"
+    "</body>\n"
+    "</html>\n"
+    "\n");
 
   server.chunkedResponseFinalize();
   Serial.println("DONE");
@@ -180,8 +190,6 @@ void handleRoot() {
                                   "</a></h3>\n"
                                   "\n"));
 
-
-
   {
     String output ;
     output.reserve(2000);
@@ -189,9 +197,8 @@ void handleRoot() {
     {
       // Room Layout img Reference
       output += "\n";
-      output += "      <div style=\"float:left; height:" + String( SIZE_2D_GRAPH + 40 + 10 ) + "; width:" + String(SIZE_2D_GRAPH + 10 ) + "\">\n";
-      output += "          <p>Room Layout:</p>\n";
-      output += "          <iframe height=" + String( SIZE_2D_GRAPH + 10) + " width=" + String(SIZE_2D_GRAPH + 10) + " frameBorder=\"0\"  hspace=\"0\" vspace=\"0\" marginheight=\"0\" \"\n";
+      output += "      <div style=\"float:left; height:" + String( SIZE_2D_GRAPH + 90 ) + "; width:" + String(SIZE_2D_GRAPH + 20) + "\">\n";
+      output += "          <iframe height=" + String( SIZE_2D_GRAPH + 60) + " width=" + String(SIZE_2D_GRAPH + 20) + " frameBorder=\"0\"  hspace=\"0\" vspace=\"0\" marginheight=\"0\" \"\n";
       output += "          src=\"/roomLayout.html\" />\n";
       output += "          </iframe>\n";
       output += "      </div>\n";
@@ -200,20 +207,14 @@ void handleRoot() {
     {
       output += "  <div style=\"text-align:left; margin:8px;\">\n";
 
-      // Uptime
-      output += "      <p>" + upTimeString() + "</p>\n";
-
-      // Show Scan percentage
-      output += "      <p>Scan: " + String(resultArrayIndex * 100 / resultStorageHandler.maxIndex() ) + " %</p>\n";
-
       // Open Scad Reference
-      output += "      <p><a href=\"/scan-3D.scad\" target=\"_blank\">scan-3D.scad</a></p>\n\n";
+      output += "      <a href=\"/scan-3D.scad\" target=\"_blank\">scan-3D.scad</a><br/>\n\n";
 
       // CSV Reference
-      output += "      <p><a href=\"/scan.csv\"  target=\"_blank\">scan.csv</a></p>\n\n";
+      output += "      <a href=\"/scan.csv\"  target=\"_blank\">scan.csv</a><br/>\n\n";
 
       // /distanceGraph.svg
-      output += "      <p><a href=\"/distanceGraph.svg\"  target=\"_blank\">distanceGraph.svg</a></p>\n\n";
+      output += "      <a href=\"/distanceGraph.svg\"  target=\"_blank\">distanceGraph.svg</a><br/>\n\n";
 
       output += "   </div>\n\n";
     }
@@ -372,7 +373,8 @@ void deliverScad() {
   server.sendHeader("Content-Disposition", "attachment; filename=" + filename);
 
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);   //Enable Chunked Transfer
-  server.send(200, "application/x-openscad", F(
+  server.send(200, "application/x-openscad",
+              F(
                 "// ===========================================================\n"
                 "// 3D-Scan with Distance Sensor\n"
                 "// ===========================================================\n"
