@@ -24,14 +24,14 @@ const size_t loop_delay = 100;
 const uint8_t channelAz = 0;
 const uint8_t channelEl = 1;
 
-float servoAzRef1Grad  = 90;
+float servoAzRef1Grad  =   90;
 float servoAzRef1Pulse = 2500;
-float servoAzRef2Grad = -90;
-float servoAzRef2Pulse = 550;
+float servoAzRef2Grad  =  -90;
+float servoAzRef2Pulse =  550;
 
-float servoElRef1Grad = 0;
-float servoElRef1Pulse = 610;
-float servoElRef2Grad = 180;
+float servoElRef1Grad  =    0;
+float servoElRef1Pulse =  610;
+float servoElRef2Grad  = -180;
 float servoElRef2Pulse = 2360;
 
 
