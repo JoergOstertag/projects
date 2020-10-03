@@ -33,7 +33,7 @@ ResultStorageHandler resultStorageHandler;
 ESP_WiFiManager ESP_wifiManager("ESP_Configuration");
 
 
-unsigned int resultArrayIndex = 0;
+unsigned int currentResultArrayIndex = 0;
 
 #define DIST_MIN 1
 #define DIST_MAX 500*10
@@ -44,7 +44,7 @@ unsigned int resultArrayIndex = 0;
 void measure() {
 
   int dist_mm = getDistance(debugDistance);
-  resultStorageHandler.putResult(resultArrayIndex, dist_mm);
+  resultStorageHandler.putResult(currentResultArrayIndex, dist_mm);
 }
 
 
@@ -59,7 +59,7 @@ void showMemory() {
 void loop() {
 
   if (servoStepActive) {
-    if ( resultArrayIndex == 0 ) {
+    if ( currentResultArrayIndex == 0 ) {
       Serial.println();
 
       showMemory();
@@ -82,23 +82,23 @@ void loop() {
 
     }
 
-    resultStorageHandler.debugPosition( resultArrayIndex);
+    resultStorageHandler.debugPosition( currentResultArrayIndex );
 
   }
 
   measure();
 
 
-  if ( resultArrayIndex >= (resultStorageHandler.maxValidIndex() - 1)) {
+  if ( currentResultArrayIndex >= (resultStorageHandler.maxValidIndex() - 1)) {
     sdCardWrite(resultStorageHandler);
   }
 
   if (servoStepActive) {
-    resultArrayIndex = resultStorageHandler.nextPositionServo(resultArrayIndex);
-    PolarCoordinate position = resultStorageHandler.getPosition(resultArrayIndex);
+    currentResultArrayIndex = resultStorageHandler.nextPositionServo(currentResultArrayIndex);
+    PolarCoordinate position = resultStorageHandler.getPosition(currentResultArrayIndex);
 
     if ( debugDistance) {
-      //Serial.printf( "       New ArrayPos: %5u", resultArrayIndex);
+      //Serial.printf( "       New ArrayPos: %5u", currentResultArrayIndex);
     }
 
     servo_move(position);

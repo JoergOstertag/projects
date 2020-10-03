@@ -6,28 +6,28 @@
 ResultStorageHandler::ResultStorageHandler() {
 }
 
-bool ResultStorageHandler::checkPosition(unsigned int resultArrayIndex) {
-  if (resultArrayIndex >= maxAvailableArrayIndex) {
+bool ResultStorageHandler::checkPosition(unsigned int currentResultArrayIndex) {
+  if (currentResultArrayIndex >= maxAvailableArrayIndex) {
     Serial.print("Result Array Index ( ");
-    Serial.print(resultArrayIndex);
+    Serial.print(currentResultArrayIndex);
     Serial.print(" ) out of bound. maxAvailableArrayIndex=");
     Serial.print(maxAvailableArrayIndex);
     Serial.println();
     return false;
   }
 
-  if (resultArrayIndex >= maxIndex() ) {
+  if (currentResultArrayIndex >= maxIndex() ) {
     Serial.print("Result Array Index ( ");
-    Serial.print(resultArrayIndex);
+    Serial.print(currentResultArrayIndex);
     Serial.print(" ) too large. maxIndex=");
     Serial.print(maxIndex());
     Serial.println();
     return false;
   }
 
-  if (resultArrayIndex >= maxValidIndex() ) {
+  if (currentResultArrayIndex >= maxValidIndex() ) {
     Serial.print("Result Array Index ( ");
-    Serial.print(resultArrayIndex);
+    Serial.print(currentResultArrayIndex);
     Serial.print(" ) too large. maxValidIndex=");
     Serial.print(maxValidIndex());
     Serial.println();
@@ -37,26 +37,26 @@ bool ResultStorageHandler::checkPosition(unsigned int resultArrayIndex) {
   return true;
 }
 
-void ResultStorageHandler::debugPosition( unsigned int resultArrayIndex) {
-  PolarCoordinate position = ResultStorageHandler::getPosition(resultArrayIndex);
+void ResultStorageHandler::debugPosition( unsigned int currentResultArrayIndex) {
+  PolarCoordinate position = ResultStorageHandler::getPosition(currentResultArrayIndex);
   if ( debugResultPosition) {
-    Serial.printf( " ArrayPos: %5u", resultArrayIndex);
+    Serial.printf( " ArrayPos: %5u", currentResultArrayIndex);
     Serial.printf( " AZ: %4d", (int)position.az );
     Serial.printf( " EL: %4d", (int)position.el );
   }
 }
 
-PolarCoordinate ResultStorageHandler::getPosition(unsigned int resultArrayIndex) {
+PolarCoordinate ResultStorageHandler::getPosition(unsigned int currentResultArrayIndex) {
 
-  checkPosition(resultArrayIndex);
+  checkPosition(currentResultArrayIndex);
 
   PolarCoordinate resultCoordinate;
-  unsigned int elIndex = resultArrayIndex / servoNumPointsAz();
+  unsigned int elIndex = currentResultArrayIndex / servoNumPointsAz();
   // Serial.print(" elIndex: ");  Serial.print(elIndex );
 
   resultCoordinate.el = servoPosElMin + elIndex * servoStepEl;
 
-  unsigned int azIndex = resultArrayIndex - (elIndex * servoNumPointsAz());
+  unsigned int azIndex = currentResultArrayIndex - (elIndex * servoNumPointsAz());
   // Serial.print(" azIndex: ");  Serial.print(azIndex );
 
   resultCoordinate.az = servoPosAzMin + (azIndex * servoStepAz);
@@ -64,19 +64,19 @@ PolarCoordinate ResultStorageHandler::getPosition(unsigned int resultArrayIndex)
   return resultCoordinate;
 }
 
-int ResultStorageHandler::getResult(unsigned int resultArrayIndex) {
-  if ( !  checkPosition(resultArrayIndex)) {
+int ResultStorageHandler::getResult(unsigned int currentResultArrayIndex) {
+  if ( !  checkPosition(currentResultArrayIndex)) {
     return -2;
   }
 
-  return _result[resultArrayIndex];
+  return _result[currentResultArrayIndex];
 }
 
-void ResultStorageHandler::putResult(unsigned int resultArrayIndex, int value) {
-  if ( ! checkPosition(resultArrayIndex) ) {
+void ResultStorageHandler::putResult(unsigned int currentResultArrayIndex, int value) {
+  if ( ! checkPosition(currentResultArrayIndex) ) {
     return;
   }
-  _result[resultArrayIndex] = value;
+  _result[currentResultArrayIndex] = value;
 };
 
 unsigned int ResultStorageHandler::indexOfPosition( PolarCoordinate  currentPosition ) {
@@ -112,30 +112,30 @@ unsigned int ResultStorageHandler::servoNumPointsEl() {
     Get next position with the smallest movement. So the servo is not moving unnecessary positions
     XXX: Here we have to get the height and with of the scan area an iterate by changing the az-direction forward and backward.
 */
-unsigned int ResultStorageHandler::nextPositionServo( unsigned int resultArrayIndex) {
-  resultArrayIndex  += 1;
-  if (resultArrayIndex >= maxAvailableArrayIndex) {
+unsigned int ResultStorageHandler::nextPositionServo( unsigned int currentResultArrayIndex) {
+  currentResultArrayIndex  += 1;
+  if (currentResultArrayIndex >= maxAvailableArrayIndex) {
     return 0;
   }
-  if (resultArrayIndex >= maxIndex() ) {
+  if (currentResultArrayIndex >= maxIndex() ) {
     return 0;
   }
-  return resultArrayIndex;
+  return currentResultArrayIndex;
 }
 
 
 /**
    Get next position array wise
 */
-unsigned int ResultStorageHandler::nextPositionLinear( unsigned int resultArrayIndex ) {
-  resultArrayIndex += 1;
-  if (resultArrayIndex >= maxAvailableArrayIndex) {
+unsigned int ResultStorageHandler::nextPositionLinear( unsigned int currentResultArrayIndex ) {
+  currentResultArrayIndex += 1;
+  if (currentResultArrayIndex >= maxAvailableArrayIndex) {
     return 0;
   }
-  if (resultArrayIndex >= maxIndex() ) {
+  if (currentResultArrayIndex >= maxIndex() ) {
     return 0;
   }
-  return resultArrayIndex;
+  return currentResultArrayIndex;
 }
 
 

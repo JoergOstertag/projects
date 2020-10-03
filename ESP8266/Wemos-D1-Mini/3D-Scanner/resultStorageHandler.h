@@ -30,18 +30,18 @@ class ResultStorageHandler {
     float servoPosElMax =  60;
     float servoStepEl   =   1.5;
 
-    PolarCoordinate getPosition(unsigned int resultArrayIndex);
-    int getResult(unsigned int resultArrayIndex);
-    void putResult(unsigned int resultArrayIndex, int value);
+    PolarCoordinate getPosition(unsigned int currentResultArrayIndex);
+    int getResult(unsigned int currentResultArrayIndex);
+    void putResult(unsigned int currentResultArrayIndex, int value);
     unsigned int indexOfPosition( PolarCoordinate  currentPosition );
-    unsigned int nextPositionLinear( unsigned int resultArrayIndex );
-    unsigned int nextPositionServo( unsigned int resultArrayIndex );
+    unsigned int nextPositionLinear( unsigned int currentResultArrayIndex );
+    unsigned int nextPositionServo( unsigned int currentResultArrayIndex );
     unsigned int maxIndex();
     unsigned int maxValidIndex();
     unsigned int servoNumPointsAz();
     unsigned int servoNumPointsEl();
-    bool checkPosition(unsigned int resultArrayIndex);
-    void debugPosition( unsigned int resultArrayIndex);
+    bool checkPosition(unsigned int currentResultArrayIndex);
+    void debugPosition( unsigned int currentResultArrayIndex);
 
     int resultMax();
     void initResults();

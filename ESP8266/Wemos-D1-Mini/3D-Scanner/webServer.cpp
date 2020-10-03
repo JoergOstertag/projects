@@ -18,7 +18,7 @@
 
 ESP8266WebServer server(80);
 
-extern unsigned int resultArrayIndex;
+extern unsigned int currentResultArrayIndex;
 
 extern ResultStorageHandler resultStorageHandler;
 
@@ -156,7 +156,7 @@ void deliverRoomLayoutHtml() {
     upTimeString() + "<br/>\n"
 
     // Show Scan percentage
-    + "Scan: " + String(resultArrayIndex * 100 / resultStorageHandler.maxIndex() ) + " %<br/>\n"
+    + "Scan: " + String(currentResultArrayIndex * 100 / resultStorageHandler.maxIndex() ) + " %<br/>\n"
 
     "<a href=\"roomLayout.html\">Room Layout:</a><br/>\n"
 
@@ -261,6 +261,13 @@ void handleRoot() {
 
 }
 
+void handleStartNewScan() {
+  Serial.print("handleStartNewScan ... ");
+  currentResultArrayIndex = 0;
+  resultStorageHandler.resetResults();
+  servoStepActive = true;
+}
+
 /**
    Separate Frame for input FOrm
 */
@@ -331,6 +338,9 @@ void handleInputForm() {
   server.sendContent( F( "        </table>\n"
                          "      <input type=\"submit\" value=\"Submit\">\n"
                          "     </form><br>\n"
+
+                         "<br/>"
+                         " <a href=\"/startNewScan\"> start New Clean Scan</a><br/>"
                          "    </div>\n\n"
                          "   </div>\n\n"
                          " </body>\n\n"
@@ -562,6 +572,7 @@ void initWebserver(ResultStorageHandler &newResultStorageHandler) {  // Register
   Serial.print("initWebserver ... ");
   resultStorageHandler = newResultStorageHandler;
   if ( ACTIVATE_WEBSERVER ) {
+    server.serveStatic("/favicon.png", SPIFFS, "/favicon.png");
     server.on("/", handleRoot);
     server.on("/distanceGraph.svg", deliverDistanceGraph);
     server.on("/scan-3D.scad", deliverScad);
@@ -569,9 +580,9 @@ void initWebserver(ResultStorageHandler &newResultStorageHandler) {  // Register
     server.on("/roomLayout.svg", deliverRoomLayoutSvg);
     server.on("/roomLayout.html", deliverRoomLayoutHtml);
     server.on("/inputForm.html", handleInputForm);
-    server.on("/writeToSdCard.cgi", writeToSdCard);
     server.on("/file", handleFile);
-    server.serveStatic("/favicon.png", SPIFFS, "/favicon.png");
+    server.on("/writeToSdCard.cgi", writeToSdCard);
+    server.on("/startNewScan", handleStartNewScan);
     server.onNotFound(handleNotFound);
     server.begin();
   }
