@@ -56,16 +56,14 @@ void handleFile() {
 
 bool handleParameters() {
   bool changes = false;
-  if ( !servoStepActive) {
-    //    changes |= parseParameter(server, "servoPosEl",    servoPosEl );
-  }
   changes |= parseParameter(server, "servoPosAzMin",    resultStorageHandler.servoPosAzMin);
   changes |= parseParameter(server, "servoPosAzMax",    resultStorageHandler.servoPosAzMax);
   changes |= parseParameter(server, "servoStepAz",      resultStorageHandler.servoStepAz);
   parseParameter(server, "servoOffsetAZ", servoOffsetAZ);
 
-  if ( !servoStepActive ) {
-    //  changes |= parseParameter(server, "servoPosAz",    servoPosAz );
+  if ( !servoStepActive) {
+    // parseParameter(server, "servoPosEl",    position.az );
+    // parseParameter(server, "servoPosAz",    position.el );
   }
   changes |= parseParameter(server, "servoPosElMin",    resultStorageHandler.servoPosElMin);
   changes |= parseParameter(server, "servoPosElMax",    resultStorageHandler.servoPosElMax);
@@ -76,6 +74,7 @@ bool handleParameters() {
   parseParameter(server, "servoStepActive", servoStepActive);
   parseParameter(server, "preMeasureDelay", preMeasureDelay);
   parseParameter(server, "distanceMaxRetry", distanceMaxRetry);
+  parseParameter(server, "distanceNumAveraging", distanceNumAveraging);
 
   parseParameter(server, "debugPosition", debugPosition);
   parseParameter(server, "debugDistance", debugDistance);
@@ -189,15 +188,15 @@ void handleRoot() {
                                   "\n"
                                   "<body>\n"
                                   "\n"
-                                  "  <h3><a href=\"https://github.com/JoergOstertag/projects/blob/master/ESP8266/Wemos-D1-Mini/3D-Scanner/README.md\"  target=\"_blank\">"
-                                  "ESP8266 3D-Scanner"
-                                  "</a></h3>\n"
+                                  "  <h3><a href=\"/\">ESP8266 3D-Scanner</a></h3>\n"
+
+
                                   "\n"));
 
   {
     String output ;
     output.reserve(2000);
-    output += "   <div style=\"class:roomLayout; float:left; width:100%; margin:8px;\">\n";
+    output += F("   <div style=\"class:roomLayout; float:left; width:100%; margin:8px;\">\n");
     {
       // Room Layout img Reference
       output += "\n";
@@ -211,14 +210,19 @@ void handleRoot() {
     {
       output += "  <div style=\"text-align:left; margin:8px;\">\n";
 
+      // Link to Documentation
+      output +=  F("<a href=\"https://github.com/JoergOstertag/projects/blob/master/ESP8266/Wemos-D1-Mini/3D-Scanner/README.md\"  target=\"_blank\">"
+                   "Documentation"
+                   "</a><br/>\n");
+
       // Open Scad Reference
-      output += "      <a href=\"/scan-3D.scad\" target=\"_blank\">scan-3D.scad</a><br/>\n\n";
+      output += F("      <a href=\"/scan-3D.scad\" target=\"_blank\">scan-3D.scad</a><br/>\n\n");
 
       // CSV Reference
-      output += "      <a href=\"/scan.csv\"  target=\"_blank\">scan.csv</a><br/>\n\n";
+      output += F("      <a href=\"/scan.csv\"  target=\"_blank\">scan.csv</a><br/>\n\n");
 
       // /distanceGraph.svg
-      output += "      <a href=\"/distanceGraph.svg\"  target=\"_blank\">distanceGraph.svg</a><br/>\n\n";
+      output += F("      <a href=\"/distanceGraph.svg\"  target=\"_blank\">distanceGraph.svg</a><br/>\n\n");
 
       output += "   </div>\n\n";
     }
@@ -227,13 +231,13 @@ void handleRoot() {
     {
       // HTML Forms
       //output += "      <div style=\"text-align:right; margin: 8px;\">\n";
-      output += "   <iframe height=600 width=400 src=\"inputForm.html\" />\n";
+      output += F("   <iframe height=600 width=400 src=\"inputForm.html\" />\n");
       //output +=           inputForm();
       //output += "      </div>\n\n";
     }
 
-    output += "    </div>\n";
-    output += "\n";
+    output += F("    </div>\n"
+                "\n");
     server.sendContent(output);
   }
 
@@ -286,38 +290,39 @@ void handleInputForm() {
                        " <div style=\"text-align:right; margin: 8px;\">\n"));
 
   // border: 1px solid green;
-  server.sendContent("   <div style=\"text-align:left; margin:8px; \">\n"
-                     "   <a href=\"/inputForm.html\">Parameters:</a>\n"
-                     "     <form action=\"/inputForm.html\">\n");
+  server.sendContent(F("   <div style=\"text-align:left; margin:8px; \">\n"
+                       "   <a href=\"/inputForm.html\">Parameters:</a>\n"
+                       "     <form action=\"/inputForm.html\">\n"));
 
   server.sendContent("      <table>\n");
-  // output += formString("servoPosAz",       servoPosAz);
-  server.sendContent( formString("servoPosAzMin",       resultStorageHandler.servoPosAzMin));
-  server.sendContent( formString("servoPosAzMax",       resultStorageHandler.servoPosAzMax));
-  server.sendContent( formString("servoStepAz",         resultStorageHandler.servoStepAz)                    );
-  server.sendContent( formString("servoOffsetAZ",       servoOffsetAZ)                    );
+  server.sendContent( formString("servoPosAzMin",        resultStorageHandler.servoPosAzMin));
+  server.sendContent( formString("servoPosAzMax",        resultStorageHandler.servoPosAzMax));
+  server.sendContent( formString("servoStepAz",          resultStorageHandler.servoStepAz));
+  server.sendContent( formString("servoOffsetAZ",        servoOffsetAZ));
 
-  server.sendContent( "         <tr><td><br></td></tr>\n"                    );
-  //  output += formString("servoPosEl",       servoPosEl)
-  server.sendContent( formString("servoPosElMin",       resultStorageHandler.servoPosElMin)                    );
-  server.sendContent( formString("servoPosElMax",       resultStorageHandler.servoPosElMax)                    );
-  server.sendContent( formString("servoStepEl",         resultStorageHandler.servoStepEl)                    );
-  server.sendContent( formString("servoOffsetEL",       servoOffsetEL));
+  server.sendContent( F("         <tr><td><br></td></tr>\n" ));
+  server.sendContent( formString("servoPosElMin",        resultStorageHandler.servoPosElMin));
+  server.sendContent( formString("servoPosElMax",        resultStorageHandler.servoPosElMax));
+  server.sendContent( formString("servoStepEl",          resultStorageHandler.servoStepEl));
+  server.sendContent( formString("servoOffsetEL",        servoOffsetEL));
 
-  server.sendContent( "         <tr><td><br></td></tr>\n"   );
-  server.sendContent( formString("servoStepActive",     servoStepActive)                    );
-
-  server.sendContent( "         <tr><td><br></td></tr>\n"                    );
-  server.sendContent( formString("preMeasureDelay",      preMeasureDelay)                    );
+  server.sendContent( F("         <tr><td><br></td></tr>\n" ));
+  server.sendContent( formString("servoStepActive",      servoStepActive));
+  if (!servoStepActive) {
+    //server.sendContent( formString("servoPosAz",         position.az));
+    //server.sendContent( formString("servoPosEl",         position.el));
+  }
+  server.sendContent( F("         <tr><td><br></td></tr>\n" ));
+  server.sendContent( formString("preMeasureDelay",      preMeasureDelay));
   server.sendContent( formString("distanceMaxRetry",     distanceMaxRetry));
+  server.sendContent( formString("distanceNumAveraging", distanceNumAveraging));
 
-
-  server.sendContent( "         <tr><td><br></td></tr>\n"                    );
+  server.sendContent( F("         <tr><td><br></td></tr>\n" ));
   server.sendContent( formString("debugDistance",        debugDistance));
   server.sendContent( formString("debugPosition",        debugPosition));
   server.sendContent( formString("debugResultPosition",  resultStorageHandler.debugResultPosition ));
 
-  if ( false) {
+  if ( false ) {
     server.sendContent( F("    <div class=\"slidecontainer\"> \n\n"
                           "          <input type=\"range\" min=\"1\" max=\"100\" value=\"50\" class=\"slider\" id=\"myRange\">\n\n"
                           "    </div>\n\n"));
@@ -374,7 +379,7 @@ void deliverCSV() {
    Send Open Scad File to Server connection
 */
 void deliverScad() {
-  Serial.print("deliverScad ... ");
+  Serial.print(F("deliverScad ... "));
 
   String filename = "scan-3D.scad";
   server.sendHeader("Content-Disposition", "attachment; filename=" + filename);
@@ -566,6 +571,7 @@ void initWebserver(ResultStorageHandler &newResultStorageHandler) {  // Register
     server.on("/inputForm.html", handleInputForm);
     server.on("/writeToSdCard.cgi", writeToSdCard);
     server.on("/file", handleFile);
+    server.serveStatic("/favicon.png", SPIFFS, "/favicon.png");
     server.onNotFound(handleNotFound);
     server.begin();
   }

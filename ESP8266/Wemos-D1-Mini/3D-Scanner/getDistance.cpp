@@ -41,7 +41,12 @@ bool debugDistance = false;
 /**
    delay before measuring
 */
-int preMeasureDelay = 0;
+int preMeasureDelay = 10;
+
+/**
+   Number of Measurements to take for everagint
+*/
+int distanceNumAveraging = 5;
 
 void initDistance() {
 
@@ -59,19 +64,26 @@ void initDistance() {
 int getDistance(bool debugDistance) {
 
   delay(preMeasureDelay);
-  int dist_mm = -1;
 
+  int dist_mm_avg = 0;
+  int avgCount = 0;
+  for (int i = 0; i < distanceNumAveraging ; i++) {
+    int dist_mm = -1;
 #ifdef USE_DISTANCE_VL53L0X
-  dist_mm = getDistanceVl53L0X(debugDistance);
+    dist_mm = getDistanceVl53L0X(debugDistance);
 #endif
 #ifdef USE_DISTANCE_LIDAR_LITE
-  dist_mm = getDistanceLidarLite(debugDistance);
+    dist_mm = getDistanceLidarLite(debugDistance);
 #endif
-
 #ifdef USE_DISTANCE_HCSR04
-  dist_mm = 10.0 * distanceSensor.measureDistanceCm();
+    dist_mm = 10.0 * distanceSensor.measureDistanceCm();
 #endif
 
-  return dist_mm;
+    if (dist_mm > 0) {
+      dist_mm_avg += dist_mm;
+      avgCount++;
+    }
+  }
 
+  return dist_mm_avg / avgCount;
 }

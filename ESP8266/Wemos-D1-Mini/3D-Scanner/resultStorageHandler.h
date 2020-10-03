@@ -18,7 +18,7 @@ class ResultStorageHandler {
   public:
     ResultStorageHandler();
 
-    bool debugResultPosition = true;
+    bool debugResultPosition = false;
 
     int maxAvailableArrayIndex = 1;
 

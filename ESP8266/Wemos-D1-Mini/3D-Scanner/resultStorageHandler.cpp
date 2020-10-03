@@ -19,8 +19,17 @@ bool ResultStorageHandler::checkPosition(unsigned int resultArrayIndex) {
   if (resultArrayIndex >= maxIndex() ) {
     Serial.print("Result Array Index ( ");
     Serial.print(resultArrayIndex);
-    Serial.print(" ) too large. servoNumPoints=");
+    Serial.print(" ) too large. maxIndex=");
     Serial.print(maxIndex());
+    Serial.println();
+    return false;
+  }
+
+  if (resultArrayIndex >= maxValidIndex() ) {
+    Serial.print("Result Array Index ( ");
+    Serial.print(resultArrayIndex);
+    Serial.print(" ) too large. maxValidIndex=");
+    Serial.print(maxValidIndex());
     Serial.println();
     return false;
   }
@@ -156,5 +165,9 @@ void ResultStorageHandler::initResults() {
   Serial.println("Init Results Array ...");
   uint32_t freeHeap = ESP.getFreeHeap();
   maxAvailableArrayIndex = (freeHeap - 8 * 1024) / sizeof(short);
-  _result = (short*) malloc( sizeof(short) * (maxAvailableArrayIndex + 1));
+  if (maxAvailableArrayIndex >= 0) {
+    _result = (short*) malloc( sizeof(short) * (maxAvailableArrayIndex + 1));
+  } else {
+    Serial.println("Cannot allocate Memory");
+  }
 }

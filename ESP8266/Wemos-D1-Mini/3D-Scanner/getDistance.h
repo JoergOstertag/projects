@@ -8,6 +8,7 @@ extern int distanceRetryDelay;
 extern bool debugDistance;
 extern int distanceFov;
 extern int preMeasureDelay;
+extern int distanceNumAveraging;
 
 void initDistance();
 int getDistance(bool debugDistance);

@@ -68,7 +68,7 @@ void initDistanceLidarLite() {
     lidarliteAddress: Default 0x62. Fill in new address here if changed. See
       operating manual for instructions.
   */
-  myLidarLite.configure(0); // Change this number to try out alternate configurations
+  myLidarLite.configure(4); // Change this number to try out alternate configurations
 }
 
 
