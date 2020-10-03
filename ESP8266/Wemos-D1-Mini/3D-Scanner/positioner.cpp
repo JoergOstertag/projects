@@ -4,18 +4,20 @@
 #include <Arduino.h>
 
 
-int servoStepActive = 1;
-bool debugPosition = true;
+bool servoStepActive = true;
+bool debugPosition = false;
 
 // Correction for Servo Direction and Position
-bool servoCounterClockwiseAZ = true;
-bool servoCounterClockwiseEL = true;
 int servoOffsetAZ = -90;
 int servoOffsetEL = -90;
 
 PolarCoordinate servoLastPosition = {0, 0};
 
 void delayServo(PolarCoordinate position);
+
+#ifndef SERVO_PCA
+#define SERVO_PWM
+#endif
 
 
 #ifdef SERVO_PCA
@@ -26,10 +28,15 @@ const size_t loop_delay = 100;
 const uint8_t channelAz = 0;
 const uint8_t channelEl = 1;
 
-const uint16_t servoAzPulse_0 = 2500;
-const uint16_t servoAzPulse_180 = 550;
-const uint16_t servoElPulse_0 = 610;
-const uint16_t servoElPulse_180 = 2360;
+float servoAzRef1Grad  = 90;
+float servoAzRef1Pulse = 2500;
+float servoAzRef2Grad = -90;
+float servoAzRef2Pulse = 550;
+
+float servoElRef1Grad = 0;
+float servoElRef1Pulse = 610;
+float servoElRef2Grad = 180;
+float servoElRef2Pulse = 2360;
 
 
 #include <PCA9685.h>
@@ -44,10 +51,9 @@ void initPositioner() {
 
 }
 
-
 void pcaServoSet(PolarCoordinate position) {
-  int servo_pulse_durationAz = map(position.az, 0, 180, servoAzPulse_0, servoAzPulse_180);
-  int servo_pulse_durationEl = map(position.el, 0, 180, servoElPulse_0, servoElPulse_180);
+  int servo_pulse_durationAz = map(position.az, servoAzRef1Grad, servoAzRef2Grad, servoAzRef1Pulse, servoAzRef2Pulse);
+  int servo_pulse_durationEl = map(position.el, servoElRef1Grad, servoElRef2Grad, servoElRef1Pulse, servoElRef2Pulse);
   if ( debugPosition) {
     Serial.printf( " AzPulse: %4d", (int)servo_pulse_durationAz );
     Serial.printf( " ElPulse: %4d", (int)servo_pulse_durationAz );
@@ -62,7 +68,7 @@ void pcaServoSet(PolarCoordinate position) {
 // ------------------------------------------------------
 // PWM
 // ------------------------------------------------------
-#ifndef SERVO_PCA
+#ifdef SERVO_PWM
 Servo servo_az;
 Servo servo_el;
 

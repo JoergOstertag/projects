@@ -18,14 +18,12 @@ class ResultStorageHandler {
   public:
     ResultStorageHandler();
 
-
-
-    bool debugResultPosition = false;
+    bool debugResultPosition = true;
 
     int maxAvailableArrayIndex = 1;
 
-    float servoPosAzMin =   0;
-    float servoPosAzMax = 180;
+    float servoPosAzMin = -90;
+    float servoPosAzMax =  90;
     float servoStepAz   =   0.5;
 
     float servoPosElMin =   0;

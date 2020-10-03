@@ -4,10 +4,11 @@
 #include <Servo.h>
 #include "resultStorageHandler.h"
 
-extern int servoStepActive;
-extern bool debugPosition;
+extern bool servoStepActive;
 extern int servoOffsetAZ;
 extern int servoOffsetEL;
+
+extern bool debugPosition;
 
 void initPositioner();
 void servo_move(PolarCoordinate position);

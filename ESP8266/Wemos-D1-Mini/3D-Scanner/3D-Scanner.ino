@@ -58,7 +58,7 @@ void showMemory() {
 
 void loop() {
 
-  if (servoStepActive > 0) {
+  if (servoStepActive) {
     if ( resultArrayIndex == 0 ) {
       Serial.println();
 
@@ -93,7 +93,7 @@ void loop() {
     sdCardWrite(resultStorageHandler);
   }
 
-  if (servoStepActive > 0) {
+  if (servoStepActive) {
     resultArrayIndex = resultStorageHandler.nextPositionServo(resultArrayIndex);
     PolarCoordinate position = resultStorageHandler.getPosition(resultArrayIndex);
 
@@ -110,15 +110,15 @@ void loop() {
     MDNS.update();
   }
 
-  //  Serial.println();
+  if (debugDistance || debugPosition || resultStorageHandler.debugResultPosition) {
+    Serial.println();
+  }
 
 }
 
 
 
 void setup() {
-  debugDistance = false;
-  debugPosition = false;
 
   Serial.begin(115200);
 

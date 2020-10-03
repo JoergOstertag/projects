@@ -56,7 +56,7 @@ void handleFile() {
 
 bool handleParameters() {
   bool changes = false;
-  if ( servoStepActive == 0) {
+  if ( !servoStepActive) {
     //    changes |= parseParameter(server, "servoPosEl",    servoPosEl );
   }
   changes |= parseParameter(server, "servoPosAzMin",    resultStorageHandler.servoPosAzMin);
@@ -64,7 +64,7 @@ bool handleParameters() {
   changes |= parseParameter(server, "servoStepAz",      resultStorageHandler.servoStepAz);
   parseParameter(server, "servoOffsetAZ", servoOffsetAZ);
 
-  if ( servoStepActive == 0) {
+  if ( !servoStepActive ) {
     //  changes |= parseParameter(server, "servoPosAz",    servoPosAz );
   }
   changes |= parseParameter(server, "servoPosElMin",    resultStorageHandler.servoPosElMin);
@@ -76,6 +76,10 @@ bool handleParameters() {
   parseParameter(server, "servoStepActive", servoStepActive);
   parseParameter(server, "preMeasureDelay", preMeasureDelay);
   parseParameter(server, "distanceMaxRetry", distanceMaxRetry);
+
+  parseParameter(server, "debugPosition", debugPosition);
+  parseParameter(server, "debugDistance", debugDistance);
+  parseParameter(server, "debugResultPosition", resultStorageHandler.debugResultPosition);
 
   return changes;
 }
@@ -305,15 +309,18 @@ void handleInputForm() {
 
   server.sendContent( "         <tr><td><br></td></tr>\n"                    );
   server.sendContent( formString("preMeasureDelay",      preMeasureDelay)                    );
-  server.sendContent( formString("distanceMaxRetry", distanceMaxRetry));
+  server.sendContent( formString("distanceMaxRetry",     distanceMaxRetry));
 
-  String output ;
-  output.reserve(3000);
-  output = "\n";
+
+  server.sendContent( "         <tr><td><br></td></tr>\n"                    );
+  server.sendContent( formString("debugDistance",        debugDistance));
+  server.sendContent( formString("debugPosition",        debugPosition));
+  server.sendContent( formString("debugResultPosition",  resultStorageHandler.debugResultPosition ));
+
   if ( false) {
-    output += "    <div class=\"slidecontainer\"> \n\n"
-              "          <input type=\"range\" min=\"1\" max=\"100\" value=\"50\" class=\"slider\" id=\"myRange\">\n\n"
-              "    </div>\n\n";
+    server.sendContent( F("    <div class=\"slidecontainer\"> \n\n"
+                          "          <input type=\"range\" min=\"1\" max=\"100\" value=\"50\" class=\"slider\" id=\"myRange\">\n\n"
+                          "    </div>\n\n"));
   }
 
   server.sendContent( F( "        </table>\n"
