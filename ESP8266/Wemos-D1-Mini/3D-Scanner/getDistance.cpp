@@ -41,12 +41,12 @@ bool debugDistance = false;
 /**
    delay before measuring
 */
-int preMeasureDelay = 10;
+int preMeasureDelay = 5;
 
 /**
    Number of Measurements to take for everagint
 */
-int distanceNumAveraging = 5;
+int distanceNumAveraging = 1;
 
 void initDistance() {
 

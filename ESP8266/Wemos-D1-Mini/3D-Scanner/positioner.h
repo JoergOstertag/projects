@@ -5,8 +5,6 @@
 #include "resultStorageHandler.h"
 
 extern bool servoStepActive;
-extern int servoOffsetAZ;
-extern int servoOffsetEL;
 
 extern bool debugPosition;
 

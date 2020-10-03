@@ -35,6 +35,8 @@
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
 void initDistanceVl53L0X() {
+  distanceFov = 20;
+
   Serial.println("Conneting Adafruit VL53L0X ...");
   if (!lox.begin()) {
     Serial.println(F("Failed to boot VL53L0X"));

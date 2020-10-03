@@ -1,6 +1,6 @@
 #include "htmlFormHandler.h"
 
-bool formDebug = true;
+bool formDebug = false;
 
 
 bool parseParameter(ESP8266WebServer &server, String name, float &value ) {

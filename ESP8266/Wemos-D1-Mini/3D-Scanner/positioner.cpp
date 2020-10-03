@@ -7,10 +7,6 @@
 bool servoStepActive = true;
 bool debugPosition = false;
 
-// Correction for Servo Direction and Position
-int servoOffsetAZ = -90;
-int servoOffsetEL = -90;
-
 PolarCoordinate servoLastPosition = {0, 0};
 
 void delayServo(PolarCoordinate position);

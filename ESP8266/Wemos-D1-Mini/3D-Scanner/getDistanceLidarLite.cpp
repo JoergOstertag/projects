@@ -31,6 +31,8 @@ LIDARLite myLidarLite;
 
 
 void initDistanceLidarLite() {
+  distanceFov = 2;
+
   Serial.println("Conneting Lidar Lite ...");
   /*
     begin(int configuration, bool fasti2c, char lidarliteAddress)

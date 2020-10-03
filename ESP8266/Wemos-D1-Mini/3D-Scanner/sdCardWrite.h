@@ -5,7 +5,7 @@
 // Interrims import
 #include "resultStorageHandler.h"
 
-void sdCardWrite(ResultStorageHandler &resultStorageHandler);
+void sdCardWriteCSV(ResultStorageHandler &resultStorageHandler);
 void initSdCard();
 //File sdOpen(String fileName);
 

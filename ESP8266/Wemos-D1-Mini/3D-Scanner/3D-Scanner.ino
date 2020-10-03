@@ -90,7 +90,7 @@ void loop() {
 
 
   if ( currentResultArrayIndex >= (resultStorageHandler.maxValidIndex() - 1)) {
-    sdCardWrite(resultStorageHandler);
+    sdCardWriteCSV(resultStorageHandler);
   }
 
   if (servoStepActive) {

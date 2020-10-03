@@ -40,6 +40,40 @@ File sdOpen(String fileName) {
   return myFile;
 }
 
+
+
+void dir(char *dirName) {
+  SdFile root;
+  SdFile file;
+
+  char fileName[512];
+
+  int rootFileCount = 0;
+  if (!root.open(dirName)) {
+    Serial.println("open root failed");
+  }
+  while (file.openNext(&root, O_RDONLY)) {
+    if (!file.isHidden()) {
+      rootFileCount++;
+    }
+
+    file.getName(fileName, 511);
+    Serial.print(fileName);
+    Serial.print(" ");
+    if (file.isDir()) {
+      Serial.print("DIR");
+    }
+    Serial.println();
+  }
+  file.close();
+
+  Serial.print("Seen ");
+  Serial.print(rootFileCount);
+  Serial.print(" Files in Directory '");
+  Serial.print(dirName);
+  Serial.println("'");
+}
+
 void readSdCardFile(String fileName) {
   // re-open the file for reading:
   myFile = SD.open(fileName);
@@ -47,16 +81,16 @@ void readSdCardFile(String fileName) {
     Serial.println("test.txt:");
 
     // read from the file until there's nothing else in it:
-    int lineCount = 0;
+    int byteCount = 0;
     while (myFile.available()) {
       Serial.write(myFile.read());
-      lineCount++;
+      byteCount++;
       ESP.wdtFeed();
-      delay(1);
+      // delay(1);
     }
     // close the file:
     myFile.close();
-    Serial.printf("Seen %d Lines\n", lineCount);
+    Serial.printf("Seen %d Lines\n", byteCount);
   } else {
     // if the file didn't open, print an error:
     Serial.println("error opening test.txt");
@@ -71,16 +105,20 @@ void sdCardFileCountLines(String fileName) {
     Serial.print("Check " + fileName + "\n");
 
     // read from the file until there's nothing else in it:
+    int byteCount = 0;
     int lineCount = 0;
     while (myFile.available()) {
-      myFile.read();
-      lineCount++;
+      char c = myFile.read();
+      if ( c == '\n' ) {
+        lineCount++;
+      }
+      byteCount++;
       ESP.wdtFeed();
-      delay(1);
+      // delay(1);
     }
     // close the file:
     myFile.close();
-    Serial.printf("Seen %d Lines\n", lineCount);
+    Serial.printf("Seen %d Lines, %d Bytes\n", lineCount, byteCount);
   } else {
     // if the file didn't open, print an error:
     Serial.println("error opening test.txt");
@@ -96,9 +134,11 @@ void createFolder() {
   }
 }
 
-void sdCardWriteInternal(ResultStorageHandler &resultStorageHandler) {
+void sdCardWriteCsvInternal(ResultStorageHandler &resultStorageHandler) {
 
-  Serial.print(F("\nInitializing SD card..."));
+  Serial.println(F("\nWriting CSV to SD card ... "));
+
+  Serial.print(F("\nInitializing SD card ... "));
 
   if (!SD.begin(SD_CS_PIN)) {
     Serial.println("initialization failed!");
@@ -120,18 +160,21 @@ void sdCardWriteInternal(ResultStorageHandler &resultStorageHandler) {
     myFile.println("az,el,distance");
 
     String output;
-    output.reserve(2000);
+    output.reserve(100);
 
-    for ( int i = 0; i < resultStorageHandler.maxIndex(); i++) {
-      PolarCoordinate position = resultStorageHandler.getPosition(i);
+    for ( int i = 0; i < resultStorageHandler.maxValidIndex(); i++) {
+      int dist = resultStorageHandler.getResult(i);
+      if ( dist > 0) {
+        PolarCoordinate position = resultStorageHandler.getPosition(i);
 
-      output = position.az;
-      output += ";";
-      output += position.el;
-      output += ";";
-      output += resultStorageHandler.getResult(i);
-      myFile.println(output );
+        output = position.az;
+        output += ";";
+        output += position.el;
+        output += ";";
+        output += dist;
+        myFile.println(output );
 
+      }
     }
 
     // close the file:
@@ -143,12 +186,13 @@ void sdCardWriteInternal(ResultStorageHandler &resultStorageHandler) {
   }
 
   sdCardFileCountLines(fileName);
+  dir("/");
 }
 #endif
 
-void sdCardWrite(ResultStorageHandler &resultStorageHandler) {
+void sdCardWriteCSV(ResultStorageHandler &resultStorageHandler) {
 #ifdef USE_SD_CARD
-  sdCardWriteInternal(resultStorageHandler);
+  sdCardWriteCsvInternal(resultStorageHandler);
 #else
   Serial.println("Writing to SD DISABLED");
 #endif

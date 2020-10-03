@@ -59,7 +59,6 @@ bool handleParameters() {
   changes |= parseParameter(server, "servoPosAzMin",    resultStorageHandler.servoPosAzMin);
   changes |= parseParameter(server, "servoPosAzMax",    resultStorageHandler.servoPosAzMax);
   changes |= parseParameter(server, "servoStepAz",      resultStorageHandler.servoStepAz);
-  parseParameter(server, "servoOffsetAZ", servoOffsetAZ);
 
   if ( !servoStepActive) {
     // parseParameter(server, "servoPosEl",    position.az );
@@ -68,7 +67,6 @@ bool handleParameters() {
   changes |= parseParameter(server, "servoPosElMin",    resultStorageHandler.servoPosElMin);
   changes |= parseParameter(server, "servoPosElMax",    resultStorageHandler.servoPosElMax);
   changes |= parseParameter(server, "servoStepEl",      resultStorageHandler.servoStepEl);
-  parseParameter(server, "servoOffsetEL", servoOffsetEL);
 
 
   parseParameter(server, "servoStepActive", servoStepActive);
@@ -266,6 +264,7 @@ void handleStartNewScan() {
   currentResultArrayIndex = 0;
   resultStorageHandler.resetResults();
   servoStepActive = true;
+  server.send(200, "text/html", "<html>New Scan started</html>");
 }
 
 /**
@@ -305,13 +304,14 @@ void handleInputForm() {
   server.sendContent( formString("servoPosAzMin",        resultStorageHandler.servoPosAzMin));
   server.sendContent( formString("servoPosAzMax",        resultStorageHandler.servoPosAzMax));
   server.sendContent( formString("servoStepAz",          resultStorageHandler.servoStepAz));
-  server.sendContent( formString("servoOffsetAZ",        servoOffsetAZ));
 
   server.sendContent( F("         <tr><td><br></td></tr>\n" ));
   server.sendContent( formString("servoPosElMin",        resultStorageHandler.servoPosElMin));
   server.sendContent( formString("servoPosElMax",        resultStorageHandler.servoPosElMax));
   server.sendContent( formString("servoStepEl",          resultStorageHandler.servoStepEl));
-  server.sendContent( formString("servoOffsetEL",        servoOffsetEL));
+
+  PolarCoordinate maxPosition = resultStorageHandler.getPosition(resultStorageHandler.maxValidIndex());
+  server.sendContent( "         <tr><td>Max Elevation: </td><td>Az: " + String(maxPosition.el)  + " , El: " + String(maxPosition.az) + "</td></tr>\n");
 
   server.sendContent( F("         <tr><td><br></td></tr>\n" ));
   server.sendContent( formString("servoStepActive",      servoStepActive));
@@ -340,7 +340,8 @@ void handleInputForm() {
                          "     </form><br>\n"
 
                          "<br/>"
-                         " <a href=\"/startNewScan\"> start New Clean Scan</a><br/>"
+                         " <a href=\"/startNewScan\" target=\"command\"> start New Clean Scan</a><br/>"
+                         " <a href=\"/writeToSdCardCsv.cgi\"  target=\"command\"> write csv to SD Card</a><br/>"
                          "    </div>\n\n"
                          "   </div>\n\n"
                          " </body>\n\n"
@@ -349,6 +350,7 @@ void handleInputForm() {
 
 
   Serial.println("DONE");
+  server.send(200, "text/html", "<html>CSV Write done</html>");
 }
 
 
@@ -400,12 +402,14 @@ void deliverScad() {
                 "// ===========================================================\n"
                 "// 3D-Scan with Distance Sensor\n"
                 "// ===========================================================\n"
-                "fov=20;\n"
-                "\n"
-                "\n"
-                "\n"
-                "\n"
-              ));
+                "fov= "));
+  server.sendContent( String(distanceFov));
+  server.sendContent( F(";\n"
+                        "\n"
+                        "\n"
+                        "\n"
+                        "\n"
+                       ));
 
   for ( int i = 0; i < resultStorageHandler.maxValidIndex(); i++) {
     PolarCoordinate position = resultStorageHandler.getPosition(i);
@@ -540,8 +544,10 @@ void deliverRoomLayoutSvg() {
 }
 
 
-void writeToSdCard() {
-  sdCardWrite(resultStorageHandler);
+void handleWriteToSdCardCsv() {
+  Serial.println("handleWriteToSdCardCsv");
+  sdCardWriteCSV(resultStorageHandler);
+  server.send(200, "image/svg+xml", "<html>Writing to SD Card Done</html>");
 }
 
 
@@ -581,7 +587,7 @@ void initWebserver(ResultStorageHandler &newResultStorageHandler) {  // Register
     server.on("/roomLayout.html", deliverRoomLayoutHtml);
     server.on("/inputForm.html", handleInputForm);
     server.on("/file", handleFile);
-    server.on("/writeToSdCard.cgi", writeToSdCard);
+    server.on("/writeToSdCardCsv.cgi", handleWriteToSdCardCsv);
     server.on("/startNewScan", handleStartNewScan);
     server.onNotFound(handleNotFound);
     server.begin();
