@@ -1,8 +1,6 @@
 #include <Arduino.h>
 #include <PCA9685.h>
 
-#include "Constants.h"
-
 //#define OUTPUT_ENABLE_PIN
 
 PCA9685 pca9685;
