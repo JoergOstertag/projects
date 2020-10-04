@@ -152,7 +152,7 @@ void deliverRoomLayoutHtml() {
   server.sendContent(
     // Uptime
     upTimeString() + "<br/>\n"
-
+    "DateTimeString: "+ dateTimeString() + "<br/>\n"
     // Show Scan percentage
     + "Scan: " + String(currentResultArrayIndex * 100 / resultStorageHandler.maxIndex() ) + " %<br/>\n"
 
@@ -350,11 +350,11 @@ void handleInputForm() {
   server.sendContent( "         <tr><td>maxValidIndex: </td><td>" + String(resultStorageHandler.maxValidIndex()) + "</td></tr>\n");
   server.sendContent( "         <tr><td>maxAvailableArrayIndex: </td><td>" + String(resultStorageHandler.maxAvailableArrayIndex) + "</td></tr>\n");
   server.sendContent( F( "  </table>\n"));
-  
+
   server.sendContent( F( "    </div>\n\n"
-                      "   </div>\n\n"
-                      " </body>\n\n"
-                      "</html>\n"));
+                         "   </div>\n\n"
+                         " </body>\n\n"
+                         "</html>\n"));
   server.chunkedResponseFinalize();
 
 
