@@ -15,6 +15,8 @@
 #include "getDistance.h"
 
 
+
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266mDNS.h>
@@ -55,8 +57,32 @@ void showMemory() {
   Serial.print("MaxFreeBlockSize: "); Serial.print( maxBlock / 1024); Serial.println("KB");
 }
 
+/**
+    Check current WiFi Status and reconnect if necessary
+*/
+wl_status_t prevStatus;
+void checkWifiStatus(void) {
+
+  if (WiFi.status() != prevStatus) {
+    Serial.print("Wifi State changed to ");
+    Serial.println(ESP_wifiManager.getStatus(WiFi.status()));
+    prevStatus = WiFi.status();
+    if ( WiFi.isConnected() ) {
+      Serial.print("Local IP: ");  Serial.println(WiFi.localIP());
+      Serial.print("SSID: ");      Serial.println(WiFi.SSID());
+    }
+  }
+
+  if (!WiFi.isConnected()) {
+    ESP_wifiManager.autoConnect();
+  }
+}
+
 
 void loop() {
+
+  checkWifiStatus();
+
 
   if (servoStepActive) {
     if ( currentResultArrayIndex == 0 ) {
@@ -126,19 +152,21 @@ void setup() {
   Serial.println("3D-Scanner .... ");
 
 
+  {
+    Serial.println("Wifi Manager ...");
+    ESP_wifiManager.setDebugOutput(true);
 
-  Serial.println("Wifi Manager ...");
-  ESP_wifiManager.setDebugOutput(true);
+    // ESP_wifiManager.setMinimumSignalQuality(-1);
 
-  // ESP_wifiManager.setMinimumSignalQuality(-1);
+    // To reset the configuration simply diconnect from the current Wifi
+    // WiFi.disconnect();
 
-  // To reset the configuration simply diconnect from the current Wifi
-  // WiFi.disconnect();
+    ESP_wifiManager.autoConnect();
+    Serial.println("");
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+  }
 
-  ESP_wifiManager.autoConnect();
-  Serial.println("");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
 
   initPositioner();
 

@@ -311,7 +311,6 @@ void handleInputForm() {
   server.sendContent( formString("servoStepEl",          resultStorageHandler.servoStepEl));
 
   PolarCoordinate maxPosition = resultStorageHandler.getPosition(resultStorageHandler.maxValidIndex());
-  server.sendContent( "         <tr><td>Max Elevation: </td><td>Az: " + String(maxPosition.el)  + " , El: " + String(maxPosition.az) + "</td></tr>\n");
 
   server.sendContent( F("         <tr><td><br></td></tr>\n" ));
   server.sendContent( formString("servoStepActive",      servoStepActive));
@@ -341,11 +340,21 @@ void handleInputForm() {
 
                          "<br/>"
                          " <a href=\"/startNewScan\" target=\"command\"> start New Clean Scan</a><br/>"
-                         " <a href=\"/writeToSdCardCsv.cgi\"  target=\"command\"> write csv to SD Card</a><br/>"
-                         "    </div>\n\n"
-                         "   </div>\n\n"
-                         " </body>\n\n"
-                         "</html>\n"));
+                         " <a href=\"/writeToSdCardCsv.cgi\"  target=\"command\"> write csv to SD Card</a><br/>"));
+
+  server.sendContent( F( "   <table>\n"));
+  server.sendContent( "         <tr><td>Max Elevation: </td><td>El: " + String(maxPosition.el)  + " , Az: " + String(maxPosition.az) + "</td></tr>\n");
+  server.sendContent( "         <tr><td>servoNumPointsAz: </td><td>" + String( resultStorageHandler.servoNumPointsAz()) + "</td></tr>\n");
+  server.sendContent( "         <tr><td>servoNumPointsEl: </td><td>" + String(resultStorageHandler.servoNumPointsEl()) + "</td></tr>\n");
+  server.sendContent( "         <tr><td>maxIndex: </td><td>" + String(resultStorageHandler.maxIndex()) + "</td></tr>\n");
+  server.sendContent( "         <tr><td>maxValidIndex: </td><td>" + String(resultStorageHandler.maxValidIndex()) + "</td></tr>\n");
+  server.sendContent( "         <tr><td>maxAvailableArrayIndex: </td><td>" + String(resultStorageHandler.maxAvailableArrayIndex) + "</td></tr>\n");
+  server.sendContent( F( "  </table>\n"));
+  
+  server.sendContent( F( "    </div>\n\n"
+                      "   </div>\n\n"
+                      " </body>\n\n"
+                      "</html>\n"));
   server.chunkedResponseFinalize();
 
 

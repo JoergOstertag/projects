@@ -22,7 +22,7 @@ Um die Servosteuerung zu trennen habe ich das PCA9685 Board verwendet (ein 16 Ka
 Dieser steuert jetzt die beiden Servos an und hat auch eine eigene Stromversorgung für die Servos bekommen.
 Damit funktioniert das Ganze recht zuverlässig.
 
-Die beiden LIDAR Scanner sind beide über I2C anschliessbar. Sowohl der Garmin Sensor als auch der günstige
+Die beiden LIDAR Sensoren sind beide über I2C anschliessbar. Sowohl der Garmin Sensor als auch der günstige
 VL53L0X Sensor. Damit ist die I2C Schnittstelle (Pin D1,D2) des Wemos Chip schon belegt. 
 Um auf die SD-Karte zu schreiben braucht man die SPI Schnittstelle damit sind die Pins der SPI Schnittstelle (D5,D6,D7,D8) auch belegt.
 Somit bleiben nur noch der PIN D0,D3 und D4 übrig um einen Servo an zu steuern. 
@@ -35,6 +35,12 @@ Denn dadurch sind nach außen wirklich nur 4 Kabel an die Sensoreinheit notwendi
 ![distanceGraph.svg](img/distanceGraph.svg)
 ![roomLayout.svg](img/roomLayout.svg)
 ![scan-3D.scad](img/scan-3D.scad
+
+Weitere Links
+-------------
+
+https://static.garmin.com/pumac/LIDAR_Lite_v3_Operation_Manual_and_Technical_Specifications.pdf
+
 
 Andere ähnliche Projekte:
 -------------------------

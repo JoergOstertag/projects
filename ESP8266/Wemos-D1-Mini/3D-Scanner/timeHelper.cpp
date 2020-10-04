@@ -1,5 +1,6 @@
 #include "timeHelper.h"
 
+
 String upTimeString() {
   char temp[100];
   int sec = millis() / 1000;
@@ -36,4 +37,5 @@ String dateTimeString() {
 void initTimeHelper() {
   // Set timezone to get the resulting time as local time (not as GMT)
   configTime(MYTZ, "pool.ntp.org");
+
 }
