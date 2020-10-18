@@ -5,7 +5,9 @@ debug=0;
 debugFrames=1*debug;
 
 // Select part to render/print
-part=0; // [ 0:All, 11:adapter 16mm mit raste, 12: Adapter 15.7mm ohne raste]
+part=0; // [ 0:All, 11:adapter d16mm h2.8 mit raste, 12: Adapter d15.7mm h3.4 ohne raste]
+// Not working:
+// , 13: Adapter d20mm h2.4 ohne raste, 14: Adapter d19.8mm h8.4 ohne raste]
 
 // Border for walls 
 border=1.3;
@@ -47,6 +49,9 @@ module showPart(part=0){
     // Part Ids for Debugging
 	if ( part == 11) Adapter(d=16,withRecess=1,h=2.8);
 	if ( part == 12) Adapter(d=15.7,withRecess=0,h=3.4);
+ 	// Not working:
+    // if ( part == 13) Adapter(d=20.0,withRecess=0,h=2.4); 
+    // if ( part == 14) Adapter(d=19.8,withRecess=0,h=8.4);
     
 	
     if ( debug ) {
@@ -60,7 +65,7 @@ module showPart(part=0){
 
 
 module Adapter(
-    h=2.8,
+    h=2.8, // max << 7mm since screw is only 9mm 
     d=15.7,
     withRecess=0
 ){ 
@@ -82,7 +87,7 @@ module Adapter(
         
         // schraube
         translate([0,0,-.01])
-            cylinder(d=4.9,h=9);
+            cylinder(d=4.9,h=h+9);
 
         // auflage am motor
         translate([0,0,-.01])
