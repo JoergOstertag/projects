@@ -24,7 +24,7 @@ addSpace2XYZ=addSpace*2*[1,1,1];
 /* [Hidden] */
 
 // Number of segments in circle
-$fn=25;
+$fn=55;
 
 difference(){
     showPart(part=part);
@@ -65,7 +65,7 @@ module Adapter16mm(){
         // innerhalb des Werkzeuges
         union(){
             translate([16.0/2-.2,-3.8/2,-.01])
-                cube([2.7,3.8,h]);
+                cube([2.5,3.5,h]);
             cylinder(d=16.0,h=h+.1);
             
             // Abdeckplatte vertiefung
