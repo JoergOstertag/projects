@@ -14,7 +14,7 @@ Wenn das mehr Zeug eine recht hohe Masse hat muss man natürlich die Schraube se
 
 
 ### result
-![result](img/result.jpg)
+![result](img/result.jpg|width=100)
 
 
 
