@@ -3,7 +3,6 @@ Adapter für den kleinen Bosch Akku Winkelschleifer
 
 
 ### example mounted
-![example mounted](img/example-mounted.jpg){:height="50%" width="50%"}
 
 <img src="img/example-mounted.jpg" height="50%" width="50%">
 
@@ -16,7 +15,7 @@ Wenn das mehr Zeug eine recht hohe Masse hat muss man natürlich die Schraube se
 
 
 ### result
-![result](img/result.jpg){:height="50%" width="50%"}
+<img src="img/result.jpg" height="50%" width="50%">
 
 
 
@@ -28,11 +27,11 @@ Ali Express Links:
 [Grinder Shaping Blade 65mm Wood Carving Disc 12 Teeth 16mm Bore Wood Shaping Disc Grinder Disc for 100/115 Angle Grinder](https://de.aliexpress.com/item/4000263256386.html)
 
 ### photo 2020 10 18 13 39 57
-![photo 2020 10 18 13 39 57](img/photo_2020-10-18_13-39-57.jpg)
+<img src="img/photo_2020-10-18_13-39-57.jpg" height="50%" width="50%">
 
 
 ### WIN 20201018 15 18 20 Pro
-![WIN 20201018 15 18 20 Pro](img/WIN_20201018_15_18_20_Pro.jpg)
+<img src="img/WIN_20201018_15_18_20_Pro.jpg" height="50%" width="50%">
 
 
 
@@ -41,10 +40,10 @@ Ali Express Links:
 [75mm inner 16mm Tungsten Carbide Wood Grinding Wheel Discs Angle Grinder Sanding Discs Metal Plastic Wood Abrasive Tool](https://www.aliexpress.com/item/4000299728868.html)
 
 ### photo 2020 10 18 15 23 17
-![photo 2020 10 18 15 23 17](img/photo_2020-10-18_15-23-17.jpg)
+<img src="img/photo_2020-10-18_15-23-17.jpg" height="50%" width="50%">
 
 ### photo 2020 10 18 15 23 18
-![photo 2020 10 18 15 23 18](img/photo_2020-10-18_15-23-18.jpg)
+<img src="img/photo_2020-10-18_15-23-18.jpg" height="50%" width="50%">
 
 ### WIN 20201018 15 15 20 Pro
-![WIN 20201018 15 15 20 Pro](img/WIN_20201018_15_15_20_Pro.jpg)
+<img src="img/WIN_20201018_15_15_20_Pro.jpg" height="50%" width="50%">
