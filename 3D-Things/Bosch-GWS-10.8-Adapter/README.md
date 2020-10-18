@@ -5,6 +5,8 @@ Adapter für den kleinen Bosch Akku Winkelschleifer
 ### example mounted
 ![example mounted](img/example-mounted.jpg){:height="50%" width="50%"}
 
+<img src="img/example-mounted.jpg" height="50%" width="50%">
+
 Der Bosch GWS 10,8 ist ein genialer Winkelschleifer. Von Bosch bekommt man dort so ganz normal Trennscheiben fächerscheiben Punkt wenn man allerdings mehr verwenden will und danach sucht stellt man fest dass meistens der Innendurchmesser der Scheiben nicht ganz passt. Daher habe ich hier mal probiert ob man einen Adapter machen kann, der den Innendurchmesser so anpasst dass man auch andere Scheiben und Werkzeuge auf dem Winkelschleifer verwenden kann. Man muss natürlich sehr darauf aufpassen das alles 100% passt. Denn die Drehzahl des Winkelschleifers ist nicht ganz zu unterschätzen. Daher könnt ihr das gerne verwenden aber gar keine Garantie auf nichts.
 
 Einfach funktionieren tut es nur bis zu einem Durchmesser von 19 mm. Bis dahin ist das Werkzeug immer noch in den Metallplatten des Winkelschleifers eingespannt. Wenn es darüber hinaus geht denke ich reicht ein Plastik Adapter nicht mehr aus, denn er hat nicht mehr genügend Stabilität.
