@@ -140,18 +140,32 @@ cat /tmp/scadDirectories.txt | while read dir; do
 	find stl 
 
 	echo 
-	echo "Generate $dir/README-images.md"
-    find stl -name "*.png" | while read f ; do
-		name=`basename "$f"`
-		name="${name%.png}"
-		name="${name//-/ }"
-		name="${name//_/ }"
-		echo "### $name"
-		echo "![$name]($f)"
-		echo
-		
-    done >README-images.md
-    )
+	echo "Generate $dir/README-stl.md"
+	find stl -name "*.png" | while read f ; do
+	    name=`basename "$f"`
+	    name="${name%.png}"
+	    name="${name//-/ }"
+	    name="${name//_/ }"
+	    echo "### $name"
+	    echo "![$name]($f)"
+	    echo
+	done >README-stl.md
+
+
+	
+	echo 
+	echo "Generate $dir/README-img.md"
+	find img -name "*.png" -o -name "*.jpg" | while read f ; do
+	    name=`basename "$f"`
+	    name="${name%.png}"
+	    name="${name%.jpg}"
+	    name="${name//-/ }"
+	    name="${name//_/ }"
+	    echo "### $name"
+	    echo "![$name]($f)"
+	    echo
+	done >README-img.md
+        )
 done
 
 exit
