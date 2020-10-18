@@ -5,7 +5,7 @@ debug=0;
 debugFrames=1*debug;
 
 // Select part to render/print
-part=11; // [ 0:All, 1:adapter 16mm mit raste]
+part=0; // [ 0:All, 11:adapter 16mm mit raste, 12: Adapter 15.7mm ohne raste]
 
 // Border for walls 
 border=1.3;
@@ -45,7 +45,8 @@ module showPart(part=0){
     
  
     // Part Ids for Debugging
-	if ( part == 11) Adapter16mm();
+	if ( part == 11) Adapter(d=16,withRecess=1,h=2.8);
+	if ( part == 12) Adapter(d=15.7,withRecess=0,h=3.4);
     
 	
     if ( debug ) {
@@ -58,15 +59,21 @@ module showPart(part=0){
 
 
 
-module Adapter16mm(){ 
-    h=2.8;
+module Adapter(
+    h=2.8,
+    d=15.7,
+    withRecess=0
+){ 
+    
     difference(){
 
         // innerhalb des Werkzeuges
-        union(){
-            translate([16.0/2-.2,-3.8/2,-.01])
-                cube([2.5,3.5,h]);
-            cylinder(d=16.0,h=h+.1);
+        union(){ // recess/Aussparung/Lasche
+            if(withRecess)
+                translate([d/2-.2,-3.8/2,-.01])
+                    cube([2.5,3.5,h]);
+            
+            cylinder(d=d,h=h+.1);
             
             // Abdeckplatte vertiefung
             translate([0,0,h+.01])
