@@ -23,8 +23,11 @@ neigungSensor=$neigungSensor;
 
 // include <walls.scad>
 
+translate([0,0,-minZ]){
 // drawPolar();
+}
 drawKarth();
+
 
 ";
 }
@@ -32,16 +35,17 @@ drawKarth();
 sub writeModule($){
     my $of = shift;
     
-print $of "
+    print $of "
 
-module showMarker(x=0,y=0,z=0){
+    module showMarker(x=0,y=0,z=0){
     translate([x,y,z])
 	color(\"black\")
 	sphere(d=5);
-
 }
+";
 
-module segment(az=0, el=0, dist=20 ) {
+    print $of "
+    module segment(az=0, el=0, dist=20 ) {
     if ( dist > 0 ) {
        tanFactor=tan(fov);
        deltaDist= .1;
@@ -61,11 +65,9 @@ module segment(az=0, el=0, dist=20 ) {
                 }
       }
 }
+
     ";
 }
-
-
-my $minZ;
 
 
 sub readCsvFile($){
@@ -78,8 +80,6 @@ sub readCsvFile($){
 
     my $values;
 
-    $minZ   = 100000;
-    
     my $count=0;
     my $line = readline $fh; # Header weg
     while ( ! eof($fh) ) {
@@ -95,59 +95,100 @@ sub readCsvFile($){
 	my $az1 = $az * 1.0; # + 90.0;
 	my $el1 = $el * 1.11;
 	
-	# print "($az1,$el1,$dist)\n";
-	my $azRad = $az1 * pi() / 180;
-	my $elRad = $el1 * pi() / 180;
-	
-	my $distFloor= cos($elRad) * $dist;
-	my $z = sin($elRad) * $dist;
-	my $x = cos($azRad) * $distFloor;
-	my $y = sin($azRad) * $distFloor;
-
-	# Rotate 45° down for xyz
-	my $d = sqrt($x*$x + $z*$z);
-	my $alpha = atan($z / $x );
-	$alpha += $neigungSensor;
-	$x = $d * cos($alpha);
-	$z = $d * sin($alpha);
-
-	# Nachkomma Stellen reduzieren
-	$x =sprintf("%6.2f",$x);
-	$y =sprintf("%6.2f",$y);
-	$z =sprintf("%6.2f",$z);
-
 	# if ( $count < 20 )
 	{
 	    $values->{$az}->{$el}={
-		dist => $dist,
-		x    => $x,
-		y    => $y,
-		z    => $z,
 		az   => $az1,
 		el   => $el1,
+		dist => $dist,
 	    };
 	};
-	$minZ=min($z,$minZ);
     }
     close($fh);
     return $values;
 }
 
+sub addXZY($){
+    my $values = shift;
+    for my $az ( keys %{$values} ){
+	for my $el ( keys %{$values->{$az}}){
+	    my $az1 = $values->{$az}->{$el}->{az};
+	    my $el1 = $values->{$az}->{$el}->{el};
+	    my $dist = $values->{$az}->{$el}->{dist};
+	    	    
+	    # print "($az1,$el1,$dist)\n";
+	    my $azRad = $az1 * pi() / 180;
+	    my $elRad = $el1 * pi() / 180;
+	    
+	    my $distFloor= cos($elRad) * $dist;
+	    my $z = sin($elRad) * $dist;
+	    my $x = cos($azRad) * $distFloor;
+	    my $y = sin($azRad) * $distFloor;
+	    
+	    # Rotate 45° down for xyz
+	    my $d = sqrt($x*$x + $z*$z);
+	    my $alpha = atan($z / $x );
+	    $alpha += $neigungSensor;
+	    $x = $d * cos($alpha);
+	    $z = $d * sin($alpha);
+	    
+	    # Nachkomma Stellen reduzieren
+	    $x = sprintf("%6.2f",$x);
+	    $y = sprintf("%6.2f",$y);
+	    $z = sprintf("%6.2f",$z);
+	    
+	    
+	    $values->{$az}->{$el}->{x}=$x;
+	    $values->{$az}->{$el}->{y}=$y;
+	    $values->{$az}->{$el}->{z}=$z;
+	    
+	}
+    }
+}
+
+sub getMinZ($){
+    my $values = shift;
+    my $minZ   = 100000;
+    for my $az ( keys %{$values} ){
+	for my $el ( keys %{$values->{$az}}){
+	    my $z = $values->{$az}->{$el}->{z};
+	    $minZ=min($z,$minZ);
+	}
+    }
+    
+    return $minZ;
+}
+
+sub getElValues($){
+    my $values = shift;
+    my %elValues;
+    for my $az ( keys %{$values} ){
+	map { $elValues{$_} = 1 } keys %{$values->{$az}};
+    };
+    my @elValues = sort { $a <=> $b } keys %elValues;
+    return @elValues;
+}
+
+sub getAzValues($){
+    my $values = shift;
+    
+    my @azValues = sort { $a <=> $b } keys %{$values};
+    return @azValues;
+}
 
 foreach my $fileName (@ARGV) {
 
     my $values = readCsvFile($fileName);
-
+    addXZY($values);
+    my $minZ=getMinZ($values);
+    print "MinZ: $minZ\n";
+    
     my $baseFilename= "$fileName";
     $baseFilename =~s/\.csv//;
 
     # Get all possible az/el Values
     my @azValues = sort { $a <=> $b } keys %{$values};
-    my %elValues;
-    for my $az ( @azValues ) {
-	map { $elValues{$_} = 1 } keys %{$values->{$az}};
-    };
-    my @elValues = sort { $a <=> $b } keys %elValues;
+    my @elValues = getElValues($values);
     #print Dumper ( \@elValues );
     # print Dumper( \@azValues );
     
@@ -162,9 +203,6 @@ foreach my $fileName (@ARGV) {
     print $of "\n";
     print $of "minZ=$minZ;\n";
     print $of "\n";
-    print $of "translate([0,0,-minZ])\n";
-    print $of "// drawPolar();\n";
-    print $of "drawKarth();\n";
     print $of "\n";
     
     writeModule($of);
