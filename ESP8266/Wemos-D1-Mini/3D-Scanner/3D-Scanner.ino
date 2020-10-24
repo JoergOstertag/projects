@@ -4,8 +4,6 @@
   - adapt fov=20 to real value of sensor
   - put fov automatically into the resulting scad fi
   - Add sin() to calculation of in 2D-distances-SVG
-  - use separate iframes so the refreash not always reinjects the html Values (even after recompile)
-  - use seperate Sourcode Files
   - Check Memory usage for larger Scans (Maybe use seperate I2C RAM or SD-Card
   - refactor az/el calculation to have a loop over arrayindex (prevent rounding errors in index calculation)
   - inputForm fields only take integer (not float) displayint float is working

@@ -78,6 +78,18 @@ bool handleParameters() {
   parseParameter(server, "debugDistance", debugDistance);
   parseParameter(server, "debugResultPosition", resultStorageHandler.debugResultPosition);
 
+
+
+  changes |= parseParameter(server, "servoAzRef1Grad", servoAzRef1Grad );
+  changes |= parseParameter(server, "servoAzRef1Pulse", servoAzRef1Pulse );
+  changes |= parseParameter(server, "servoAzRef2Grad", servoAzRef2Grad );
+  changes |= parseParameter(server, "servoAzRef2Pulse", servoAzRef2Pulse );
+
+  changes |= parseParameter(server, "servoElRef1Grad", servoElRef1Grad  );
+  changes |= parseParameter(server, "servoElRef1Pulse", servoElRef1Pulse );
+  changes |= parseParameter(server, "servoElRef2Grad", servoElRef2Grad  );
+  changes |= parseParameter(server, "servoElRef2Pulse", servoElRef2Pulse );
+
   return changes;
 }
 
@@ -152,7 +164,7 @@ void deliverRoomLayoutHtml() {
   server.sendContent(
     // Uptime
     upTimeString() + "<br/>\n"
-    "DateTimeString: "+ dateTimeString() + "<br/>\n"
+    "DateTimeString: " + dateTimeString() + "<br/>\n"
     // Show Scan percentage
     + "Scan: " + String(currentResultArrayIndex * 100 / resultStorageHandler.maxIndex() ) + " %<br/>\n"
 
@@ -186,25 +198,33 @@ void handleRoot() {
                                   "\n"
                                   "<body>\n"
                                   "\n"
-                                  "  <h3><a href=\"/\">ESP8266 3D-Scanner</a></h3>\n"
-
-
                                   "\n"));
 
   {
     String output ;
     output.reserve(2000);
     output += F("   <div style=\"class:roomLayout; float:left; width:100%; margin:8px;\">\n");
+      output += "  <h3><a href=\"/\">ESP8266 3D-Scanner</a></h3>\n";
     {
       // Room Layout img Reference
       output += "\n";
-      output += "      <div style=\"float:left; height:" + String( SIZE_2D_GRAPH + 90 ) + "; width:" + String(SIZE_2D_GRAPH + 20) + "\">\n";
+      output += "      <div style=\"float:left; height:" + String( SIZE_2D_GRAPH + 120 ) + "; width:" + String(SIZE_2D_GRAPH + 20) + "\">\n";
       output += "          <iframe height=" + String( SIZE_2D_GRAPH + 60) + " width=" + String(SIZE_2D_GRAPH + 20) + " frameBorder=\"0\"  hspace=\"0\" vspace=\"0\" marginheight=\"0\" \"\n";
       output += "          src=\"/roomLayout.html\" />\n";
       output += "          </iframe>\n";
       output += "      </div>\n";
     }
 
+    server.sendContent(output); output = "";
+
+    {
+      // HTML Forms
+      //output += "      <div style=\"text-align:right; margin: 8px;\">\n";
+      output += F("   <iframe height=100%   width=500 src=\"inputForm.html\" />\n");
+      //output +=           inputForm();
+      //output += "      </div>\n\n";
+    }
+    
     {
       output += "  <div style=\"text-align:left; margin:8px;\">\n";
 
@@ -223,15 +243,6 @@ void handleRoot() {
       output += F("      <a href=\"/distanceGraph.svg\"  target=\"_blank\">distanceGraph.svg</a><br/>\n\n");
 
       output += "   </div>\n\n";
-    }
-    server.sendContent(output); output = "";
-
-    {
-      // HTML Forms
-      //output += "      <div style=\"text-align:right; margin: 8px;\">\n";
-      output += F("   <iframe height=600 width=400 src=\"inputForm.html\" />\n");
-      //output +=           inputForm();
-      //output += "      </div>\n\n";
     }
 
     output += F("    </div>\n"
@@ -298,7 +309,9 @@ void handleInputForm() {
   // border: 1px solid green;
   server.sendContent(F("   <div style=\"text-align:left; margin:8px; \">\n"
                        "   <a href=\"/inputForm.html\">Parameters:</a>\n"
-                       "     <form action=\"/inputForm.html\">\n"));
+                       "     <form action=\"/inputForm.html\">\n"
+                       "      <input type=\"submit\" value=\"Submit\">\n"
+                      ));
 
   server.sendContent("      <table>\n");
   server.sendContent( formString("servoPosAzMin",        resultStorageHandler.servoPosAzMin));
@@ -328,6 +341,16 @@ void handleInputForm() {
   server.sendContent( formString("debugPosition",        debugPosition));
   server.sendContent( formString("debugResultPosition",  resultStorageHandler.debugResultPosition ));
 
+  server.sendContent( formString("servoAzRef1Grad",      servoAzRef1Grad));
+  server.sendContent( formString("servoAzRef1Pulse",     servoAzRef1Pulse));
+  server.sendContent( formString("servoAzRef2Grad",      servoAzRef2Grad));
+  server.sendContent( formString("servoAzRef2Pulse",     servoAzRef2Pulse));
+
+  server.sendContent( formString("servoElRef1Grad",      servoElRef1Grad));
+  server.sendContent( formString("servoElRef1Pulse",     servoElRef1Pulse));
+  server.sendContent( formString("servoElRef2Grad",      servoElRef2Grad ));
+  server.sendContent( formString("servoElRef2Pulse",     servoElRef2Pulse ));
+
   if ( false ) {
     server.sendContent( F("    <div class=\"slidecontainer\"> \n\n"
                           "          <input type=\"range\" min=\"1\" max=\"100\" value=\"50\" class=\"slider\" id=\"myRange\">\n\n"
@@ -335,7 +358,6 @@ void handleInputForm() {
   }
 
   server.sendContent( F( "        </table>\n"
-                         "      <input type=\"submit\" value=\"Submit\">\n"
                          "     </form><br>\n"
 
                          "<br/>"
@@ -349,6 +371,9 @@ void handleInputForm() {
   server.sendContent( "         <tr><td>maxIndex: </td><td>" + String(resultStorageHandler.maxIndex()) + "</td></tr>\n");
   server.sendContent( "         <tr><td>maxValidIndex: </td><td>" + String(resultStorageHandler.maxValidIndex()) + "</td></tr>\n");
   server.sendContent( "         <tr><td>maxAvailableArrayIndex: </td><td>" + String(resultStorageHandler.maxAvailableArrayIndex) + "</td></tr>\n");
+
+
+
   server.sendContent( F( "  </table>\n"));
 
   server.sendContent( F( "    </div>\n\n"
