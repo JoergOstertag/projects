@@ -204,7 +204,7 @@ void handleRoot() {
     String output ;
     output.reserve(2000);
     output += F("   <div style=\"class:roomLayout; float:left; width:100%; margin:8px;\">\n");
-      output += "  <h3><a href=\"/\">ESP8266 3D-Scanner</a></h3>\n";
+    output += "  <h3><a href=\"/\">ESP8266 3D-Scanner</a></h3>\n";
     {
       // Room Layout img Reference
       output += "\n";
@@ -220,34 +220,15 @@ void handleRoot() {
     {
       // HTML Forms
       //output += "      <div style=\"text-align:right; margin: 8px;\">\n";
-      output += F("   <iframe height=100%   width=500 src=\"inputForm.html\" />\n");
+      output += F("   <iframe height=100%   width=700 src=\"inputForm.html\" />\n");
       //output +=           inputForm();
       //output += "      </div>\n\n";
     }
-    
-    {
-      output += "  <div style=\"text-align:left; margin:8px;\">\n";
-
-      // Link to Documentation
-      output +=  F("<a href=\"https://github.com/JoergOstertag/projects/blob/master/ESP8266/Wemos-D1-Mini/3D-Scanner/README.md\"  target=\"_blank\">"
-                   "Documentation"
-                   "</a><br/>\n");
-
-      // Open Scad Reference
-      output += F("      <a href=\"/scan-3D.scad\" target=\"_blank\">scan-3D.scad</a><br/>\n\n");
-
-      // CSV Reference
-      output += F("      <a href=\"/scan.csv\"  target=\"_blank\">scan.csv</a><br/>\n\n");
-
-      // /distanceGraph.svg
-      output += F("      <a href=\"/distanceGraph.svg\"  target=\"_blank\">distanceGraph.svg</a><br/>\n\n");
-
-      output += "   </div>\n\n";
-    }
+    server.sendContent(output); output = "";
 
     output += F("    </div>\n"
                 "\n");
-    server.sendContent(output);
+    server.sendContent(output); output = "";
   }
 
 
@@ -290,69 +271,82 @@ void handleInputForm() {
 
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);   //Enable Chunked Transfer
   server.send(200, "text/html", "");
-  server.sendContent(F("<html>\n"
-                       "<head>\n"
-                       "  <title><a href=\"/\">Parameters</a></title>\n"
-                       "  <style>\n"
-                       "    body {\n"
-                       "     background-color: #cccccc;\n"
-                       "     font-family: Arial, Helvetica, Sans-Serif;\n"
-                       "     Color: #000088;\n"
-                       "     }\n"
-                       "  </style>\n"
-                       "</head>\n\n"
-                       "\n"
-                       "<body>\n"
-                       "\n"
-                       " <div style=\"text-align:right; margin: 8px;\">\n"));
+  server.sendContent( F("<html>\n"
+                        "<head>\n"
+                        "  <title>Parameters</title>\n"
+                        "  <style>\n"
+                        "    body {\n"
+                        "     background-color: #cccccc;\n"
+                        "     font-family: Arial, Helvetica, Sans-Serif;\n"
+                        "     Color: #000088;\n"
+                        "     }\n"
+                        "  </style>\n"
+                        "</head>\n\n"
+                        "\n"
+                        "<body>\n"
+                        "\n"
+                        " <div style=\"text-align:right; margin: 8px;\">\n"));
 
   // border: 1px solid green;
-  server.sendContent(F("   <div style=\"text-align:left; margin:8px; \">\n"
-                       "   <a href=\"/inputForm.html\">Parameters:</a>\n"
-                       "     <form action=\"/inputForm.html\">\n"
-                       "      <input type=\"submit\" value=\"Submit\">\n"
+  server.sendContent( F("   <div style=\"text-align:left; margin:8px; \">\n"
+                        "     <form action=\"/inputForm.html\">\n"
+                        "      <a href=\"/inputForm.html\">Parameters:</a>\n"
+                        "      <input type=\"submit\" value=\"Submit\">\n"
+                       ));
+
+  server.sendContent( F("      <table>\n"
+                        "        <TR>\n"
+                        "            <TD>Az:</TD>"));
+  server.sendContent( formString("", "servoPosAzMin",        resultStorageHandler.servoPosAzMin,      ""));
+  server.sendContent( formString("", "servoPosAzMax",        resultStorageHandler.servoPosAzMax,      ""));
+  server.sendContent( formString("", "servoStepAz",          resultStorageHandler.servoStepAz,        ""));
+
+  server.sendContent( F("         </TR>\n"
+                        "\n"
+                        "        <TR> <TD>El:</TD>"));
+  server.sendContent( formString("", "servoPosElMin",        resultStorageHandler.servoPosElMin,     ""));
+  server.sendContent( formString("", "servoPosElMax",        resultStorageHandler.servoPosElMax,     ""));
+  server.sendContent( formString("", "servoStepEl",          resultStorageHandler.servoStepEl,     ""));
+  server.sendContent(F("      </TR>\n"
+                       "\n"
                       ));
-
-  server.sendContent("      <table>\n");
-  server.sendContent( formString("servoPosAzMin",        resultStorageHandler.servoPosAzMin));
-  server.sendContent( formString("servoPosAzMax",        resultStorageHandler.servoPosAzMax));
-  server.sendContent( formString("servoStepAz",          resultStorageHandler.servoStepAz));
-
-  server.sendContent( F("         <tr><td><br></td></tr>\n" ));
-  server.sendContent( formString("servoPosElMin",        resultStorageHandler.servoPosElMin));
-  server.sendContent( formString("servoPosElMax",        resultStorageHandler.servoPosElMax));
-  server.sendContent( formString("servoStepEl",          resultStorageHandler.servoStepEl));
 
   PolarCoordinate maxPosition = resultStorageHandler.getPosition(resultStorageHandler.maxValidIndex());
 
-  server.sendContent( F("         <tr><td><br></td></tr>\n" ));
-  server.sendContent( formString("servoStepActive",      servoStepActive));
-  if (!servoStepActive) {
-    //server.sendContent( formString("servoPosAz",         position.az));
-    //server.sendContent( formString("servoPosEl",         position.el));
+  //  server.sendContent( F("         <tr><td><br></td></tr>\n" ));
+  server.sendContent( formString("", "servoStepActive",      servoStepActive,   ""));
+  if ( ! servoStepActive ) {
+    //    server.sendContent( formString("", "servoPosAz",         position.az),     "");
+    //    server.sendContent( formString("", "servoPosEl",         position.el),     "");
   }
-  server.sendContent( F("         <tr><td><br></td></tr>\n" ));
-  server.sendContent( formString("preMeasureDelay",      preMeasureDelay));
-  server.sendContent( formString("distanceMaxRetry",     distanceMaxRetry));
-  server.sendContent( formString("distanceNumAveraging", distanceNumAveraging));
 
   server.sendContent( F("         <tr><td><br></td></tr>\n" ));
-  server.sendContent( formString("debugDistance",        debugDistance));
-  server.sendContent( formString("debugPosition",        debugPosition));
-  server.sendContent( formString("debugResultPosition",  resultStorageHandler.debugResultPosition ));
 
-  server.sendContent( formString("servoAzRef1Grad",      servoAzRef1Grad));
-  server.sendContent( formString("servoAzRef1Pulse",     servoAzRef1Pulse));
-  server.sendContent( formString("servoAzRef2Grad",      servoAzRef2Grad));
-  server.sendContent( formString("servoAzRef2Pulse",     servoAzRef2Pulse));
+  server.sendContent( F("         <tr><td>Distance</td>\n" ) );
+  server.sendContent( formString(F("                      <td>pre Measure Delay</td>") ,      "preMeasureDelay",      preMeasureDelay,      F("         </tr>\n")));
+  server.sendContent( formString(F("         <tr><TD></TD><td>Max Retry</td>"),      "distanceMaxRetry",     distanceMaxRetry,     F("         </tr>\n")));
+  server.sendContent( formString(F("         <tr><TD></TD><td>Num Averaging</td>"),  "distanceNumAveraging", distanceNumAveraging, F("         </tr>\n")));
+  server.sendContent( formString(F("         <tr><TD></TD>"),                               "debugDistance",        debugDistance,        F("         </tr >\n")));
 
-  server.sendContent( formString("servoElRef1Grad",      servoElRef1Grad));
-  server.sendContent( formString("servoElRef1Pulse",     servoElRef1Pulse));
-  server.sendContent( formString("servoElRef2Grad",      servoElRef2Grad ));
-  server.sendContent( formString("servoElRef2Pulse",     servoElRef2Pulse ));
+  server.sendContent( F("         <tr><td><br></td></tr>\n" ));
+
+  server.sendContent( F("         <tr><td><br>Position: </td > \n" ));
+  server.sendContent( formString( F("                       "),                              "debugPosition",        debugPosition,     F("         </tr> ") ));
+  server.sendContent( formString( F("         <tr><TD></TD> "),                              "debugResultPosition",  resultStorageHandler.debugResultPosition ,     F(" </tr>\n")));
+
+  server.sendContent( formString( F("         <tr> <TD>Az: </TD> "),                          "servoAzRef1Grad",      servoAzRef1Grad,     ""));
+  server.sendContent( formString("",                                                          "servoAzRef1Pulse",     servoAzRef1Pulse,     F("         </tr> \n")));
+
+  server.sendContent( formString( F("         <tr><td></td>"),                             "servoAzRef2Grad",      servoAzRef2Grad,     ""));
+  server.sendContent( formString("",                                                          "servoAzRef2Pulse",     servoAzRef2Pulse,     F("         </tr> " )));
+
+  server.sendContent( formString( F("         <tr> <TD>El: </TD> " ),                          "servoElRef1Grad",      servoElRef1Grad,     ""));
+  server.sendContent( formString("",                                                          "servoElRef1Pulse",     servoElRef1Pulse,     F("         </tr> \n"  )));
+  server.sendContent( formString( F("         <tr><td></td> "),                               "servoElRef2Grad",      servoElRef2Grad,     ""));
+  server.sendContent( formString("",                                                          "servoElRef2Pulse",     servoElRef2Pulse,     F("         </tr> ")));
 
   if ( false ) {
-    server.sendContent( F("    <div class=\"slidecontainer\"> \n\n"
+    server.sendContent( F("    <div class = \"slidecontainer\"> \n\n"
                           "          <input type=\"range\" min=\"1\" max=\"100\" value=\"50\" class=\"slider\" id=\"myRange\">\n\n"
                           "    </div>\n\n"));
   }
@@ -366,15 +360,35 @@ void handleInputForm() {
 
   server.sendContent( F( "   <table>\n"));
   server.sendContent( "         <tr><td>Max Elevation: </td><td>El: " + String(maxPosition.el)  + " , Az: " + String(maxPosition.az) + "</td></tr>\n");
-  server.sendContent( "         <tr><td>servoNumPointsAz: </td><td>" + String( resultStorageHandler.servoNumPointsAz()) + "</td></tr>\n");
-  server.sendContent( "         <tr><td>servoNumPointsEl: </td><td>" + String(resultStorageHandler.servoNumPointsEl()) + "</td></tr>\n");
-  server.sendContent( "         <tr><td>maxIndex: </td><td>" + String(resultStorageHandler.maxIndex()) + "</td></tr>\n");
-  server.sendContent( "         <tr><td>maxValidIndex: </td><td>" + String(resultStorageHandler.maxValidIndex()) + "</td></tr>\n");
-  server.sendContent( "         <tr><td>maxAvailableArrayIndex: </td><td>" + String(resultStorageHandler.maxAvailableArrayIndex) + "</td></tr>\n");
-
-
-
+  server.sendContent( "         <tr><td>servo Num Points Az: </td><td>" + String( resultStorageHandler.servoNumPointsAz()) + "</td></tr>\n");
+  server.sendContent( "         <tr><td>servo Num Points El: </td><td>" + String(resultStorageHandler.servoNumPointsEl()) + "</td></tr>\n");
+  server.sendContent( "         <tr><td>max Index: </td><td>" + String(resultStorageHandler.maxIndex()) + "</td></tr>\n");
+  server.sendContent( "         <tr><td>max Valid Index: </td><td>" + String(resultStorageHandler.maxValidIndex()) + "</td></tr>\n");
+  server.sendContent( "         <tr><td>max Available ArrayIndex: </td><td>" + String(resultStorageHandler.maxAvailableArrayIndex) + "</td></tr>\n");
   server.sendContent( F( "  </table>\n"));
+
+  String output = "";
+  {
+    output += "  <div style=\"text-align:left; margin:8px;\">\n";
+
+    // Link to Documentation
+    output +=  F("<a href=\"https://github.com/JoergOstertag/projects/blob/master/ESP8266/Wemos-D1-Mini/3D-Scanner/README.md\"  target=\"_blank\">"
+                 "Documentation"
+                 "</a><br/>\n");
+
+    // Open Scad Reference
+    output += F("      <a href=\"/scan-3D.scad\" target=\"_blank\">scan-3D.scad</a><br/>\n\n");
+
+    // CSV Reference
+    output += F("      <a href=\"/scan.csv\"  target=\"_blank\">scan.csv</a><br/>\n\n");
+
+    // /distanceGraph.svg
+    output += F("      <a href=\"/distanceGraph.svg\"  target=\"_blank\">distanceGraph.svg</a><br/>\n\n");
+
+    output += "   </div>\n\n";
+  }
+  server.sendContent(output); output = "";
+
 
   server.sendContent( F( "    </div>\n\n"
                          "   </div>\n\n"

@@ -23,11 +23,12 @@ bool parseParameter(ESP8266WebServer &server, String name, float &value ) {
 }
 
 
-String formString(String name, int value) {
-  String output = "";
-  output += "          <tr><td>" + name + ": </td><td><input type=\"text\" name=\"" + name + "\" value=\"";
+String formString(String prefix, String name, int value, String postfix ) {
+  String output = prefix + "\n";
+  output += "          <td><input title=\"" + name + "\" type=\"text\" name=\"" + name + "\" size=\"6\" value=\"";
   output += value;
-  output += "\"></td></tr>\n";
+  output += "\"></td>\n";
+  output +=  postfix;
 
   return output;
 }
@@ -36,7 +37,7 @@ bool parseParameter(ESP8266WebServer &server, String name, int &value ) {
   String parameterString = server.arg(name);
   if (parameterString != "") {
     int newValue = parameterString.toInt();
-    if ( newValue != value ) {
+    if ( newValue != value) {
       Serial.print("parameterString(");
       Serial.print(name);
       Serial.print("): changed '");
@@ -53,29 +54,27 @@ bool parseParameter(ESP8266WebServer &server, String name, int &value ) {
 
 
 
-String formString(String name, bool value) {
+String formString(String prefix, String name, bool value, String postfix ) {
   if (formDebug) {
     Serial.print("formString(");
     Serial.print(name);
     Serial.print("): ");
     Serial.println(value);
   }
-  String output = "          "
-                  "<tr><td>"
-                  "<label for = \""
+  String output = prefix + "\n          "
+                  "<td>"
+                  " <label for = \""
                   + name
                   + "\">" + name + "</label>"
-                  + ": </td><td>"
-
-                  // <INPUT type="radio" name="sex" value="Male"> Male<BR>
-                  // <INPUT type="radio" name="sex" value="Female"> Female<BR>
+                  + ": </td> <td>"
                   + " <input type=\"radio\" id=\"" + name + "\" name=\"" + name + "\" value=\"ON\" " + ( value ? " checked " : " " ) + " > ON\n"
                   + " <input type=\"radio\" id=\"" + name + "\" name=\"" + name + "\" value=\"OFF\" " + ( !value ? " checked " : " " ) + " > OFF\n"
-                  + "</td></tr>\n";
+                  + "</td>\n"
+                  + postfix;
   return output;
 }
 
-bool parseParameter(ESP8266WebServer & server, String name, bool & value ) {
+bool parseParameter(ESP8266WebServer &server, String name, bool & value ) {
   if (server.hasArg(name)) {
     String parameterString = server.arg(name);
     if (formDebug) {
@@ -111,11 +110,12 @@ bool parseParameter(ESP8266WebServer & server, String name, bool & value ) {
 }
 
 
-String formString(String name, float value) {
-  String output = "";
-  output += "          <tr><td>" + name + ": </td><td><input type=\"text\" name=\"" + name + "\" value=\"";
+String formString(String prefix, String name, float value, String postfix ) {
+  String output = prefix + "\n";
+  output += "          <td><input title=\"" + name + "\" type=\"text\" name=\"" + name + "\" size=\"6\" value=\"";
   output += value;
-  output += "\"></td></tr>\n";
+  output += "\"></td>\n";
+  output += postfix;
 
   return output;
 }
