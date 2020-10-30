@@ -31,6 +31,7 @@ LIDARLite myLidarLite;
 
 
 void initDistanceLidarLite() {
+  
   distanceFov = 2;
 
   Serial.println("Conneting Lidar Lite ...");
@@ -79,7 +80,6 @@ int getDistanceLidarLite(bool debugDistance) {
 
   // Serial.printf(" preMeasureDelay: %d", preMeasureDelay);
   delay(preMeasureDelay);
-
 
   /*
     distance(bool biasCorrection, char lidarliteAddress)

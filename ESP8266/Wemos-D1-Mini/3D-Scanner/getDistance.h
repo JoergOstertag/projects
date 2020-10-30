@@ -13,4 +13,12 @@ extern int distanceNumAveraging;
 void initDistance();
 int getDistance(bool debugDistance);
 
+enum SensorTypes {
+  ULTRASONIC,
+  LIDAR_LITE,
+  TF_LUNA
+};
+extern SensorTypes sensorType;
+String sensorType2String( SensorTypes sensorType );
+
 #endif

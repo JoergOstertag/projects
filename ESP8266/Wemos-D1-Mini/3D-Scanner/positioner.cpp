@@ -3,6 +3,13 @@
 #include "positioner.h"
 #include <Arduino.h>
 
+#include <PCA9685.h>
+
+
+#ifndef SERVO_PCA
+#define SERVO_PWM
+#endif
+
 
 bool servoStepActive = true;
 bool debugPosition = false;
@@ -11,12 +18,9 @@ PolarCoordinate servoLastPosition = {0, 0};
 
 void delayServo(PolarCoordinate position);
 
-#ifndef SERVO_PCA
-#define SERVO_PWM
-#endif
 
-
-#ifdef SERVO_PCA
+// For SERVO_PCA
+PCA9685 pca9685;
 const uint8_t device_address = 0x40;
 
 const size_t loop_delay = 100;
@@ -35,13 +39,11 @@ float servoElRef2Grad  =    0;
 float servoElRef2Pulse = 2300;
 
 
-#include <PCA9685.h>
-
-PCA9685 pca9685;
 
 uint16_t servo_pulse_duration;
 
-void initPositioner() {
+void initPositionerPCA() {
+  Serial.println(F("Initialize PCA8685 ..."));
   pca9685.setupSingleDevice(Wire, device_address);
   pca9685.setToServoFrequency();
 
@@ -58,13 +60,11 @@ void pcaServoSet(PolarCoordinate position) {
   pca9685.setChannelServoPulseDuration(channelEl, servo_pulse_durationEl);
   delay(loop_delay );
 }
-#endif
 
 
 // ------------------------------------------------------
 // PWM
 // ------------------------------------------------------
-#ifdef SERVO_PWM
 Servo servo_az;
 Servo servo_el;
 
@@ -73,12 +73,17 @@ void pwmServoSet(PolarCoordinate position) {
   servo_az.write(position.az );
 }
 
-void initPositioner() {
+
+void initPositionerPWM() {
+  Serial.println(F("Initialize Normal PWM Servos ..."));
   Serial.println("Attaching Servo ...");
+  
+  Serial.print(F("AZ-Servo to Pin ")); Serial.print(PIN_SERVO_AZ); Serial.println();
   servo_az.attach(PIN_SERVO_AZ);  // attaches the servo
+  
+  Serial.print(F("EL-Servo to Pin ")); Serial.print(PIN_SERVO_EL); Serial.println();
   servo_el.attach(PIN_SERVO_EL);  // attaches the servo
 }
-#endif
 
 
 void delayServo(PolarCoordinate position) {
@@ -117,4 +122,15 @@ void servo_move(PolarCoordinate position) {
   delayServo(position);
 
   servoLastPosition = position;
+}
+
+
+
+void initPositioner() {
+#ifdef SERVO_PCA
+  initPositionerPCA();
+#else
+  initPositionerPWM();
+#endif
+
 }

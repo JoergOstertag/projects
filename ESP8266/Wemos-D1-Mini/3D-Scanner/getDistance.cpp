@@ -2,20 +2,12 @@
 
 #include "getDistance.h"
 
-#ifdef USE_DISTANCE_VL53L0X
 #include "getDistanceVl53L0X.h"
-#endif
-
-#ifdef USE_DISTANCE_LIDAR_LITE
 #include "getDistanceLidarLite.h"
-#endif
-
-
-#ifdef USE_DISTANCE_HCSR04
 #include <HCSR04.h>
 
 UltraSonicDistanceSensor distanceSensor(D3, D4);
-#endif
+
 
 /**
    The Maximum Number of retries
@@ -48,17 +40,34 @@ int preMeasureDelay = 5;
 */
 int distanceNumAveraging = 1;
 
+SensorTypes sensorType = LIDAR_LITE;
+
 void initDistance() {
+  switch ( sensorType ) {
+    case ULTRASONIC:
+      break;
+    case LIDAR_LITE:
+      initDistanceLidarLite();
+      break;
+    case TF_LUNA:
+      initDistanceVl53L0X();
+      break;
+  };
+}
 
-#ifdef USE_DISTANCE_VL53L0X
-  initDistanceVl53L0X();
-#endif
-
-#ifdef USE_DISTANCE_LIDAR_LITE
-  initDistanceLidarLite();
-#endif
-
-
+String sensorType2String( SensorTypes sensorType ) {
+  switch ( sensorType ) {
+    case ULTRASONIC:
+      return(F("Ultrasonic HC-SR04"));
+      break;
+    case LIDAR_LITE:
+      return(F("Garmin Lidar Lite"));
+      break;
+    case TF_LUNA:
+      return(F("TF Lnua"));
+      break;
+  };
+  return "Unknown Sensor";
 }
 
 int getDistance(bool debugDistance) {
@@ -69,15 +78,18 @@ int getDistance(bool debugDistance) {
   int avgCount = 0;
   for (int i = 0; i < distanceNumAveraging ; i++) {
     int dist_mm = -1;
-#ifdef USE_DISTANCE_VL53L0X
-    dist_mm = getDistanceVl53L0X(debugDistance);
-#endif
-#ifdef USE_DISTANCE_LIDAR_LITE
-    dist_mm = getDistanceLidarLite(debugDistance);
-#endif
-#ifdef USE_DISTANCE_HCSR04
-    dist_mm = 10.0 * distanceSensor.measureDistanceCm();
-#endif
+    switch ( sensorType ) {
+      case ULTRASONIC:
+        dist_mm = 10.0 * distanceSensor.measureDistanceCm();
+        break;
+      case LIDAR_LITE:
+        dist_mm = getDistanceLidarLite(debugDistance);
+        break;
+      case TF_LUNA:
+        dist_mm = getDistanceVl53L0X(debugDistance);
+        break;
+    };
+
 
     if (dist_mm > 0) {
       dist_mm_avg += dist_mm;

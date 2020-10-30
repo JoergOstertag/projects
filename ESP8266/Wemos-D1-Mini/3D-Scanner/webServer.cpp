@@ -123,7 +123,7 @@ void deliverDistanceGraph() {
 
   for ( int i = 0; i < resultStorageHandler.maxValidIndex(); i++) {
     PolarCoordinate position = resultStorageHandler.getPosition(i);
-    int el = position.el;
+//    int el = position.el;
     int az = position .az;
     int y2 = resultStorageHandler.getResult(i) * height / maxVal;
     if ( y2 > 0 ) {
@@ -327,6 +327,7 @@ void handleInputForm() {
   server.sendContent( formString(F("         <tr><TD></TD><td>Max Retry</td>"),      "distanceMaxRetry",     distanceMaxRetry,     F("         </tr>\n")));
   server.sendContent( formString(F("         <tr><TD></TD><td>Num Averaging</td>"),  "distanceNumAveraging", distanceNumAveraging, F("         </tr>\n")));
   server.sendContent( formString(F("         <tr><TD></TD>"),                               "debugDistance",        debugDistance,        F("         </tr >\n")));
+  sensorType2String(sensorType);
 
   server.sendContent( F("         <tr><td><br></td></tr>\n" ));
 
@@ -626,7 +627,8 @@ void initWebserver(ResultStorageHandler &newResultStorageHandler) {  // Register
   Serial.print("initWebserver ... ");
   resultStorageHandler = newResultStorageHandler;
   if ( ACTIVATE_WEBSERVER ) {
-    server.serveStatic("/favicon.png", SPIFFS, "/favicon.png");
+    // deprecated
+    // server.serveStatic("/favicon.png", SPIFFS, "/favicon.png");
     server.on("/", handleRoot);
     server.on("/distanceGraph.svg", deliverDistanceGraph);
     server.on("/scan-3D.scad", deliverScad);
