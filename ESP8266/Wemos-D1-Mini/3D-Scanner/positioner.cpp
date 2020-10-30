@@ -5,6 +5,11 @@
 
 #include <PCA9685.h>
 
+// #include <ESP8266WiFi.h>
+// #include <WiFiClient.h>
+// #include <ESP8266WebServer.h>
+
+
 
 #ifndef SERVO_PCA
 #define SERVO_PWM
@@ -28,15 +33,16 @@ const size_t loop_delay = 100;
 const uint8_t channelAz = 0;
 const uint8_t channelEl = 1;
 
+// These Values are set in setPulseReferences()
 float servoAzRef1Grad  =   90;
-float servoAzRef1Pulse = 2380;
+float servoAzRef1Pulse = 2220;
 float servoAzRef2Grad  =  -90;
-float servoAzRef2Pulse =  750;
+float servoAzRef2Pulse =  900;
 
 float servoElRef1Grad  =  180;
-float servoElRef1Pulse =  555;
+float servoElRef1Pulse =  900;
 float servoElRef2Grad  =    0;
-float servoElRef2Pulse = 2300;
+float servoElRef2Pulse = 2200;
 
 
 
@@ -77,10 +83,10 @@ void pwmServoSet(PolarCoordinate position) {
 void initPositionerPWM() {
   Serial.println(F("Initialize Normal PWM Servos ..."));
   Serial.println("Attaching Servo ...");
-  
+
   Serial.print(F("AZ-Servo to Pin ")); Serial.print(PIN_SERVO_AZ); Serial.println();
   servo_az.attach(PIN_SERVO_AZ);  // attaches the servo
-  
+
   Serial.print(F("EL-Servo to Pin ")); Serial.print(PIN_SERVO_EL); Serial.println();
   servo_el.attach(PIN_SERVO_EL);  // attaches the servo
 }
@@ -125,8 +131,30 @@ void servo_move(PolarCoordinate position) {
 }
 
 
+void setPulseReferences() {
+  //  String chipId = String(ESP_getChipId(), HEX);
+  //  Serial.print(F("chipId: "));  Serial.print(chipId);  Serial.println();
+
+  if (0)  { // Scanner Thomas
+    servoAzRef1Pulse = 2380;
+    servoAzRef2Pulse =  750;
+    servoElRef1Pulse =  555;
+    servoElRef2Pulse = 2300;
+  }
+
+  // Scanner Joerg
+  if (1) {
+    servoAzRef1Pulse = 2200;
+    servoAzRef2Pulse =  560;
+    servoElRef1Pulse =  470;
+    servoElRef2Pulse = 2450;
+  }
+}
 
 void initPositioner() {
+
+  setPulseReferences();
+  
 #ifdef SERVO_PCA
   initPositionerPCA();
 #else
