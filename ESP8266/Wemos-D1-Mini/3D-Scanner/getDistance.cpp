@@ -33,12 +33,15 @@ bool debugDistance = false;
 /**
    delay before measuring
 */
-int preMeasureDelay = 5;
+int preMeasureDelay = 10;
 
 /**
    Number of Measurements to take for everagint
 */
-int distanceNumAveraging = 1;
+int distanceNumAveraging = 3;
+
+
+
 
 SensorTypes sensorType = LIDAR_LITE;
 
@@ -58,16 +61,32 @@ void initDistance() {
 String sensorType2String( SensorTypes sensorType ) {
   switch ( sensorType ) {
     case ULTRASONIC:
-      return(F("Ultrasonic HC-SR04"));
+      return (F("Ultrasonic HC-SR04"));
       break;
     case LIDAR_LITE:
-      return(F("Garmin Lidar Lite"));
+      return (F("Garmin Lidar Lite"));
       break;
     case TF_LUNA:
-      return(F("TF Lnua"));
+      return (F("TF Lnua"));
       break;
   };
   return "Unknown Sensor";
+}
+
+#define numAvgBuffer 10
+short avgBuffer[numAvgBuffer];
+int addAvgBuffer(int value) {
+  int result = avgBuffer[numAvgBuffer - 1];
+  for (int i = 0; i < numAvgBuffer - 1; i++) {
+    avgBuffer[i] = avgBuffer[i + 1];
+  }
+  avgBuffer[numAvgBuffer ] = value;
+  
+  for (int i = 0; i < numAvgBuffer ; i++) {
+    avgBuffer[i] ;
+  }
+
+  return result;
 }
 
 int getDistance(bool debugDistance) {
@@ -93,6 +112,7 @@ int getDistance(bool debugDistance) {
 
     if (dist_mm > 0) {
       dist_mm_avg += dist_mm;
+    int result=    addAvgBuffer(dist_mm);
       avgCount++;
     }
   }

@@ -14,7 +14,8 @@
 
 #include "sdCardWrite.h"
 
-#define SIZE_2D_GRAPH 600
+int graph2DsvgSize = 800;
+
 
 ESP8266WebServer server(80);
 
@@ -90,6 +91,7 @@ bool handleParameters() {
   changes |= parseParameter(server, "servoElRef2Grad", servoElRef2Grad  );
   changes |= parseParameter(server, "servoElRef2Pulse", servoElRef2Pulse );
 
+  changes |= parseParameter(server, "graph2DsvgSize", graph2DsvgSize );
   return changes;
 }
 
@@ -123,7 +125,7 @@ void deliverDistanceGraph() {
 
   for ( int i = 0; i < resultStorageHandler.maxValidIndex(); i++) {
     PolarCoordinate position = resultStorageHandler.getPosition(i);
-//    int el = position.el;
+    //    int el = position.el;
     int az = position .az;
     int y2 = resultStorageHandler.getResult(i) * height / maxVal;
     if ( y2 > 0 ) {
@@ -208,8 +210,8 @@ void handleRoot() {
     {
       // Room Layout img Reference
       output += "\n";
-      output += "      <div style=\"float:left; height:" + String( SIZE_2D_GRAPH + 120 ) + "; width:" + String(SIZE_2D_GRAPH + 20) + "\">\n";
-      output += "          <iframe height=" + String( SIZE_2D_GRAPH + 60) + " width=" + String(SIZE_2D_GRAPH + 20) + " frameBorder=\"0\"  hspace=\"0\" vspace=\"0\" marginheight=\"0\" \"\n";
+      output += "      <div style=\"float:left; height:" + String( graph2DsvgSize + 120 ) + "; width:" + String(graph2DsvgSize + 20) + "\">\n";
+      output += "          <iframe height=" + String( graph2DsvgSize + 60) + " width=" + String(graph2DsvgSize + 20) + " frameBorder=\"0\"  hspace=\"0\" vspace=\"0\" marginheight=\"0\" \"\n";
       output += "          src=\"/roomLayout.html\" />\n";
       output += "          </iframe>\n";
       output += "      </div>\n";
@@ -217,26 +219,26 @@ void handleRoot() {
 
     server.sendContent(output); output = "";
 
-    {
-      // HTML Forms
-      //output += "      <div style=\"text-align:right; margin: 8px;\">\n";
-      output += F("   <iframe height=100%   width=700 src=\"inputForm.html\" />\n");
-      //output +=           inputForm();
-      //output += "      </div>\n\n";
-    }
-    server.sendContent(output); output = "";
 
-    output += F("    </div>\n"
-                "\n");
-    server.sendContent(output); output = "";
-  }
+    // HTML input Form
+    server.sendContent(
+      F("   <iframe height=300 width=500 src=\"inputForm.html\" />\n"
+       ));
+   
+    // End DIV
+    server.sendContent(
+      F("< / div > \n"
+        "\n"
+       ));
+  
+  } // ... DIV
 
 
 
   // Distances Graf img reference
 
   server.sendContent(F( "\n"
-                        "       <div style=\"float:left; margin:8px;\">\n"
+                        "       < div style = \"float:left; margin:8px;\">\n"
                         "          <p>Distances:<p/>\n"
                         "          <img src=\"/deliverDistanceGraph.svg\" />\n"
                         "       </div>\n"
@@ -259,14 +261,13 @@ void handleStartNewScan() {
   server.send(200, "text/html", "<html>New Scan started</html>");
 }
 
-/**
-   Separate Frame for input FOrm
-*/
+
 void handleInputForm() {
   Serial.print("handleInputForm ... ");
 
   if (   handleParameters()) {
     resultStorageHandler.resetResults();
+    currentResultArrayIndex = 0;
   }
 
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);   //Enable Chunked Transfer
@@ -310,6 +311,77 @@ void handleInputForm() {
   server.sendContent(F("      </TR>\n"
                        "\n"
                       ));
+  server.sendContent( formString("", "servoStepActive",      servoStepActive,   ""));
+
+  server.sendContent( F( "  </table>\n"));
+  String output = "";
+  {
+    output += "  <div style=\"text-align:left; margin:8px;\">\n";
+
+    // Link to Documentation
+    output +=  F("<a href=\"https://github.com/JoergOstertag/projects/blob/master/ESP8266/Wemos-D1-Mini/3D-Scanner/README.md\"  target=\"_blank\">"
+                 "Documentation"
+                 "</a><br/>\n");
+
+    output += F("      <a href=\"/scan-3D.scad\"        target=\"_blank\">        scan-3D.scad</a>    <br/>\n\n");
+    output += F("      <a href=\"/scan.csv\"            target=\"_blank\">        scan.csv</a>        <br/>\n\n");
+    output += F("      <a href=\"/distanceGraph.svg\"   target=\"distanceGraph\"> distanceGraph.svg</a><br/>\n\n");
+    output += F("      <a href=\"/configuration.html\"  target=\"configuration\"> configuration.html</a><br/>\n\n");
+    output += "   </div>\n\n";
+  }
+  server.sendContent(output); output = "";
+
+
+  server.sendContent( F( "    </div>\n\n"
+                         "   </div>\n\n"
+                         " </body>\n\n"
+                         "</html>\n"));
+  server.chunkedResponseFinalize();
+
+
+  Serial.println("DONE");
+  server.send(200, "text/html", "<html>handleInputForm Write done</html>");
+}
+
+/**
+   Separate Frame for input Form
+*/
+void handleConfigurationHtml() {
+  Serial.print("handleConfigurationHtml ... ");
+
+  if (   handleParameters()) {
+    resultStorageHandler.resetResults();
+    currentResultArrayIndex = 0;
+  }
+
+  server.setContentLength(CONTENT_LENGTH_UNKNOWN);   //Enable Chunked Transfer
+  server.send(200, "text/html", "");
+  server.sendContent( F("<html>\n"
+                        "<head>\n"
+                        "  <title>Parameters</title>\n"
+                        "  <style>\n"
+                        "    body {\n"
+                        "     background-color: #cccccc;\n"
+                        "     font-family: Arial, Helvetica, Sans-Serif;\n"
+                        "     Color: #000088;\n"
+                        "     }\n"
+                        "  </style>\n"
+                        "</head>\n\n"
+                        "\n"
+                        "<body>\n"
+                        "\n"
+                        " <div style=\"text-align:right; margin: 8px;\">\n"));
+
+  // border: 1px solid green;
+  server.sendContent( F("   <div style=\"text-align:left; margin:8px; \">\n"
+                        "     <form action=\"/configuration.html\">\n"
+                        "      <a href=\"/configuration.html\">Configuration:</a>\n"
+                        "      <input type=\"submit\" value=\"Submit\">\n"
+                       ));
+
+  server.sendContent( F("      <table>\n"
+                        "        <TR>\n"
+                        "            <TD>Az:</TD>"));
 
   PolarCoordinate maxPosition = resultStorageHandler.getPosition(resultStorageHandler.maxValidIndex());
 
@@ -346,6 +418,8 @@ void handleInputForm() {
   server.sendContent( formString( F("         <tr><td></td> "),                               "servoElRef2Grad",      servoElRef2Grad,     ""));
   server.sendContent( formString("",                                                          "servoElRef2Pulse",     servoElRef2Pulse,     F("         </tr> ")));
 
+  server.sendContent( formString( F("         <tr><td></td> "),                               "graph2DsvgSize", graph2DsvgSize, F("         </tr> ")));
+
   if ( false ) {
     server.sendContent( F("    <div class = \"slidecontainer\"> \n\n"
                           "          <input type=\"range\" min=\"1\" max=\"100\" value=\"50\" class=\"slider\" id=\"myRange\">\n\n"
@@ -355,8 +429,9 @@ void handleInputForm() {
   server.sendContent( F( "        </table>\n"
                          "     </form><br>\n"
 
-                         "<br/>"
-                         " <a href=\"/startNewScan\" target=\"command\"> start New Clean Scan</a><br/>"
+                         "<br/>"));
+
+  server.sendContent( F( " <a href=\"/startNewScan\" target=\"command\"> start New Clean Scan</a><br/>"
                          " <a href=\"/writeToSdCardCsv.cgi\"  target=\"command\"> write csv to SD Card</a><br/>"));
 
   server.sendContent( F( "   <table>\n"));
@@ -368,29 +443,6 @@ void handleInputForm() {
   server.sendContent( "         <tr><td>max Available ArrayIndex: </td><td>" + String(resultStorageHandler.maxAvailableArrayIndex) + "</td></tr>\n");
   server.sendContent( F( "  </table>\n"));
 
-  String output = "";
-  {
-    output += "  <div style=\"text-align:left; margin:8px;\">\n";
-
-    // Link to Documentation
-    output +=  F("<a href=\"https://github.com/JoergOstertag/projects/blob/master/ESP8266/Wemos-D1-Mini/3D-Scanner/README.md\"  target=\"_blank\">"
-                 "Documentation"
-                 "</a><br/>\n");
-
-    // Open Scad Reference
-    output += F("      <a href=\"/scan-3D.scad\" target=\"_blank\">scan-3D.scad</a><br/>\n\n");
-
-    // CSV Reference
-    output += F("      <a href=\"/scan.csv\"  target=\"_blank\">scan.csv</a><br/>\n\n");
-
-    // /distanceGraph.svg
-    output += F("      <a href=\"/distanceGraph.svg\"  target=\"_blank\">distanceGraph.svg</a><br/>\n\n");
-
-    output += "   </div>\n\n";
-  }
-  server.sendContent(output); output = "";
-
-
   server.sendContent( F( "    </div>\n\n"
                          "   </div>\n\n"
                          " </body>\n\n"
@@ -399,7 +451,7 @@ void handleInputForm() {
 
 
   Serial.println("DONE");
-  server.send(200, "text/html", "<html>CSV Write done</html>");
+  server.send(200, "text/html", "<html>configurationHtml Write done</html>");
 }
 
 
@@ -509,8 +561,8 @@ void deliverRoomLayoutSvg() {
   Serial.print("drawRoomLayout ... ");
   char temp[200];
 
-  int height = SIZE_2D_GRAPH;
-  int width  = SIZE_2D_GRAPH;
+  int height = graph2DsvgSize;
+  int width  = graph2DsvgSize;
 
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);   //Enable Chunked Transfer
   server.send(200, "image/svg+xml", "");
@@ -623,7 +675,7 @@ void serverHandleClient() {
   server.handleClient();
 }
 
-void initWebserver(ResultStorageHandler &newResultStorageHandler) {  // Register URLs to answer
+void initWebserver(ResultStorageHandler & newResultStorageHandler) { // Register URLs to answer
   Serial.print("initWebserver ... ");
   resultStorageHandler = newResultStorageHandler;
   if ( ACTIVATE_WEBSERVER ) {
@@ -636,6 +688,7 @@ void initWebserver(ResultStorageHandler &newResultStorageHandler) {  // Register
     server.on("/roomLayout.svg", deliverRoomLayoutSvg);
     server.on("/roomLayout.html", deliverRoomLayoutHtml);
     server.on("/inputForm.html", handleInputForm);
+    server.on("/configuration.html", handleConfigurationHtml);
     server.on("/file", handleFile);
     server.on("/writeToSdCardCsv.cgi", handleWriteToSdCardCsv);
     server.on("/startNewScan", handleStartNewScan);

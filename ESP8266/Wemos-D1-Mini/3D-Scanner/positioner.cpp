@@ -144,8 +144,8 @@ void setPulseReferences() {
 
   // Scanner Joerg
   if (1) {
-    servoAzRef1Pulse = 2200;
-    servoAzRef2Pulse =  560;
+    servoAzRef1Pulse =  560;
+    servoAzRef2Pulse = 2200;
     servoElRef1Pulse =  470;
     servoElRef2Pulse = 2450;
   }
