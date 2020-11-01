@@ -22,4 +22,9 @@ extern float servoElRef2Pulse;
 void initPositioner();
 void servo_move(PolarCoordinate position);
 
+
+// Laser to see where we currently measure
+void laser(int brightness);
+extern int laserIntensityMax;
+
 #endif

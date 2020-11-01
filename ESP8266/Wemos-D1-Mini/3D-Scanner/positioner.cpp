@@ -10,7 +10,7 @@
 // #include <ESP8266WebServer.h>
 
 
-
+// PCA9685 Servo board
 #ifndef SERVO_PCA
 #define SERVO_PWM
 #endif
@@ -55,6 +55,13 @@ void initPositionerPCA() {
 
 }
 
+
+int laserIntensityMax= 1;
+// Laser to see where we currently measure
+void laser(int brightness) {
+  pca9685.setChannelDutyCycle(2, brightness*laserIntensityMax/100, 0);
+}
+
 void pcaServoSet(PolarCoordinate position) {
   int servo_pulse_durationAz = map(position.az, servoAzRef1Grad, servoAzRef2Grad, servoAzRef1Pulse, servoAzRef2Pulse);
   int servo_pulse_durationEl = map(position.el, servoElRef1Grad, servoElRef2Grad, servoElRef1Pulse, servoElRef2Pulse);
@@ -64,6 +71,8 @@ void pcaServoSet(PolarCoordinate position) {
   }
   pca9685.setChannelServoPulseDuration(channelAz, servo_pulse_durationAz);
   pca9685.setChannelServoPulseDuration(channelEl, servo_pulse_durationEl);
+
+
   delay(loop_delay );
 }
 
@@ -154,7 +163,7 @@ void setPulseReferences() {
 void initPositioner() {
 
   setPulseReferences();
-  
+
 #ifdef SERVO_PCA
   initPositionerPCA();
 #else

@@ -28,6 +28,7 @@
 #include "timeHelper.h"
 
 #include "sdCardWrite.h"
+#include "groveLcd.h"
 
 ResultStorageHandler resultStorageHandler;
 
@@ -90,7 +91,6 @@ void loop() {
 
   measure();
 
-
   if ( currentResultArrayIndex >= (resultStorageHandler.maxValidIndex() - 1)) {
     sdCardWriteCSV(resultStorageHandler);
   }
@@ -104,18 +104,20 @@ void loop() {
     }
 
     servo_move(position);
-  }
 
+    groveLcdLoop(position);
+
+  }
 
   if (ACTIVATE_WEBSERVER) {
     serverHandleClient();
     MDNS.update();
   }
 
-  if (debugDistance || debugPosition || resultStorageHandler.debugResultPosition) {
-    if (servoStepActive) {
-      Serial.println();
-    }
+  if ( debugDistance || (( debugPosition || resultStorageHandler.debugResultPosition) &&
+                         servoStepActive)) {
+    Serial.println();
+
   }
 
 }
@@ -150,4 +152,9 @@ void setup() {
   }
 
   initWebserver(resultStorageHandler);
+
+  groveLcdSetup();
+
+
+
 }

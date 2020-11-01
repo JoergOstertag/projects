@@ -1,4 +1,3 @@
-#include "webServer.h"
 #include "config.h"
 
 #include <ESP8266WiFi.h>
@@ -92,6 +91,10 @@ bool handleParameters() {
   changes |= parseParameter(server, "servoElRef2Pulse", servoElRef2Pulse );
 
   changes |= parseParameter(server, "graph2DsvgSize", graph2DsvgSize );
+
+  parseParameter(server, "laserIntensityMax", laserIntensityMax);
+
+
   return changes;
 }
 
@@ -209,12 +212,10 @@ void handleRoot() {
     output += "  <h3><a href=\"/\">ESP8266 3D-Scanner</a></h3>\n";
     {
       // Room Layout img Reference
-      output += "\n";
-      output += "      <div style=\"float:left; height:" + String( graph2DsvgSize + 120 ) + "; width:" + String(graph2DsvgSize + 20) + "\">\n";
-      output += "          <iframe height=" + String( graph2DsvgSize + 60) + " width=" + String(graph2DsvgSize + 20) + " frameBorder=\"0\"  hspace=\"0\" vspace=\"0\" marginheight=\"0\" \"\n";
-      output += "          src=\"/roomLayout.html\" />\n";
-      output += "          </iframe>\n";
-      output += "      </div>\n";
+      output += "\n"
+                "      <div style=\"float:left; height:" + String( graph2DsvgSize + 120 ) + "; width:" + String(graph2DsvgSize + 20) + "\">\n"
+                "          <iframe height=" + String( graph2DsvgSize + 60) + " width=" + String(graph2DsvgSize + 20) + " src=\"/roomLayout.html\" frameBorder=\"0\"  hspace=\"0\" vspace=\"0\" marginheight=\"0\" ></iframe>\n"
+                "      </div>\n";
     }
 
     server.sendContent(output); output = "";
@@ -222,15 +223,16 @@ void handleRoot() {
 
     // HTML input Form
     server.sendContent(
-      F("   <iframe height=300 width=500 src=\"inputForm.html\" />\n"
+      F("   <iframe height=300 width=600 src=\"inputForm.html\" name=\"frame_input\"   frameBorder=\"2\"  hspace=\"2\" vspace=\"2\" marginheight=\"0\" ></iframe>\n"
+        "   <iframe height=100 width=600 src=\"unknown.html\"   name=\"frame_command\" frameBorder=\"2\"  hspace=\"2\" vspace=\"2\" marginheight=\"0\" ></iframe>\n"
        ));
-   
+
     // End DIV
     server.sendContent(
-      F("< / div > \n"
+      F("</div> \n"
         "\n"
        ));
-  
+
   } // ... DIV
 
 
@@ -323,7 +325,10 @@ void handleInputForm() {
                  "Documentation"
                  "</a><br/>\n");
 
-    output += F("      <a href=\"/scan-3D.scad\"        target=\"_blank\">        scan-3D.scad</a>    <br/>\n\n");
+    server.sendContent( F( " <a href=\"/startNewScan\"          target=\"frame_command\"> start New Clean Scan</a><br/>"
+                           " <a href=\"/writeToSdCardCsv.cgi\"  target=\"frame_command\"> write csv to SD Card</a><br/>"));
+
+    output += F("      <a href=\"/scan-3D.scad\"        target=\"frame_command\">        scan-3D.scad</a>    <br/>\n\n");
     output += F("      <a href=\"/scan.csv\"            target=\"_blank\">        scan.csv</a>        <br/>\n\n");
     output += F("      <a href=\"/distanceGraph.svg\"   target=\"distanceGraph\"> distanceGraph.svg</a><br/>\n\n");
     output += F("      <a href=\"/configuration.html\"  target=\"configuration\"> configuration.html</a><br/>\n\n");
@@ -396,21 +401,21 @@ void handleConfigurationHtml() {
 
   server.sendContent( F("         <tr><td>Distance</td>\n" ) );
   server.sendContent( formString(F("                      <td>pre Measure Delay</td>") ,      "preMeasureDelay",      preMeasureDelay,      F("         </tr>\n")));
-  server.sendContent( formString(F("         <tr><TD></TD><td>Max Retry</td>"),      "distanceMaxRetry",     distanceMaxRetry,     F("         </tr>\n")));
-  server.sendContent( formString(F("         <tr><TD></TD><td>Num Averaging</td>"),  "distanceNumAveraging", distanceNumAveraging, F("         </tr>\n")));
-  server.sendContent( formString(F("         <tr><TD></TD>"),                               "debugDistance",        debugDistance,        F("         </tr >\n")));
+  server.sendContent( formString(F("         <tr><TD></TD><td>Max Retry</td>"),               "distanceMaxRetry",     distanceMaxRetry,     F("         </tr>\n")));
+  server.sendContent( formString(F("         <tr><TD></TD><td>Num Averaging</td>"),           "distanceNumAveraging", distanceNumAveraging, F("         </tr>\n")));
+  server.sendContent( formString(F("         <tr><TD></TD>"),                                 "debugDistance",        debugDistance,        F("         </tr >\n")));
   sensorType2String(sensorType);
 
   server.sendContent( F("         <tr><td><br></td></tr>\n" ));
 
   server.sendContent( F("         <tr><td><br>Position: </td > \n" ));
-  server.sendContent( formString( F("                       "),                              "debugPosition",        debugPosition,     F("         </tr> ") ));
-  server.sendContent( formString( F("         <tr><TD></TD> "),                              "debugResultPosition",  resultStorageHandler.debugResultPosition ,     F(" </tr>\n")));
+  server.sendContent( formString( F("                       "),                               "debugPosition",        debugPosition,     F("         </tr> ") ));
+  server.sendContent( formString( F("         <tr><TD></TD> "),                               "debugResultPosition",  resultStorageHandler.debugResultPosition ,     F(" </tr>\n")));
 
   server.sendContent( formString( F("         <tr> <TD>Az: </TD> "),                          "servoAzRef1Grad",      servoAzRef1Grad,     ""));
   server.sendContent( formString("",                                                          "servoAzRef1Pulse",     servoAzRef1Pulse,     F("         </tr> \n")));
 
-  server.sendContent( formString( F("         <tr><td></td>"),                             "servoAzRef2Grad",      servoAzRef2Grad,     ""));
+  server.sendContent( formString( F("         <tr><td></td>"),                                "servoAzRef2Grad",      servoAzRef2Grad,     ""));
   server.sendContent( formString("",                                                          "servoAzRef2Pulse",     servoAzRef2Pulse,     F("         </tr> " )));
 
   server.sendContent( formString( F("         <tr> <TD>El: </TD> " ),                          "servoElRef1Grad",      servoElRef1Grad,     ""));
@@ -418,7 +423,9 @@ void handleConfigurationHtml() {
   server.sendContent( formString( F("         <tr><td></td> "),                               "servoElRef2Grad",      servoElRef2Grad,     ""));
   server.sendContent( formString("",                                                          "servoElRef2Pulse",     servoElRef2Pulse,     F("         </tr> ")));
 
-  server.sendContent( formString( F("         <tr><td></td> "),                               "graph2DsvgSize", graph2DsvgSize, F("         </tr> ")));
+  server.sendContent( formString( F("         <tr><td>graph2D svg Size</td> "),               "graph2DsvgSize", graph2DsvgSize, F("         </tr> ")));
+
+  server.sendContent( formString( F("         <tr><td>laser intensity Max</td> "),            "laserIntensityMax", laserIntensityMax, F("         </tr> ")));
 
   if ( false ) {
     server.sendContent( F("    <div class = \"slidecontainer\"> \n\n"
@@ -430,9 +437,6 @@ void handleConfigurationHtml() {
                          "     </form><br>\n"
 
                          "<br/>"));
-
-  server.sendContent( F( " <a href=\"/startNewScan\" target=\"command\"> start New Clean Scan</a><br/>"
-                         " <a href=\"/writeToSdCardCsv.cgi\"  target=\"command\"> write csv to SD Card</a><br/>"));
 
   server.sendContent( F( "   <table>\n"));
   server.sendContent( "         <tr><td>Max Elevation: </td><td>El: " + String(maxPosition.el)  + " , Az: " + String(maxPosition.az) + "</td></tr>\n");
@@ -648,7 +652,7 @@ void deliverRoomLayoutSvg() {
 void handleWriteToSdCardCsv() {
   Serial.println("handleWriteToSdCardCsv");
   sdCardWriteCSV(resultStorageHandler);
-  server.send(200, "image/svg+xml", "<html>Writing to SD Card Done</html>");
+  server.send(200, "text/html", "<html>Writing to SD Card Done</html>");
 }
 
 

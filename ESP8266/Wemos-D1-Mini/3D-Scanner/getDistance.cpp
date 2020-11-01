@@ -1,6 +1,7 @@
 #include "config.h"
 
 #include "getDistance.h"
+#include "positioner.h"
 
 #include "getDistanceVl53L0X.h"
 #include "getDistanceLidarLite.h"
@@ -81,7 +82,7 @@ int addAvgBuffer(int value) {
     avgBuffer[i] = avgBuffer[i + 1];
   }
   avgBuffer[numAvgBuffer ] = value;
-  
+
   for (int i = 0; i < numAvgBuffer ; i++) {
     avgBuffer[i] ;
   }
@@ -92,6 +93,8 @@ int addAvgBuffer(int value) {
 int getDistance(bool debugDistance) {
 
   delay(preMeasureDelay);
+
+  laser(100);
 
   int dist_mm_avg = 0;
   int avgCount = 0;
@@ -112,10 +115,12 @@ int getDistance(bool debugDistance) {
 
     if (dist_mm > 0) {
       dist_mm_avg += dist_mm;
-    int result=    addAvgBuffer(dist_mm);
+      int result =    addAvgBuffer(dist_mm);
       avgCount++;
     }
   }
+
+  laser(0);
 
   return dist_mm_avg / avgCount;
 }
