@@ -59,12 +59,12 @@ module showPart(part=0){
 
 
 module Adapter( ){ 
-    z=12;
+    z=16;
     x=40;
-    y=18;
+    y=14.8;
     
-    z2=5;
-    b2=3; // Seitlie border
+    z2=6;
+    b2=3.5; // Seitlie border
     
     boden=3;
     
@@ -78,11 +78,11 @@ module Adapter( ){
                 translate([0,0,boden]){
                     translate([-.1,b2,0])
                        rotate([0,-45,0])
-                            cube([z,y-2*b2,z2+.1]);
+                            cube([z,y-2*b2,2*z2+.1]);
 
                     translate([-.1+x,-b2+y,0])
                        rotate([0,-45,180])
-                            cube([z,y-2*b2,z2+.1]);
+                            cube([z,y-2*b2,2*z2+.1]);
                 }
     }
 }
