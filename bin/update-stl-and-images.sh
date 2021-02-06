@@ -13,6 +13,11 @@ if echo "$@" | grep -e '--no-png' ; then
 	DO_GENERATE_PNG=false
 fi
 
+DEBUG=false
+if echo "$@" | grep -e '--debug' -e '--verbose' ; then
+	DEBUG=true
+fi
+
 
 scadBin="/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD"
 if ! [ -s "$scadBin" ]; then
@@ -24,10 +29,12 @@ fi
 if ! [ -s "$scadBin" ]; then
     scadBin="/cygdrive/c/Program Files/OpenSCAD/openscad.exe"
 fi
-if ! [ -s "$scadBin" ]; then
+if ! [ -x "$scadBin" ]; then
 	echo "!!!!!!!! ERROR: missing Scad Binary"
 	exit -1;
 fi
+
+$DEBUG && echo "scadBin: $scadBin"
 
 ###################################################################
 

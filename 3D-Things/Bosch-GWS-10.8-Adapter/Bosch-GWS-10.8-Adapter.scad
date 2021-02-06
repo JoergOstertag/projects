@@ -5,9 +5,9 @@ debug=0;
 debugFrames=1*debug;
 
 // Select part to render/print
-part=0; // [ 0:All, 11:adapter d16mm h2.8 mit raste, 12: Adapter d15.7mm h3.4 ohne raste]
+part=0; // [ 0:All, 11:adapter d16mm h2.8 mit raste, 12: Adapter d15.7mm h3.4 ohne raste, 13:adapter d16mm h3.6 mit raste]
 // Not working:
-// , 13: Adapter d20mm h2.4 ohne raste, 14: Adapter d19.8mm h8.4 ohne raste]
+// , 14: Adapter d20mm h2.4 ohne raste, 15: Adapter d19.8mm h8.4 ohne raste]
 
 // Border for walls 
 border=1.3;
@@ -49,9 +49,10 @@ module showPart(part=0){
     // Part Ids for Debugging
 	if ( part == 11) Adapter(d=16,withRecess=1,h=2.8);
 	if ( part == 12) Adapter(d=15.7,withRecess=0,h=3.4);
- 	// Not working:
-    // if ( part == 13) Adapter(d=20.0,withRecess=0,h=2.4); 
-    // if ( part == 14) Adapter(d=19.8,withRecess=0,h=8.4);
+ 	if ( part == 13) Adapter(d=16,withRecess=1,h=3.4);
+	// Not working: The default screw falls through
+    // if ( part == 14) Adapter(d=20.0,withRecess=0,h=2.4); 
+    // if ( part == 15) Adapter(d=19.8,withRecess=0,h=8.4);
     
 	
     if ( debug ) {
