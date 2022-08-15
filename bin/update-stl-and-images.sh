@@ -12,11 +12,11 @@ fi
 if echo "$@" | grep -e '--no-png' ; then
 	DO_GENERATE_PNG=false
 fi
-
 DEBUG=false
 if echo "$@" | grep -e '--debug' -e '--verbose' ; then
-	DEBUG=true
+    DEBUG=true
 fi
+
 
 
 scadBin="/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD"
@@ -27,9 +27,12 @@ if ! [ -s "$scadBin" ]; then
     scadBin="/usr/bin/openscad"
 fi
 if ! [ -s "$scadBin" ]; then
+    scadBin="/usr/bin/openscad-nightly"
+fi
+if ! [ -s "$scadBin" ]; then
     scadBin="/cygdrive/c/Program Files/OpenSCAD/openscad.exe"
 fi
-if ! [ -x "$scadBin" ]; then
+if ! [ -s "$scadBin" ]; then
 	echo "!!!!!!!! ERROR: missing Scad Binary"
 	exit -1;
 fi
@@ -162,6 +165,7 @@ cat /tmp/scadDirectories.txt | while read dir; do
 	
 	echo 
 	echo "Generate $dir/README-img.md"
+	mkdir -p img
 	find img -name "*.png" -o -name "*.jpg" | while read f ; do
 	    name=`basename "$f"`
 	    name="${name%.png}"
