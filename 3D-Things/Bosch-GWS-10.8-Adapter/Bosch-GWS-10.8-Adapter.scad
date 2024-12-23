@@ -5,9 +5,9 @@ debug=0;
 debugFrames=1*debug;
 
 // Select part to render/print
-part=0; // [ 0:All, 11:adapter d16mm h2.8 mit raste, 12: Adapter d15.7mm h3.4 ohne raste, 13:adapter d16mm h3.6 mit raste]
+part=0; // [ 0:All, 11:adapter d16mm h2.8 mit raste, 12: Adapter d15.7mm h3.4 ohne raste, 13:adapter d16.2mm h3.6 mit raste=3mm, 14:adapter d=12.6 h=10.3 ohne raste, 15:adapter d=16.3 h=3.0 ohne Raste ]
 // Not working:
-// , 14: Adapter d20mm h2.4 ohne raste, 15: Adapter d19.8mm h8.4 ohne raste]
+// , 31: Adapter d20mm h2.4 ohne raste, 32: Adapter d19.8mm h8.4 ohne raste]
 
 // Border for walls 
 border=1.3;
@@ -47,12 +47,14 @@ module showPart(part=0){
     
  
     // Part Ids for Debugging
-	if ( part == 11) Adapter(d=16,withRecess=1,h=2.8);
-	if ( part == 12) Adapter(d=15.7,withRecess=0,h=3.4);
- 	if ( part == 13) Adapter(d=16,withRecess=1,h=3.4);
+	if ( part == 11) Adapter(d=16,  h=2.8, withRecess=1);
+	if ( part == 12) Adapter(d=15.7,h=3.4, withRecess=0);
+ 	if ( part == 13) Adapter(d=16.2,h=3.4, withRecess=1,recessWidth=3);
+	if ( part == 14) Adapter(d=12.6,h=10.3,withRecess=0,recessWidth=3);
+	if ( part == 15) Adapter(d=16.3,h=3.0, withRecess=0,recessWidth=3);
 	// Not working: The default screw falls through
-    // if ( part == 14) Adapter(d=20.0,withRecess=0,h=2.4); 
-    // if ( part == 15) Adapter(d=19.8,withRecess=0,h=8.4);
+    // if ( part == 31) Adapter(d=20.0,withRecess=0,h=2.4); 
+    // if ( part == 32) Adapter(d=19.8,withRecess=0,h=8.4);
     
 	
     if ( debug ) {
@@ -68,7 +70,8 @@ module showPart(part=0){
 module Adapter(
     h=2.8, // max << 7mm since screw is only 9mm 
     d=15.7,
-    withRecess=0
+    withRecess=0,
+    recessWidth=3.5
 ){ 
     
     difference(){
@@ -76,8 +79,8 @@ module Adapter(
         // innerhalb des Werkzeuges
         union(){ // recess/Aussparung/Lasche
             if(withRecess)
-                translate([d/2-.2,-3.8/2,-.01])
-                    cube([2.5,3.5,h]);
+                translate([d/2-.2,-recessWidth/2,-.01])
+                    cube([2.5,recessWidth,h]);
             
             cylinder(d=d,h=h+.1);
             
@@ -98,7 +101,7 @@ module Adapter(
 
  
 module Screw(){
-    cylinder(d=4.9,h=11.5);
+    cylinder(d=4.98,h=11.5);
     difference(){
         cylinder(d=19.5,h=3.4);
         translate([0,0,3.4-.6+.01])
